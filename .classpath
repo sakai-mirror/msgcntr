@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry sourcepath="JRE_SRC" kind="var" path="JRE_LIB"/>
 	<classpathentry kind="src" path="messageforums-api/src/java"/>
+	<classpathentry kind="src" path="messageforums-component-shared/test"/>
 	<classpathentry kind="src" path="messageforums-app/src/webapp/WEB-INF"/>
 	<classpathentry kind="src" path="messageforums-app/src/java"/>
 	<classpathentry kind="src" path="messageforums-component-shared/src/java"/>
@@ -21,5 +22,13 @@
 	<classpathentry kind="var" path="MAVEN_REPO/commons-lang/jars/commons-lang-2.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jsf"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
+	<classpathentry kind="var" path="MAVEN_REPO/junit/jars/junit-3.8.1.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/jta/jars/jta-h2.1.8.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/dom4j/jars/dom4j-1.6.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/commons-collections/jars/commons-collections-2.1.1.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/odmg/jars/odmg-3.0.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/ehcache/jars/ehcache-1.1.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/cglib/jars/cglib-full-2.0.2.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/aopalliance/jars/aopalliance-1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
