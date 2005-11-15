@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry sourcepath="JRE_SRC" kind="var" path="JRE_LIB"/>
 	<classpathentry kind="src" path="messageforums-api/src/java"/>
 	<classpathentry kind="src" path="messageforums-component-shared/test"/>
 	<classpathentry kind="src" path="messageforums-app/src/webapp/WEB-INF"/>
 	<classpathentry kind="src" path="messageforums-app/src/java"/>
 	<classpathentry kind="src" path="messageforums-component-shared/src/java"/>
-	<classpathentry kind="var" path="MAVEN_REPO/jsf/jars/jsf-impl-1.1.01.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/jsf/jars/jsf-api-1.1.01.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/jspapi/jars/jsp-api-2.0-20040521.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/servletapi/jars/servletapi-2.4-20040521.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/commons-fileupload/jars/commons-fileupload-1.0.jar"/>
-	<classpathentry kind="src" path="/legacy"/>
-	<classpathentry kind="src" path="/kernel"/>
-	<classpathentry kind="var" path="MAVEN_REPO/hibernate/jars/hibernate-2.1.8.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/springframework/jars/spring-1.1.5.jar"/>
-	<classpathentry kind="src" path="/legacy-service"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/util"/>
-	<classpathentry kind="var" path="MAVEN_REPO/xerces/jars/xercesImpl-2.6.2.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/commons-logging/jars/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/commons-lang/jars/commons-lang-2.0.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jsf"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/admin-tools"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/high-util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jsf"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/kernel"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/legacy"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/legacy-service"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/login"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/metaobj"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/osid"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/portal"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/preferences"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/presentation"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/profile"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/providers"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/reference"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/roster"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scheduler"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sections"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/tool_config"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/webservices"/>
 	<classpathentry kind="var" path="MAVEN_REPO/junit/jars/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/jta/jars/jta-h2.1.8.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/dom4j/jars/dom4j-1.6.jar"/>
