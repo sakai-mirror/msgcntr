@@ -219,7 +219,11 @@ public class DiscussionForumTool
   public DiscussionForumTool()
   {
     LOG.debug("DiscussionForumTool()");
-    ;
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.threadedview")))
+    {
+    	threaded = true;
+    	selectedMessageView = THREADED_VIEW;
+    }
   }
 
   /**
@@ -612,6 +616,11 @@ public class DiscussionForumTool
       DiscussionForum forum = forumManager.createForum();
       selectedForum = null;
       selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
+      if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+      {
+      	selectedForum.setReadFullDesciption(true);
+      }
+
       setNewForumBeanAssign();
       
       return FORUM_SETTING_REVISE;
@@ -645,6 +654,11 @@ public class DiscussionForumTool
       return MAIN;
     }
     selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	selectedForum.setReadFullDesciption(true);
+    }
+
     setForumBeanAssign();
     
     return FORUM_SETTING;
@@ -902,6 +916,11 @@ public class DiscussionForumTool
     setSelectedForumForCurrentTopic(topic);
     selectedTopic = new DiscussionTopicBean(topic, selectedForum.getForum(),
         uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	selectedTopic.setReadFullDesciption(true);
+    }
+
     setTopicBeanAssign();
     
     if(!uiPermissionsManager.isChangeSettings(selectedTopic.getTopic(),selectedForum.getForum()))
@@ -1121,6 +1140,11 @@ public class DiscussionForumTool
     }
     selectedTopic = new DiscussionTopicBean(topic, selectedForum.getForum(),
         uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	selectedTopic.setReadFullDesciption(true);
+    }
+
     setTopicBeanAssign();
     
     return TOPIC_SETTING;
@@ -1272,6 +1296,10 @@ public class DiscussionForumTool
     setSelectedForumForCurrentTopic(topic);
     selectedTopic = new DiscussionTopicBean(topic, selectedForum.getForum(),
         uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	selectedTopic.setReadFullDesciption(true);
+    }
     setTopicBeanAssign();
     String currentForumId = getExternalParameterByKey(FORUM_ID);
     if (currentForumId != null && (!currentForumId.trim().equals(""))
@@ -1397,6 +1425,10 @@ public class DiscussionForumTool
     forum = forumManager.getForumByIdWithTopics(forum.getId());
     DiscussionForumBean decoForum = new DiscussionForumBean(forum,
         uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	decoForum.setReadFullDesciption(true);
+    }
     List temp_topics = forum.getTopics();
     if (temp_topics == null)
     {
@@ -1419,6 +1451,11 @@ public class DiscussionForumTool
         {
           DiscussionTopicBean decoTopic = new DiscussionTopicBean(topic, forum,
               uiPermissionsManager, forumManager);
+          if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+          {
+          	decoTopic.setReadFullDesciption(true);
+          }
+
           decoTopic.setTotalNoMessages(forumManager.getTotalNoMessages(topic));
           decoTopic.setUnreadNoMessages(forumManager.getUnreadNoMessages(topic));
           decoForum.addTopic(decoTopic);
@@ -1563,6 +1600,10 @@ public class DiscussionForumTool
     }
     DiscussionTopicBean decoTopic = new DiscussionTopicBean(topic,
         selectedForum.getForum(), uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	decoTopic.setReadFullDesciption(true);
+    }
     decoTopic.setTotalNoMessages(forumManager.getTotalNoMessages(topic));
     decoTopic.setUnreadNoMessages(forumManager.getUnreadNoMessages(topic));
     decoTopic.setHasNextTopic(forumManager.hasNextTopic(topic));
@@ -1714,6 +1755,11 @@ public class DiscussionForumTool
       return null;
     }
     selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	selectedForum.setReadFullDesciption(true);
+    }
+
     setForumBeanAssign();
     
     DiscussionTopic topic = forumManager.createTopic(forum);
@@ -1723,9 +1769,19 @@ public class DiscussionForumTool
       return null;
     }
     selectedTopic = new DiscussionTopicBean(topic, forum, uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	selectedTopic.setReadFullDesciption(true);
+    }
+
     setNewTopicBeanAssign();
     
     DiscussionTopicBean thisDTB = new DiscussionTopicBean(topic, forum, uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	thisDTB.setReadFullDesciption(true);
+    }
+
     setNewTopicBeanAssign(selectedForum, thisDTB);
     return thisDTB;
     //return new DiscussionTopicBean(topic, forum, uiPermissionsManager, forumManager);
@@ -3745,6 +3801,11 @@ public class DiscussionForumTool
       }
     }
     selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
+    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+    {
+    	selectedForum.setReadFullDesciption(true);
+    }
+
     setForumBeanAssign();
   }
 
