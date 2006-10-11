@@ -49,7 +49,7 @@
 
 
 		<h:dataTable id="topics" styleClass="listHier" value="#{ForumTool.selectedForum.topics}" var="topic">
-			<h:column>
+			<h:column rendered="#{! topic.nonePermission}">
         <h:panelGrid columns="2" summary="" width="100%">
           <h:panelGroup>
 				    <h:commandLink action="#{ForumTool.processActionDisplayTopic}" id="topic_title" value="#{topic.topic.title}" title=" #{topic.topic.title}">

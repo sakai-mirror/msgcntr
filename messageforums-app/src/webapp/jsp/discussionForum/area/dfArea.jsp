@@ -9,7 +9,7 @@
 
 
   <h:dataTable id="forums" value="#{ForumTool.forums}" width="100%" var="forum">
-    <h:column>
+    <h:column rendered="#{! forum.nonePermission}">
     
     <h:panelGrid columns="2" styleClass="msgHeadings" summary="">
   	    <h:panelGroup>
@@ -74,7 +74,7 @@
 	  </h:dataTable>
 
 		 <h:dataTable id="topics" value="#{forum.topics}" var="topic" width="100%">
-		   <h:column>
+		   <h:column rendered="#{! topic.nonePermission}">
 		      <h:panelGrid columns="2" summary="" width="100%">
     	        <h:panelGroup styleClass="indnt2">
     	          <h:outputText styleClass="msgDraft" id="draft" value="#{msgs.cdfm_draft}" rendered="#{topic.topic.draft == 'true'}"/>
