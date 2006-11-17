@@ -32,5 +32,6 @@
 	<classpathentry kind="var" path="MAVEN_REPO/aopalliance/jars/aopalliance-1.0.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/log4j/jars/log4j-1.2.9.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/commons-beanutils/jars/commons-beanutils-1.7.0.jar"/>
+	<classpathentry kind="src" path="/gradebook"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
