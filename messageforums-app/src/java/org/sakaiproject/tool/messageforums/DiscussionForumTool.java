@@ -3656,4 +3656,16 @@ public class DiscussionForumTool {
 	public void setGradebookExist(boolean gradebookExist) {
 		this.gradebookExist = gradebookExist;
 	}
+	
+	// UCD
+	// BugFix: UCD SAK-128 and SAKAI SAK-5945
+	public List getMessages() {
+		
+		if(displayUnreadOnly) {
+			return selectedTopic.getUnreadMessages();
+		}
+		else {
+			return selectedTopic.getMessages();
+		}
+	}
 }

@@ -162,6 +162,24 @@ public class DiscussionTopicBean
   {
     return messages;
   }
+  
+  // UCD
+  // BugFix: UCD SAK-128 and SAKAI SAK-5945
+  public List getUnreadMessages() {
+	  
+	  ArrayList readMessages = new ArrayList();
+	  
+	  for(int i = 0; i < messages.size(); i++) {
+		  
+		  if(!((DiscussionMessageBean) messages.get(i)).isRead()) {
+			  
+			  readMessages.add(messages.get(i));
+			
+		  }
+	  }
+	  
+	  return readMessages;
+  }
 
   public void setMessages(List messages)
   {
