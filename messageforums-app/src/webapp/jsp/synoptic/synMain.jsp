@@ -10,9 +10,6 @@
 	<h:form>
 	  <sakai:script contextBase="/sakai-messageforums-tool" path="/js/popupscripts.js"/>
 	  <h:panelGroup rendered="#{mfSynopticBean.myWorkspace}" > 
-       <sakai:tool_bar>
-          <sakai:tool_bar_item action="#{mfSynopticBean.processGotoOptions}" value="#{msgs.syn_options}" />
-       </sakai:tool_bar>
 
 	<h:outputText value="#{msgs.syn_no_sites}" rendered="#{! mfSynopticBean.sitesToView}" />
 
@@ -108,9 +105,9 @@
 				<h:outputText value="  " rendered="true" />
 
 	 			<h:commandLink action="synMain" actionListener="#{mfSynopticBean.processReadAll}" styleClass="active">
-					<h:graphicImage id="waveImg" url="/images/silk/email_edit.png" 
-						onmouseover="showPopupHere(this,'markAsRead'); ImageRollOver(this, '/sakai-messageforums-tool/images/silk/email_open.png');"
-						onmouseout="hidePopup('markAsRead'); ImageRollOver(this, '/sakai-messageforums-tool/images/silk/email_edit.png');" />
+					<h:graphicImage id="waveImg" url="/images/silk/email_edit.png" title="#{msgs.syn_mark_as_read}" 
+						onmouseover="ImageRollOver(this, '/sakai-messageforums-tool/images/silk/email_open.png');"
+						onmouseout="ImageRollOver(this, '/sakai-messageforums-tool/images/silk/email_edit.png');" />
 					<f:param name="contextId" value="#{eachSite.siteId}" />
 			</h:commandLink>
 			</h:panelGroup>
