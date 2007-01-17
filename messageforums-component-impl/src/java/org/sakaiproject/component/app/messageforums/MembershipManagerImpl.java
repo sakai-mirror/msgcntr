@@ -77,15 +77,19 @@ public class MembershipManagerImpl implements MembershipManager{
   }
 
   /**
-   * Filters out users whose Privacy Status is set to Hidden
+   * sets users' privacy status so can be filtered out
    * 
-   * @param all
-   * @return
+   * @param allCourseUsers - used to get user ids so can call PrivacyManager
+   * @param courseUserMap - map of all course users
+   * 
+   * @return Map of all course users with privacy status set
    */
   private Map filterByPrivacyManager(List allCourseUsers, Map courseUserMap) {
 	  
 	  List userIds = new ArrayList();
 	  Map results = new HashMap();
+
+	  Collection userCollection = courseUserMap.values();
 
 	  for (Iterator usersIter = allCourseUsers.iterator(); usersIter.hasNext();) {
 		  MembershipItem memberItem = (MembershipItem) usersIter.next();
@@ -94,27 +98,18 @@ public class MembershipManagerImpl implements MembershipManager{
 			  userIds.add(memberItem.getUser().getId());    
 		  }
 	  }
-	  
-	  // only allow private messages to be sent to users with Visible privacy status
-	  // Instructors should see all users
-	  Set memberSet = null;
-	  
-	  if (securityService.unlock(userDirectoryService.getCurrentUser(), "site.upd", getContextSiteId())) {
-		  return courseUserMap;
-	  }
-	  else {
-		  memberSet = privacyManager.findViewable(
-				  			("/site/" + toolManager.getCurrentPlacement().getContext()), new HashSet(userIds));
-	  }
-	 
 
-	  Collection userCollection = courseUserMap.values();
-		
+	  // set privacy status
+	  Set memberSet = null;		  
+
+	  memberSet = privacyManager.findViewable(
+			  			("/site/" + toolManager.getCurrentPlacement().getContext()), new HashSet(userIds));
+	  
 	  /** look through the members again to pick out Member objects corresponding
-		  to only those who are visible (as well as current user) */
+	  		to only those who are visible (as well as current user) */
 	  for (Iterator userIterator = userCollection.iterator(); userIterator.hasNext();) {
 		  MembershipItem memberItem = (MembershipItem) userIterator.next();
-					  
+				  
 		  if (memberItem.getUser() != null) {
 			  memberItem.setViewable(memberSet.contains(memberItem.getUser().getId()));
 		  }
@@ -122,7 +117,7 @@ public class MembershipManagerImpl implements MembershipManager{
 			  // want groups to be displayed
 			  memberItem.setViewable(true);
 		  }
-
+		  
 		  results.put(memberItem.getId(), memberItem);
 	  }
 		
@@ -253,7 +248,8 @@ public class MembershipManagerImpl implements MembershipManager{
       	}
       } catch (UserNotDefinedException e) {
 		// TODO Auto-generated catch block
-		e.printStackTrace();
+    	// e.printStackTrace();
+    	LOG.warn(" User " + userId + " not defined");
 	}            
       
       if(user != null)

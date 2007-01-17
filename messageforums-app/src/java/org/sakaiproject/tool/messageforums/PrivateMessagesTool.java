@@ -52,6 +52,7 @@ import org.sakaiproject.api.app.messageforums.PrivateMessage;
 import org.sakaiproject.api.app.messageforums.PrivateMessageRecipient;
 import org.sakaiproject.api.app.messageforums.PrivateTopic;
 import org.sakaiproject.api.app.messageforums.Topic;
+import org.sakaiproject.api.app.messageforums.PrivateMessage;
 import org.sakaiproject.api.app.messageforums.ui.PrivateMessageManager;
 import org.sakaiproject.api.common.edu.person.SakaiPersonManager;
 import org.sakaiproject.authz.api.Member;
@@ -69,6 +70,7 @@ import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.tool.messageforums.ui.PrivateForumDecoratedBean;
 import org.sakaiproject.tool.messageforums.ui.PrivateMessageDecoratedBean;
 import org.sakaiproject.tool.messageforums.ui.PrivateTopicDecoratedBean;
+import org.sakaiproject.tool.messageforums.ui.DecoratedAttachment;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.cover.UserDirectoryService;
@@ -103,6 +105,7 @@ public class PrivateMessagesTool
   private static final String SELECT_MSG_RECIPIENT = "pvt_select_msg_recipient";
   private static final String CONFIRM_MSG_DELETE = "pvt_confirm_msg_delete";
   private static final String ENTER_SEARCH_TEXT = "pvt_enter_search_text";
+  private static final String MOVE_MSG_ERROR = "pvt_move_msg_error";
   /**
    *Dependency Injected 
    */
@@ -121,6 +124,7 @@ public class PrivateMessagesTool
   public static final String DISPLAY_MESSAGES_PG="pvtMsg";
   public static final String SELECTED_MESSAGE_PG="pvtMsgDetail";
   public static final String COMPOSE_MSG_PG="compose";
+  public static final String COMPOSE_FROM_PG="msgForum:mainOrHp";
   public static final String MESSAGE_SETTING_PG="pvtMsgSettings";
   public static final String MESSAGE_FOLDER_SETTING_PG="pvtMsgFolderSettings";
   public static final String SEARCH_RESULT_MESSAGES_PG="pvtMsgEx";
@@ -195,6 +199,9 @@ public class PrivateMessagesTool
   //message header screen
   private String searchText="";
   private String selectView;
+  
+  //return to previous page after send msg
+  private String fromMainOrHp = null;
   //////////////////////
   /** The configuration mode, received, sent,delete, case etc ... */
   public static final String STATE_PVTMSG_MODE = "pvtmsg.mode";
@@ -635,22 +642,23 @@ public class PrivateMessagesTool
 
   public List getTotalComposeToList()
   { 
-    
-    /** just need to refilter */
-    if (totalComposeToList != null){
-        List selectItemList = new ArrayList();
+    // if user has site.upd, then don't filter
+  	final boolean noFilter = SecurityService.unlock(UserDirectoryService.getCurrentUser(), "site.upd", getContextSiteId());
+
+  	/** just need to refilter */
+    if (totalComposeToList != null) {
+    	
+  		List selectItemList = new ArrayList();
         
-    	for (Iterator i = totalComposeToList.iterator(); i.hasNext();) {
+   		for (Iterator i = totalComposeToList.iterator(); i.hasNext();) {
+   			MembershipItem item = (MembershipItem) i.next();
 
-    		MembershipItem item = (MembershipItem) i.next();
-
-    		if (item.isViewable()) {
-    			selectItemList.add(new SelectItem(item.getId(), item.getName()));
-    		}
-    	}
-
-    	return selectItemList;       
-
+   			if (noFilter || item.isViewable()) {
+   				selectItemList.add(new SelectItem(item.getId(), item.getName()));
+   			}
+   		}
+    		
+   		return selectItemList;       
     }
     
     totalComposeToListRecipients = new ArrayList();
@@ -661,8 +669,7 @@ public class PrivateMessagesTool
 
     Set memberIds = new HashSet();
     
-    for (Iterator i = members.iterator(); i.hasNext();){
-        
+    for (Iterator i = members.iterator(); i.hasNext();){       
         MembershipItem item = (MembershipItem) i.next();
  
         String name = item.getName();
@@ -678,7 +685,7 @@ public class PrivateMessagesTool
 
 		MembershipItem item = (MembershipItem) i.next();
 
-		if (item.isViewable()) {
+		if (noFilter || item.isViewable()) {
 			selectItemList.add(new SelectItem(item.getId(), item.getName()));
 		}
 	}
@@ -686,6 +693,11 @@ public class PrivateMessagesTool
 	return selectItemList;       
   }
   
+  /**
+   * 
+   * @param id
+   * @return
+   */
   public String getUserSortNameById(String id){    
     try
     {
@@ -1123,6 +1135,11 @@ public class PrivateMessagesTool
    */ 
   public String processPvtMsgCompose() {
     this.setDetailMsg(new PrivateMessageDecoratedBean(messageManager.createPrivateMessage()));
+    String fromPage = getExternalParameterByKey(COMPOSE_FROM_PG);
+    if(fromPage != null && (fromPage.equals(MESSAGE_HOME_PG) || (fromPage.equals(MAIN_PG))))
+    {
+    	fromMainOrHp = fromPage;
+    }
     LOG.debug("processPvtMsgCompose()");
     return "pvtMsgCompose" ;
   }
@@ -1191,7 +1208,20 @@ public class PrivateMessagesTool
 
     //reset contents
     resetComposeContents();
-    
+
+    if(fromMainOrHp != null && !fromMainOrHp.equals(""))
+    {
+    	String tmpBackPage = fromMainOrHp;
+    	fromMainOrHp = "";
+    	return tmpBackPage;
+    }
+    else if(selectedTopic != null)
+    {
+    	msgNavMode=getSelectedTopicTitle();
+    	setPrevNextTopicDetails(msgNavMode);
+
+    	return DISPLAY_MESSAGES_PG;
+    }
     return MAIN_PG;    
   }
      
@@ -1270,7 +1300,9 @@ public class PrivateMessagesTool
         MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));  
         if(membershipItem != null)
         {
-          sendToString +=membershipItem.getName()+"; " ;
+        	if (membershipItem.isViewable()) {
+        		sendToString +=membershipItem.getName()+"; " ;
+        	}
         }          
       }
       sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
@@ -1280,7 +1312,7 @@ public class PrivateMessagesTool
     //Add attachments
     for(int i=0; i<attachments.size(); i++)
     {
-      prtMsgManager.addAttachToPvtMsg(aMsg, (Attachment)attachments.get(i));         
+      prtMsgManager.addAttachToPvtMsg(aMsg, ((DecoratedAttachment)attachments.get(i)).getAttachment());         
     }    
     //clear
     attachments.clear();
@@ -1655,9 +1687,10 @@ public class PrivateMessagesTool
     //Add the recipientList as String for display in Sent folder
     // Since some users may be hidden, if some of these are recipients
     // filter them out (already checked if no recipients)
+    // if only 1 recipient no need to check visibility
     String sendToString="";
     if (selectedComposeToList.size() == 1) {
-        MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));  
+        MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
         if(membershipItem != null)
         {
       		  sendToString +=membershipItem.getName()+"; " ;
@@ -1684,7 +1717,7 @@ public class PrivateMessagesTool
     //Add attachments
     for(int i=0; i<allAttachments.size(); i++)
     {
-      prtMsgManager.addAttachToPvtMsg(rrepMsg, (Attachment)allAttachments.get(i));         
+      prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
     }            
     
     if((SET_AS_YES).equals(getComposeSendAsPvtMsg()))
@@ -1741,7 +1774,7 @@ public class PrivateMessagesTool
     //Add attachments
     for(int i=0; i<allAttachments.size(); i++)
     {
-      prtMsgManager.addAttachToPvtMsg(drrepMsg, (Attachment)allAttachments.get(i));         
+      prtMsgManager.addAttachToPvtMsg(drrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
     } 
     
     if((SET_AS_YES).equals(getComposeSendAsPvtMsg()))
@@ -1861,7 +1894,7 @@ public class PrivateMessagesTool
           //TODO - remove this as being set for test only  
           //thisAttach.setPvtMsgAttachId(new Long(1));
           
-          attachments.add(thisAttach);
+          attachments.add(new DecoratedAttachment(thisAttach));
           
         }
       }
@@ -1891,7 +1924,7 @@ public class PrivateMessagesTool
           
           //TODO - remove this as being set for test only
           //thisAttach.setPvtMsgAttachId(new Long(1));
-          allAttachments.add(thisAttach);
+          allAttachments.add(new DecoratedAttachment(thisAttach));
         }
       }
     }
@@ -1981,7 +2014,7 @@ public class PrivateMessagesTool
     {
       for (int i = 0; i < attachments.size(); i++)
       {
-        if (attachId.equalsIgnoreCase(((Attachment) attachments.get(i))
+        if (attachId.equalsIgnoreCase(((DecoratedAttachment) attachments.get(i)).getAttachment()
             .getAttachmentId()))
         {
           attachments.remove(i);
@@ -2024,7 +2057,7 @@ public class PrivateMessagesTool
     {
       for (int i = 0; i < allAttachments.size(); i++)
       {
-        if (attachId.equalsIgnoreCase(((Attachment) allAttachments.get(i))
+        if (attachId.equalsIgnoreCase(((DecoratedAttachment) allAttachments.get(i)).getAttachment()
             .getAttachmentId()))
         {
           allAttachments.remove(i);
@@ -2048,8 +2081,8 @@ public class PrivateMessagesTool
       
       for(int i=0; i<attachments.size(); i++)
       {
-        Attachment thisAttach = (Attachment)attachments.get(i);
-        if(((Long)thisAttach.getPvtMsgAttachId()).toString().equals(removeAttachId))
+      	DecoratedAttachment thisAttach = (DecoratedAttachment)attachments.get(i);
+        if(((Long)thisAttach.getAttachment().getPvtMsgAttachId()).toString().equals(removeAttachId))
         {
           attachments.remove(i);
           break;
@@ -2282,7 +2315,7 @@ public class PrivateMessagesTool
     LOG.debug("processPvtMsgFldCreate()");
     
     String createFolder=getAddFolder() ;
-    if(createFolder == null)
+    if(createFolder == null || createFolder.trim().length() == 0)
     {
       setErrorMessage(getResourceBundleString(ENTER_FOLDER_NAME));
       return null ;
@@ -2297,6 +2330,9 @@ public class PrivateMessagesTool
       //create a typeUUID in commons
       String newTypeUuid= typeManager.getCustomTopicType(createFolder); 
       }
+      //since PrivateMessagesTool has a session scope, 
+      //reset addFolder to blank for new form
+      addFolder = "";
       return MAIN_PG ;
     }
   }
@@ -2327,10 +2363,30 @@ public class PrivateMessagesTool
       return REVISE_FOLDER_PG;
     }
     else {
+      List tmpMsgList = prtMsgManager.getMessagesByType(typeManager.getCustomTopicType(prtMsgManager.getTopicByUuid(selectedTopicId).getTitle()), PrivateMessageManager.SORT_COLUMN_DATE,
+          PrivateMessageManager.SORT_ASC);
       prtMsgManager.renameTopicFolder(forum, selectedTopicId,  newTopicTitle);
       //rename topic in commons -- as messages are linked through commons type
       //TODO - what if more than one type objects are returned-- We need to switch from title
-      typeManager.renameCustomTopicType(selectedTopicTitle, newTopicTitle);
+      String newTypeUuid = typeManager.renameCustomTopicType(selectedTopicTitle, newTopicTitle);
+      for(int i=0; i<tmpMsgList.size(); i++)
+      {
+      	PrivateMessage tmpPM = (PrivateMessage) tmpMsgList.get(i);
+      	List tmpRecipList = tmpPM.getRecipients();
+      	tmpPM.setTypeUuid(newTypeUuid);
+      	String currentUserId = SessionManager.getCurrentSessionUserId();
+      	Iterator iter = tmpRecipList.iterator();
+      	while(iter.hasNext())
+      	{
+      		PrivateMessageRecipient tmpPMR = (PrivateMessageRecipient) iter.next();
+      		if(tmpPMR != null && tmpPMR.getUserId().equals(currentUserId))
+      		{
+      			tmpPMR.setTypeUuid(newTypeUuid);
+      		}
+      	}
+      	tmpPM.setRecipients(tmpRecipList);
+      	prtMsgManager.savePrivateMessage(tmpPM);
+      }
     }
     
     return MAIN_PG ;
@@ -2433,17 +2489,26 @@ public class PrivateMessagesTool
   {
     LOG.debug("processPvtMsgMoveMessage()");
     String moveTopicTitle=getMoveToTopic(); //this is uuid of new topic
+    if( moveTopicTitle == null || moveTopicTitle.trim().length() == 0){
+    	setErrorMessage(getResourceBundleString(MOVE_MSG_ERROR));
+    	return null;
+    }
     
     Topic newTopic= prtMsgManager.getTopicByUuid(moveTopicTitle);
     Topic oldTopic=selectedTopic.getTopic();
-    
-    prtMsgManager.movePvtMsgTopic(detailMsg.getMsg(), oldTopic, newTopic);
-    
-    //reset 
-    moveToTopic="";
-    moveToNewTopic="";
-    
-    return MAIN_PG ;
+    if( newTopic.getUuid() == oldTopic.getUuid()){
+    	//error
+    	setErrorMessage(getResourceBundleString(MOVE_MSG_ERROR));
+    	return null;
+    }else{
+	    prtMsgManager.movePvtMsgTopic(detailMsg.getMsg(), oldTopic, newTopic);
+	    
+	    //reset 
+	    moveToTopic="";
+	    moveToNewTopic="";
+	    
+	    return MAIN_PG ;
+    }
   }
   
   /**
@@ -2988,5 +3053,5 @@ public class PrivateMessagesTool
 
 	public void setMsgNavMode(String msgNavMode) {
 		this.msgNavMode = msgNavMode;
-	}
+	}	
 }
