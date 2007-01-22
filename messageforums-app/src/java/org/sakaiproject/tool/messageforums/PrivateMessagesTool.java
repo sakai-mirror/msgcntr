@@ -3,7 +3,7 @@
  * $Id: PrivateMessagesTool.java 9227 2006-05-15 15:02:42Z cwen@iupui.edu $
  ***********************************************************************************
  *
- * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
+ * Copyright (c) 2003, 2004, 2005, 2006, 2007 The Sakai Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
@@ -106,6 +106,8 @@ public class PrivateMessagesTool
   private static final String CONFIRM_MSG_DELETE = "pvt_confirm_msg_delete";
   private static final String ENTER_SEARCH_TEXT = "pvt_enter_search_text";
   private static final String MOVE_MSG_ERROR = "pvt_move_msg_error";
+  private static final String NO_MARKED_READ_MESSAGE = "pvt_no_message_mark_read";
+  
   /**
    *Dependency Injected 
    */
@@ -639,12 +641,9 @@ public class PrivateMessagesTool
   {
 	 return "/site/" + ToolManager.getCurrentPlacement().getContext();
   }
-
+  
   public List getTotalComposeToList()
   { 
-    // if user has site.upd, then don't filter
-  	final boolean noFilter = SecurityService.unlock(UserDirectoryService.getCurrentUser(), "site.upd", getContextSiteId());
-
   	/** just need to refilter */
     if (totalComposeToList != null) {
     	
@@ -653,7 +652,7 @@ public class PrivateMessagesTool
    		for (Iterator i = totalComposeToList.iterator(); i.hasNext();) {
    			MembershipItem item = (MembershipItem) i.next();
 
-   			if (noFilter || item.isViewable()) {
+   			if (isInstructor() || item.isViewable()) {
    				selectItemList.add(new SelectItem(item.getId(), item.getName()));
    			}
    		}
@@ -664,7 +663,7 @@ public class PrivateMessagesTool
     totalComposeToListRecipients = new ArrayList();
  
     courseMemberMap = membershipManager.getFilteredCourseMembers(true);
-
+//    courseMemberMap = membershipManager.getAllCourseMembers(true, true, true);
     List members = membershipManager.convertMemberMapToList(courseMemberMap);
 
     Set memberIds = new HashSet();
@@ -685,7 +684,7 @@ public class PrivateMessagesTool
 
 		MembershipItem item = (MembershipItem) i.next();
 
-		if (noFilter || item.isViewable()) {
+		if (isInstructor() || item.isViewable()) {
 			selectItemList.add(new SelectItem(item.getId(), item.getName()));
 		}
 	}
@@ -1293,20 +1292,44 @@ public class PrivateMessagesTool
       aMsg.setApproved(Boolean.FALSE);     
       aMsg.setLabel(getSelectedLabel());
       
-      //Add the recipientList as String for display in Sent folder
+      // Add the recipientList as String for display in Sent folder
+      // Any hidden users will be tacked on at the end
       String sendToString="";
-      for (int i = 0; i < selectedComposeToList.size(); i++)
-      {
-        MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));  
-        if(membershipItem != null)
-        {
-        	if (membershipItem.isViewable()) {
-        		sendToString +=membershipItem.getName()+"; " ;
-        	}
-        }          
+      String sendToHiddenString = "";
+      
+      if (selectedComposeToList.size() == 1) {
+          MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
+          if (membershipItem != null) {
+        	  sendToString +=membershipItem.getName()+"; " ;
+          }
       }
-      sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
-      aMsg.setRecipientsAsText(sendToString);
+      else {
+    	  for (int i = 0; i < selectedComposeToList.size(); i++)
+    	  {
+    		  MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));  
+    		  if(membershipItem != null)
+    		  {
+    			  if (membershipItem.isViewable()) {
+    				  sendToString +=membershipItem.getName()+"; " ;
+    			  }
+    			  else {
+    				  sendToHiddenString += membershipItem.getName() + "; ";
+    			  }
+    		  }
+    	  }
+      }
+
+      if (! "".equals(sendToString)) {
+    	  sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
+      }
+      
+      if ("".equals(sendToHiddenString)) {
+    	  aMsg.setRecipientsAsText(sendToString);
+      }
+      else {
+    	  sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space
+    	  aMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
+      }
       
     }
     //Add attachments
@@ -1646,7 +1669,7 @@ public class PrivateMessagesTool
     
     PrivateMessage currentMessage = getDetailMsg().getMsg() ;
         
-    //by default add current user
+    //by default add user who sent original message    
     for (Iterator i = totalComposeToList.iterator(); i.hasNext();) {      
       MembershipItem membershipItem = (MembershipItem) i.next();                
       
@@ -1665,7 +1688,7 @@ public class PrivateMessagesTool
       return null ;
     }
 
-    if(getSelectedComposeToList().size()<1)
+    if(selectedComposeToList.size()<1)
     {
       setErrorMessage(getResourceBundleString(SELECT_RECIPIENT_LIST_FOR_REPLY));
       return null ;
@@ -1689,6 +1712,8 @@ public class PrivateMessagesTool
     // filter them out (already checked if no recipients)
     // if only 1 recipient no need to check visibility
     String sendToString="";
+    String sendToHiddenString="";
+    
     if (selectedComposeToList.size() == 1) {
         MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
         if(membershipItem != null)
@@ -1699,20 +1724,30 @@ public class PrivateMessagesTool
     else {
     	for (int i = 0; i < selectedComposeToList.size(); i++)
     	{
-    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));  
+    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
     		if(membershipItem != null)
     		{
     			if (membershipItem.isViewable()) {
     				sendToString +=membershipItem.getName()+"; " ;
     			}
-    		}
+   		       	else {
+   	        		sendToHiddenString += membershipItem.getName() + "; ";
+   	        	}
+   	        }          
     	}
     }
 
-   	sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space	
-    
-    rrepMsg.setRecipientsAsText(sendToString);
-    
+    if (! "".equals(sendToString)) {
+  	  sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
+    }
+
+    if ("".equals(sendToHiddenString)) {
+        rrepMsg.setRecipientsAsText(sendToString);
+    }
+    else {
+    	sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
+    	rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
+    }    
     
     //Add attachments
     for(int i=0; i<allAttachments.size(); i++)
@@ -2530,6 +2565,18 @@ public class PrivateMessagesTool
     {
         this.rearrageTopicMsgsThreaded(true);
     }
+    //  If "check all", update the decorated pmb to show selected
+    if (selectAll)
+    {
+    	Iterator searchIter = searchPvtMsgs.iterator();
+    	while (searchIter.hasNext())
+    	{
+    		PrivateMessageDecoratedBean searchMsg = (PrivateMessageDecoratedBean)searchIter.next();
+    		searchMsg.setIsSelected(true);
+    	}
+    	
+    	selectAll = false;
+    }
     return searchPvtMsgs;
   }
   public void setSearchPvtMsgs(List searchPvtMsgs)
@@ -3030,7 +3077,7 @@ public class PrivateMessagesTool
     }
 
 
-    private String getAuthorString() {
+    public String getAuthorString() {
        String authorString = getUserId();
        
        try
@@ -3054,4 +3101,67 @@ public class PrivateMessagesTool
 	public void setMsgNavMode(String msgNavMode) {
 		this.msgNavMode = msgNavMode;
 	}	
+	
+	/**
+	 * @return
+	 */
+	public String processActionMarkCheckedAsRead()
+	{
+		return markCheckedMessages(true);
+	}
+	
+	/**
+	 * 
+	 * @param readStatus
+	 * @return
+	 */
+	private String markCheckedMessages(boolean readStatus)
+	{
+		List pvtMsgList = new ArrayList();
+		boolean msgSelected = false;
+		boolean searchMode = false;
+		
+		// determine if we are looking at search results or the main listing
+		if (searchPvtMsgs != null && !searchPvtMsgs.isEmpty())
+		{
+			searchMode = true;
+			pvtMsgList = searchPvtMsgs;
+		}
+		else
+		{
+			pvtMsgList = decoratedPvtMsgs;
+		}
+		
+		Iterator pvtMsgListIter = pvtMsgList.iterator(); 
+		while (pvtMsgListIter.hasNext())
+		{
+			PrivateMessageDecoratedBean decoMessage = (PrivateMessageDecoratedBean) pvtMsgListIter.next();
+			if(decoMessage.getIsSelected())
+			{
+				msgSelected = true;
+				prtMsgManager.markMessageAsReadForUser(decoMessage.getMsg());
+				
+				if (searchMode)
+				{
+					// Although the change was made in the db, the search
+					// view needs to be refreshed (it doesn't return to db)
+					decoMessage.setHasRead(true);
+					decoMessage.setIsSelected(false);
+				}
+			}      
+		}
+		
+		if (!msgSelected)
+		{
+			setErrorMessage(getResourceBundleString(NO_MARKED_READ_MESSAGE));
+			return null;
+		}
+		
+		if (searchMode)
+		{
+			return SEARCH_RESULT_MESSAGES_PG;
+		}
+		
+		return DISPLAY_MESSAGES_PG; 
+	}
 }

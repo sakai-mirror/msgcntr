@@ -23,7 +23,10 @@
 	  selectedTopic.setHasPreviousTopic(false);
     }
 %>
-<f:loadBundle basename="org.sakaiproject.tool.messageforums.bundle.Messages" var="msgs"/>
+<jsp:useBean id="msgs" class="org.sakaiproject.util.ResourceLoader" scope="session">
+   <jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.tool.messageforums.bundle.Messages"/>
+</jsp:useBean>
+
 <f:view>
 	<sakai:view title="#{msgs.pvtarea_name}">
 <!--jsp/privateMsg/pvtMsg.jsp-->
@@ -69,10 +72,10 @@
 		  <h:column>
 		    <f:facet name="header">
  					<h:commandLink action="#{PrivateMessagesTool.processCheckAll}" value="#{msgs.cdfm_checkall}" 
- 					               title="#{msgs.cdfm_checkall}"rendered="#{PrivateMessagesTool.msgNavMode == 'Deleted'}"/>
+ 					               title="#{msgs.cdfm_checkall}" />
 		     <%--<h:commandButton alt="SelectAll" image="/sakai-messageforums-tool/images/checkbox.gif" action="#{PrivateMessagesTool.processSelectAllJobs}"/>--%>
 		    </f:facet>
-				<h:selectBooleanCheckbox value="#{rcvdItems.isSelected}" rendered="#{PrivateMessagesTool.msgNavMode == 'Deleted'}"/>
+				<h:selectBooleanCheckbox value="#{rcvdItems.isSelected}"/>
 		  </h:column>
 		  <h:column>
 		    <f:facet name="header">					
@@ -184,10 +187,10 @@
 		 	<h:column>
 		    <f:facet name="header">
  					<h:commandLink action="#{PrivateMessagesTool.processCheckAll}" value="#{msgs.cdfm_checkall}" 
- 					               title="#{msgs.cdfm_checkall}" rendered="#{PrivateMessagesTool.msgNavMode == 'Deleted'}"/>
+ 					               title="#{msgs.cdfm_checkall}"/>
 		     <%--<h:commandButton alt="SelectAll" image="/sakai-messageforums-tool/images/checkbox.gif" action="#{PrivateMessagesTool.processSelectAllJobs}"/>--%>
 		    </f:facet>
-				<h:selectBooleanCheckbox value="#{rcvdItems.isSelected}" rendered="#{PrivateMessagesTool.msgNavMode == 'Deleted'}"/>
+				<h:selectBooleanCheckbox value="#{rcvdItems.isSelected}"/>
 		  </h:column>
 		  <h:column>
 				<f:facet name="header">

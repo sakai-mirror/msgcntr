@@ -3,7 +3,7 @@
  * $Id$
  ***********************************************************************************
  *
- * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
+ * Copyright (c) 2003, 2004, 2005, 2006, 2007 The Sakai Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
@@ -142,21 +142,42 @@ public class PrivateMessageDecoratedBean
     this.sendToStringDecorated = sendToStringDecorated;
   }
   
-	public ArrayList getAttachList()
+  public ArrayList getAttachList()
+  {
+	ArrayList decoAttachList = new ArrayList();
+	List attachList = msg.getAttachments(); 
+	if(attachList != null)
 	{
-		ArrayList decoAttachList = new ArrayList();
-		List attachList = msg.getAttachments(); 
-		if(attachList != null)
+		for(int i=0; i<attachList.size(); i++)
 		{
-			for(int i=0; i<attachList.size(); i++)
-			{
-				DecoratedAttachment decoAttach = new DecoratedAttachment((Attachment)attachList.get(i));
-				decoAttachList.add(decoAttach);
-			}
+			DecoratedAttachment decoAttach = new DecoratedAttachment((Attachment)attachList.get(i));
+			decoAttachList.add(decoAttach);
 		}
-		return decoAttachList;
 	}
+	return decoAttachList;
+  }
+
+  public String getVisibleRecipientsAsText() {
+	String recips = msg.getRecipientsAsText();
+	final int parenIndex = recips.indexOf("(");
+	
+	if (parenIndex > 0) {
+		return recips.substring(0, parenIndex-1);
+	}
+	else {
+		return recips;
+	}
+  }
+  
+  public String getRecipientsAsText() {
+	  return msg.getRecipientsAsText();
+  }
+
+  public String getAuthor() {
+	  return msg.getAuthor();
+  }
 }
+
 
 /**********************************************************************************
 *
