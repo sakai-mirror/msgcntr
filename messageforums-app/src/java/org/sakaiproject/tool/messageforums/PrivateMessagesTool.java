@@ -290,7 +290,7 @@ public class PrivateMessagesTool
             
     if (getPvtAreaEnabled() || isInstructor()){      
       PrivateForum pf = prtMsgManager.initializePrivateMessageArea(area);
-      pf = prtMsgManager.initializationHelper(pf, area);
+      pf = prtMsgManager.initializationHelper(pf);
       pvtTopics = pf.getTopics();
       Collections.sort(pvtTopics, PrivateTopicImpl.TITLE_COMPARATOR);   //changed to date comparator
       forum=pf;           
