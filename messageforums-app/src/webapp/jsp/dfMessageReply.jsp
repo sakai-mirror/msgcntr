@@ -157,10 +157,11 @@
 <%--							<h:outputLink value="#{eachAttach.attachmentUrl}" target="_blank">
 							  <h:outputText value="#{eachAttach.attachmentName}"/>
 							  </h:outputLink>--%>
-							<h:outputLink value="#{ForumTool.attachmentUrl}" target="_blank">
+<%--							<h:outputLink value="#{ForumTool.attachmentUrl}" target="_blank">
 							  <f:param name="attachmentId" value="#{eachAttach.attachmentId}"/>
 							  <h:outputText value="#{eachAttach.attachmentName}"/>
-							</h:outputLink>
+							</h:outputLink>--%>
+						  <h:outputText value="#{eachAttach.attachmentName}"/>							
 					  </h:column>
 					</h:dataTable>
 	    </h:panelGroup> 
