@@ -135,16 +135,7 @@
 		  </h:column>
 		  <h:column rendered="#{PrivateMessagesTool.msgNavMode == 'Sent'}">
 		    <f:facet name="header">
-   		     <h:commandLink value="#{msgs.pvt_to}"
-		                      title="#{msgs.sort_to}">
-		         <h:graphicImage value="/images/sortascending.gif" style="border:0" 
-    	                       title="#{msgs.sort_author_asc}" alt="#{msgs.sort_to_asc}"
-    	                       rendered="#{PrivateMessagesTool.sortType == 'to_asc'}"/>
-    	       <h:graphicImage value="/images/sortdescending.gif" style="border:0" 
-    	                       title="#{msgs.sort_to_desc}" alt="#{msgs.sort_to_desc}"
-    	                       rendered="#{PrivateMessagesTool.sortType == 'to_desc'}"/>
-    	       <f:param name="sortColumn" value="to"/>
-    	     </h:commandLink>
+   		       <h:outputText value="#{msgs.pvt_to}"/>
 		    </f:facet>		     		    
 		     <h:outputText value="#{rcvdItems.sendToStringDecorated}" rendered="#{rcvdItems.hasRead}" />
 		     <h:outputText styleClass="unreadMsg" value="#{rcvdItems.sendToStringDecorated}" rendered="#{!rcvdItems.hasRead}"/>
