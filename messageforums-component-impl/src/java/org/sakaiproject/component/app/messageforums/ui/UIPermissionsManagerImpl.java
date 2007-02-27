@@ -188,6 +188,11 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     {
       return true;
     }
+    /* oncourse dept. admin check */
+    if (isAdminToolsUser())
+    {
+      return true;
+    }
     
     try
     {
@@ -220,6 +225,11 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
       LOG.debug("isChangeSettings(DiscussionForum " + forum + ")");
     }
     if (isSuperUser())
+    {
+      return true;
+    }
+    /* oncourse dept. admin check */
+    if(isAdminToolsUser())
     {
       return true;
     }
@@ -261,6 +271,11 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
       LOG.debug("isNewTopic(DiscussionForum " + forum + ")");
     }
     if (isSuperUser())
+    {
+      return true;
+    }
+    /* oncourse dept. admin check */
+    if (isAdminToolsUser())
     {
       return true;
     }
@@ -419,6 +434,11 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
           + "), DiscussionForum" + forum + "");
     }
     if (isSuperUser())
+    {
+      return true;
+    }
+    /* oncourse dept. admin check */
+    if (isAdminToolsUser())
     {
       return true;
     }
@@ -1271,6 +1291,12 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     {
       return true;
     }
+    /* oncourse dept. admin check */
+    if (isAdminToolsUser())
+    {
+      return true;
+    }
+
     return false;
   }
   
@@ -1350,4 +1376,20 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
   	ThreadLocalManager.set("message_center_membership_topic", topicItems);
 		ThreadLocalManager.set("message_center_permission_set", new Boolean(true));
   }
+
+  /* oncourse dept. admin check */
+  private boolean isAdminToolsUser()
+  {
+  	LOG.debug(" isAdminToolsUser()");
+  	try 
+  	{
+  		return securityService.isAdminToolsUser(UserDirectoryService.getUser(getCurrentUserId()));
+  	} 
+  	catch (UserNotDefinedException e) 
+  	{
+  		LOG.error("error in UIPermissionsManagerImpl.isAdminToolsUser:" + e);
+  		return false;
+  	}
+  }
+
 }
