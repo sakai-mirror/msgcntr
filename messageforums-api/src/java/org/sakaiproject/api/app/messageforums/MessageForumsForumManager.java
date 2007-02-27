@@ -39,6 +39,8 @@ public interface MessageForumsForumManager {
   
     public List getForumByTypeAndContext(final String typeUuid);
     
+    public List getForumByTypeAndContextWithTopicsAllAttachments(final String typeUuid);
+    
     public List getForumByTypeAndContext(final String typeUuid, final String contextId);
       
     /**
@@ -163,4 +165,10 @@ public interface MessageForumsForumManager {
      */
     public ActorPermissions createDefaultActorPermissions();
 
+    
+    public PrivateForum getPrivateForumByOwnerAreaWithAllTopics(final String owner, final Area area);
+    
+    public PrivateForum getPrivateForumByOwnerAreaNullWithAllTopics(final String owner);
+    
+    public List getForumByTypeAndContextWithTopicsMembership(final String typeUuid, final String contextId);
 }

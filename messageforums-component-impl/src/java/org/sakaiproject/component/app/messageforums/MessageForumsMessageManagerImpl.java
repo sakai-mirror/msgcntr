@@ -24,7 +24,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -66,6 +68,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
     private static final String QUERY_BY_TOPIC_ID = "findMessagesByTopicId";
     private static final String QUERY_UNREAD_STATUS = "findUnreadStatusForMessage";
     private static final String QUERY_CHILD_MESSAGES = "finalAllChildMessages";
+    private static final String QUERY_READ_STATUS_WITH_MSGS_USER = "findReadStatusByMsgIds";
     //private static final String ID = "id";
 
     private IdManager idManager;                      
@@ -741,4 +744,33 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
   	return null;
   }
 
+
+	public Map getReadStatusForMessagesWithId(final List msgIds, final String userId)
+	{
+		Map statusMap = new HashMap();
+		if( msgIds != null && msgIds.size() > 0)
+		{
+			HibernateCallback hcb = new HibernateCallback() {
+				public Object doInHibernate(Session session) throws HibernateException, SQLException {
+					Query q = session.getNamedQuery(QUERY_READ_STATUS_WITH_MSGS_USER);
+					q.setParameter("userId", userId, Hibernate.STRING);
+					q.setParameterList("msgIds", msgIds);
+					return q.list();
+				}
+			};
+			List statusList = (List)getHibernateTemplate().execute(hcb);
+			if(statusList != null)
+			{
+				for(int i=0; i<statusList.size(); i++)
+				{
+					UnreadStatus status = (UnreadStatus) statusList.get(i);
+					if(status != null)
+					{
+						statusMap.put(status.getMessageId(), status.getRead());
+					}
+				}
+			}
+		}
+		return statusMap;
+	}
 }

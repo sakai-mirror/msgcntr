@@ -22,6 +22,7 @@ package org.sakaiproject.api.app.messageforums;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface MessageForumsMessageManager {
 
@@ -87,5 +88,6 @@ public interface MessageForumsMessageManager {
         final boolean searchByText, final boolean searchByAuthor,final boolean searchByBody, final boolean searchByLabel,final boolean searchByDate);
     
     public String getAttachmentUrl(String id);
-}
 
+	public Map getReadStatusForMessagesWithId(List msgIds, String userId);
+}
