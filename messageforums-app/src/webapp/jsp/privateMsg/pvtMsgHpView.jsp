@@ -6,6 +6,15 @@
    <jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.tool.messageforums.bundle.Messages"/>
 </jsp:useBean>
 
+<%  
+  /** initialize user's private message area per request **/
+  FacesContext context = FacesContext.getCurrentInstance();
+  Application app = context.getApplication();
+  ValueBinding binding = app.createValueBinding("#{PrivateMessagesTool}");
+  PrivateMessagesTool pmt = (PrivateMessagesTool) binding.getValue(context);
+  pmt.initializePrivateMessageArea();
+%>
+
 <f:view>
   <sakai:view title="#{msgs.cdfm_message_pvtarea}">
 <!--jsp/privateMsg/pvtMsgHpView.jsp-->    
