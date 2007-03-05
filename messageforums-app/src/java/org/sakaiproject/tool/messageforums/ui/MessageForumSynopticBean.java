@@ -167,9 +167,6 @@ public class MessageForumSynopticBean {
 	private boolean sitesToViewSet = false;
 	private boolean pmEnabled;
 	
-	/** Decorated Bean to store stats for individual site */
-	private DecoratedCompiledMessageStats siteInfo = null;
-
 	/** Resource loader to grab bundle messages */
 	private static ResourceLoader rb = new ResourceLoader("org.sakaiproject.tool.messageforums.bundle.Messages");
 	
@@ -278,10 +275,6 @@ public class MessageForumSynopticBean {
 	 */
 	public DecoratedCompiledMessageStats getSiteInfo() {
 		return getSiteContents();
-	}
-
-	public void setSiteInfo(DecoratedCompiledMessageStats siteInfo) {
-		this.siteInfo = siteInfo;
 	}
 
 	/**
@@ -1078,8 +1071,6 @@ public class MessageForumSynopticBean {
 				// TODO: construct query to be one roundtrip to DB
 				for (Iterator iter = privateMessages.iterator(); iter.hasNext();) {
 					pvtMessageManager.markMessageAsReadForUser((PrivateMessage) iter.next());
-				
-				siteInfo.setUnreadPrivateAmt(0);
 				}
 			}
 		}
