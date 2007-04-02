@@ -381,7 +381,6 @@ public class DiscussionForumTool
         return null;
       }
       Iterator iterForum = tempForum.iterator();
-      Map unreadMap = new HashMap();
       List msgIds = new ArrayList();
       while (iterForum.hasNext())
       {
@@ -413,7 +412,7 @@ public class DiscussionForumTool
       		}
       	}
       }
-      unreadMap = forumManager.getReadStatusForMessagesWithId(msgIds, getUserId());
+
       iterForum = tempForum.iterator();
       while (iterForum.hasNext())
       {
@@ -435,7 +434,7 @@ public class DiscussionForumTool
             SessionManager.getCurrentSessionUserId()))
         { 
           //DiscussionForumBean decoForum = getDecoratedForum(forum);
-        	DiscussionForumBean decoForum = getDecoratedForumWithPersistentForumAndTopics(forum, unreadMap);
+        	DiscussionForumBean decoForum = getDecoratedForumWithPersistentForumAndTopics(forum);
         	decoForum.setGradeAssign("Default_0");
           for(int i=0; i<assignments.size(); i++)
           {
@@ -1589,7 +1588,7 @@ public class DiscussionForumTool
     return decoForum;
   }
 
-  private DiscussionForumBean getDecoratedForumWithPersistentForumAndTopics(DiscussionForum forum, Map unreadMap)
+  private DiscussionForumBean getDecoratedForumWithPersistentForumAndTopics(DiscussionForum forum)
   {
     if (LOG.isDebugEnabled())
     {
@@ -1626,31 +1625,15 @@ public class DiscussionForumTool
           	decoTopic.setReadFullDesciption(true);
           }
 
-          int totalMsgNumber = 0;
-          int readMsgNumber = 0;
-          if(topic.getMessages() != null)
-          {
-          	List thisMessageList = topic.getMessages();
-          	for(int i=0; i<thisMessageList.size(); i++)
-          	{
-          		Message thisMsg = (Message)thisMessageList.get(i);
-          		if(thisMsg != null && !thisMsg.getDraft().booleanValue())
-          		{
-          			totalMsgNumber++;
-          			if(unreadMap.get(thisMsg.getId()) != null && ((Boolean)unreadMap.get(thisMsg.getId())).booleanValue())
-          			{
-          				readMsgNumber++;
-          			}
-          		}
-          	}
-          }
+          int totalMsgNumber = forumManager.getTotalNoMessages(topic);
+          int unreadMsgNumber = forumManager.getUnreadNoMessages(topic);
+          
           if(totalMsgNumber > 0 )
           {
           	decoTopic.setTotalNoMessages(totalMsgNumber);
-          	decoTopic.setUnreadNoMessages(totalMsgNumber -readMsgNumber);
+          	decoTopic.setUnreadNoMessages(unreadMsgNumber);
           }
-          //decoTopic.setTotalNoMessages(forumManager.getTotalNoMessages(topic));
-          //decoTopic.setUnreadNoMessages(forumManager.getUnreadNoMessages(topic));
+
           decoForum.addTopic(decoTopic);
         }
       } 
