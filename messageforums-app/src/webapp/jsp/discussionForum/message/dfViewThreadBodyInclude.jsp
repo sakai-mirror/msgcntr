@@ -80,7 +80,7 @@
 
 		<%-- (Hide) Other Actions links --%>
 		<h:panelGroup rendered="#{(ForumTool.selectedTopic.isPostToGradebook && ForumTool.gradebookExist) || ForumTool.selectedTopic.isModeratedAndHasPerm || message.revise 
-									|| message.userCanDelete}">
+									|| ForumTool.canDelete}">
 			<h:outputText value=" #{msgs.cdfm_toolbar_separator} " rendered="#{ForumTool.selectedTopic.isNewResponseToResponse && message.msgApproved}" />
 			<h:outputLink value="#" onclick="toggleDisplay('#{message.message.id}_advanced_box'); toggleHide(this); return false;">
 				<h:graphicImage value="/images/silk/cog.png" alt="#{msgs.cdfm_other_actions}" />
@@ -111,7 +111,7 @@
 	</h:panelGroup>
 
 	<%-- Delete other action --%>
-	<h:panelGroup rendered="#{message.userCanDelete}" >
+	<h:panelGroup rendered="#{ForumTool.canDelete || message.isOwn}" >
 		<h:commandLink action="#{ForumTool.processDfMsgDeleteConfirm}" value="#{msgs.cdfm_button_bar_delete}">
 			<f:param value="#{message.message.id}" name="messageId" />
 			<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId" />
