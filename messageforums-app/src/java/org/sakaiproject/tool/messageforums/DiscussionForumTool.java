@@ -1031,10 +1031,13 @@ public class DiscussionForumTool
    */
   public DiscussionTopicBean getSelectedTopic()
   {
-  	rearrageTopicMsgsThreaded();
-  	setMessageBeanPreNextStatus();
- 
-    return selectedTopic;
+  	if (!selectedTopic.isSorted()) 
+  	{
+  		rearrageTopicMsgsThreaded();
+  		setMessageBeanPreNextStatus();
+  		selectedTopic.setSorted(true);
+  	}
+  	return selectedTopic;
   }
   
   /**
