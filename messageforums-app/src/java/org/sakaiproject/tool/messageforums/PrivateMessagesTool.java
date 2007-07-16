@@ -221,6 +221,10 @@ public class PrivateMessagesTool
   
   //return to previous page after send msg
   private String fromMainOrHp = null;
+  
+  // for compose, are we coming from main page?
+  private boolean fromMain;
+  
   //////////////////////
   /** The configuration mode, received, sent,delete, case etc ... */
   public static final String STATE_PVTMSG_MODE = "pvtmsg.mode";
@@ -794,7 +798,37 @@ public class PrivateMessagesTool
   {
     this.selectView=selectView ;
   }
-  public void processChangeSelectView(ValueChangeEvent eve)
+  
+  public boolean isMultiDeleteSuccess() 
+  {
+	return multiDeleteSuccess;
+  }
+
+  public void setMultiDeleteSuccess(boolean multiDeleteSuccess) 
+  {
+	this.multiDeleteSuccess = multiDeleteSuccess;
+  }
+
+
+  public String getMultiDeleteSuccessMsg() 
+  {
+	return multiDeleteSuccessMsg;
+  }
+
+  public void setMultiDeleteSuccessMsg(String multiDeleteSuccessMsg) 
+  {
+	this.multiDeleteSuccessMsg = multiDeleteSuccessMsg;
+  }
+
+public boolean isFromMain() {
+	return fromMain;
+}
+
+public String getServerUrl() {
+    return ServerConfigurationService.getServerUrl();
+ }
+
+public void processChangeSelectView(ValueChangeEvent eve)
   {
     String currentValue = (String) eve.getNewValue();
   	if (!currentValue.equalsIgnoreCase(THREADED_VIEW) && selectView != null && selectView.equals(THREADED_VIEW))
@@ -1200,6 +1234,7 @@ public class PrivateMessagesTool
   public String processPvtMsgCompose() {
     this.setDetailMsg(new PrivateMessageDecoratedBean(messageManager.createPrivateMessage()));
     setFromMainOrHp();
+    fromMain = (msgNavMode == "") || (msgNavMode == "privateMessages");
     LOG.debug("processPvtMsgCompose()");
     return PVTMSG_COMPOSE;
   }
@@ -2060,6 +2095,8 @@ public class PrivateMessagesTool
   
   ///////////////////////////       Process Select All       ///////////////////////////////
   private boolean selectAll = false;  
+  private int numberChecked = 0; // to cover case where user selectes check all
+  
   public boolean isSelectAll()
   {
     return selectAll;
@@ -2067,6 +2104,11 @@ public class PrivateMessagesTool
   public void setSelectAll(boolean selectAll)
   {
     this.selectAll = selectAll;
+  }
+
+  public int getNumberChecked() 
+  {
+	return numberChecked;
   }
 
   /**
@@ -3004,6 +3046,8 @@ public class PrivateMessagesTool
   public List createDecoratedDisplay(List msg)
   {
     List decLs= new ArrayList() ;
+    numberChecked = 0;
+
     for (Iterator iter = msg.iterator(); iter.hasNext();)
     {
       PrivateMessage element = (PrivateMessage) iter.next();                  
@@ -3013,6 +3057,7 @@ public class PrivateMessagesTool
       if(selectAll)
       {
         dbean.setIsSelected(true);
+        numberChecked++;
       }
        
       //getRecipients() is filtered for this perticular user i.e. returned list of only one PrivateMessageRecipient object
