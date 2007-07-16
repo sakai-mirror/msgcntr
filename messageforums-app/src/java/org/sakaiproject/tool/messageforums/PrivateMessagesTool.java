@@ -116,6 +116,9 @@ public class PrivateMessagesTool
   private static final String ENTER_SEARCH_TEXT = "pvt_enter_search_text";
   private static final String MOVE_MSG_ERROR = "pvt_move_msg_error";
   private static final String NO_MARKED_READ_MESSAGE = "pvt_no_message_mark_read";
+  private static final String NO_MARKED_DELETE_MESSAGE = "pvt_no_message_mark_delete";
+  private static final String NO_MARKED_MOVE_MESSAGE = "pvt_no_message_mark_move";
+  private static final String MULTIDELETE_SUCCESS_MSG = "cdfm_deleted_success";
   
   /** Used to determine if this is combined tool or not */
   private static final String MESSAGECENTER_TOOL_ID = "sakai.messagecenter";
@@ -204,7 +207,12 @@ public class PrivateMessagesTool
   
   //Delete items - Checkbox display and selection - Multiple delete
   private List selectedDeleteItems;
-  private List totalDisplayItems=new ArrayList() ;
+  private boolean multiDeleteSuccess;
+  private String multiDeleteSuccessMsg;
+  private List totalDisplayItems=new ArrayList();
+  
+  // Move to folder - Checkbox display and selection - Multiple move to folder
+  private List selectedMoveToFolderItems;
   
   //reply to 
   private String replyToBody;
@@ -820,6 +828,7 @@ public class PrivateMessagesTool
 	this.multiDeleteSuccessMsg = multiDeleteSuccessMsg;
   }
 
+
 public boolean isFromMain() {
 	return fromMain;
 }
@@ -830,6 +839,7 @@ public String getServerUrl() {
 
 public void processChangeSelectView(ValueChangeEvent eve)
   {
+    multiDeleteSuccess = false;
     String currentValue = (String) eve.getNewValue();
   	if (!currentValue.equalsIgnoreCase(THREADED_VIEW) && selectView != null && selectView.equals(THREADED_VIEW))
   	{
@@ -1005,12 +1015,14 @@ public void processChangeSelectView(ValueChangeEvent eve)
   {
     LOG.debug("processActionHome()");
     msgNavMode = "privateMessages";
+    multiDeleteSuccess = false;
     return  MAIN_PG;
   }  
   public String processActionPrivateMessages()
   {
     LOG.debug("processActionPrivateMessages()");                    
     msgNavMode = "privateMessages";            
+    multiDeleteSuccess = false;
     return  MESSAGE_HOME_PG;
   }        
   public String processDisplayForum()
@@ -1074,7 +1086,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
    */ 
   public String processPvtMsgDetail() {
     LOG.debug("processPvtMsgDetail()");
-    
+    multiDeleteSuccess = false;
+
     String msgId=getExternalParameterByKey("current_msg_detail");
     setCurrentMsgUuid(msgId) ; 
     //retrive the detail for this message with currentMessageId    
@@ -1689,6 +1702,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
    * processDisplayPreviousFolder()
    */
   public String processDisplayPreviousTopic() {
+	multiDeleteSuccess = false;
     String prevTopicTitle = getExternalParameterByKey("previousTopicTitle");
     if(hasValue(prevTopicTitle))
     {
@@ -1721,7 +1735,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
    * processDisplayNextFolder()
    */
   public String processDisplayNextTopic()
-  {  	  	
+  { 
+	multiDeleteSuccess = false;
     String nextTitle = getExternalParameterByKey("nextTopicTitle");
     if(hasValue(nextTitle))
     {
@@ -2073,14 +2088,23 @@ public void processChangeSelectView(ValueChangeEvent eve)
   { 
     LOG.debug("processPvtMsgMultiDelete()");
   
+    boolean deleted = false;
     for (Iterator iter = getSelectedDeleteItems().iterator(); iter.hasNext();)
     {
       PrivateMessage element = ((PrivateMessageDecoratedBean) iter.next()).getMsg();
       if (element != null) 
       {
+    	deleted = true;
         prtMsgManager.deletePrivateMessage(element, getPrivateMessageTypeFromContext(msgNavMode)) ;        
       }      
     }
+    
+    if (deleted)
+    {
+    	multiDeleteSuccessMsg = getResourceBundleString(MULTIDELETE_SUCCESS_MSG);
+    	multiDeleteSuccess = true;
+    }
+
     return DISPLAY_MESSAGES_PG;
   }
 
@@ -2119,7 +2143,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
   {
     LOG.debug("processCheckAll()");
     selectAll= true;
-    
+    multiDeleteSuccess = false;
+
     return null;
   }
   
@@ -2788,21 +2813,38 @@ public void processChangeSelectView(ValueChangeEvent eve)
     	//error
     	setErrorMessage(getResourceBundleString(MOVE_MSG_ERROR));
     	return null;
-    }else{
-	    prtMsgManager.movePvtMsgTopic(detailMsg.getMsg(), oldTopic, newTopic);
+    }
+    else{
+    	if (selectedMoveToFolderItems == null)
+    	{
+    		prtMsgManager.movePvtMsgTopic(detailMsg.getMsg(), oldTopic, newTopic);
+    	}
+    	else
+    	{
+    		for (Iterator movingIter = selectedMoveToFolderItems.iterator(); movingIter.hasNext();)
+    		{
+    			PrivateMessageDecoratedBean decoMessage = (PrivateMessageDecoratedBean) movingIter.next();
+		        final PrivateMessage initPrivateMessage = prtMsgManager.initMessageWithAttachmentsAndRecipients(decoMessage.getMsg());
+    			decoMessage = new PrivateMessageDecoratedBean(initPrivateMessage);
+    			
+    			prtMsgManager.movePvtMsgTopic(decoMessage.getMsg(), oldTopic, newTopic);
+    		}
+    	}
 	    
-	    //reset 
-	    moveToTopic="";
-	    moveToNewTopic="";
-	    
-	    // Return to Messages & Forums page or Messages page
-	    // TODO: once message moved, where to return to?
-	    if (isMessagesandForums()) {
-	    	return MAIN_PG;
-	    }
-	    else {
-	    	return MESSAGE_HOME_PG;
-	    }
+		//reset 
+		moveToTopic="";
+		moveToNewTopic="";
+		selectedMoveToFolderItems = null;
+		
+    	// Return to Messages & Forums page or Messages page
+   		if (isMessagesandForums()) 
+   		{
+   			return MAIN_PG;
+   		}
+   		else
+   		{
+   			return MESSAGE_HOME_PG;
+   		}
     }
   }
   
@@ -2814,7 +2856,15 @@ public void processChangeSelectView(ValueChangeEvent eve)
   {
     LOG.debug("processPvtMsgCancelToDetailView()");
     this.deleteConfirm=false;
-    return SELECTED_MESSAGE_PG ;
+    
+    // due to adding ability to move multiple messages
+    if (selectedMoveToFolderItems != null)
+    {
+    	selectedMoveToFolderItems = null;
+    	return DISPLAY_MESSAGES_PG;
+    }
+    
+    return SELECTED_MESSAGE_PG;
   }
   
   ///////////////   SEARCH      ///////////////////////
@@ -2846,7 +2896,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
   public String processSearch() 
   {
     LOG.debug("processSearch()");
-    
+    multiDeleteSuccess = false;
+
     List newls = new ArrayList() ;
 //    for (Iterator iter = getDecoratedPvtMsgs().iterator(); iter.hasNext();)
 //    {
@@ -3276,7 +3327,15 @@ public void processChangeSelectView(ValueChangeEvent eve)
     FacesContext.getCurrentInstance().addMessage(null,
         new FacesMessage(getResourceBundleString(ALERT) + ' ' + errorMsg));
   }
-  
+
+  private void setInformationMessage(String infoMsg)
+  {
+	    LOG.debug("setInformationMessage(String " + infoMsg + ")");
+	    FacesContext.getCurrentInstance().addMessage(null,
+	        new FacesMessage(infoMsg));
+  }
+
+ 
   /**
    * Enable privacy message
    * @return
@@ -3370,17 +3429,65 @@ public void processChangeSelectView(ValueChangeEvent eve)
 		return markCheckedMessages(true);
 	}
 	
-	/**
-	 * 
-	 * @param readStatus
-	 * @return
-	 */
-	private String markCheckedMessages(boolean readStatus)
-	{
-		List pvtMsgList = new ArrayList();
+	public String processActionDeleteChecked() {
+	    LOG.debug("processActionDeleteChecked()");
+
+		List pvtMsgList = getPvtMsgListToProcess();
 		boolean msgSelected = false;
-		boolean searchMode = false;
+		selectedDeleteItems = new ArrayList();
 		
+		Iterator pvtMsgListIter = pvtMsgList.iterator(); 
+		while (pvtMsgListIter.hasNext())
+		{
+			PrivateMessageDecoratedBean decoMessage = (PrivateMessageDecoratedBean) pvtMsgListIter.next();
+			if(decoMessage.getIsSelected())
+			{
+				msgSelected = true;
+				selectedDeleteItems.add(decoMessage);
+			}
+		}
+
+		if (!msgSelected)
+		{
+			setErrorMessage(getResourceBundleString(NO_MARKED_DELETE_MESSAGE));
+			return null;
+		}
+		
+		return processPvtMsgMultiDelete();
+	}
+	
+	public String processActionMoveCheckedToFolder() {
+	    LOG.debug("processActionMoveCheckedToFolder()");
+
+	    List pvtMsgList = getPvtMsgListToProcess();
+	    boolean msgSelected = false;
+	    selectedMoveToFolderItems = new ArrayList();
+	    
+		Iterator pvtMsgListIter = pvtMsgList.iterator(); 
+		while (pvtMsgListIter.hasNext())
+		{
+			PrivateMessageDecoratedBean decoMessage = (PrivateMessageDecoratedBean) pvtMsgListIter.next();
+			if(decoMessage.getIsSelected())
+			{
+				msgSelected = true;
+		        selectedMoveToFolderItems.add(decoMessage);
+			}
+		}
+
+		if (!msgSelected)
+		{
+			setErrorMessage(getResourceBundleString(NO_MARKED_MOVE_MESSAGE));
+			return null;
+		}
+		
+	    moveToTopic = selectedTopicId;
+	    return MOVE_MESSAGE_PG;
+		
+	}
+	
+	private List getPvtMsgListToProcess() {
+		List pvtMsgList = new ArrayList();
+		boolean searchMode = false;
 		// determine if we are looking at search results or the main listing
 		if (searchPvtMsgs != null && !searchPvtMsgs.isEmpty())
 		{
@@ -3391,6 +3498,19 @@ public void processChangeSelectView(ValueChangeEvent eve)
 		{
 			pvtMsgList = decoratedPvtMsgs;
 		}
+		
+		return pvtMsgList;
+	}
+	/**
+	 * 
+	 * @param readStatus
+	 * @return
+	 */
+	private String markCheckedMessages(boolean readStatus)
+	{
+		List pvtMsgList = getPvtMsgListToProcess();
+		boolean msgSelected = false;
+		boolean searchMode = false;
 		
 		Iterator pvtMsgListIter = pvtMsgList.iterator(); 
 		while (pvtMsgListIter.hasNext())

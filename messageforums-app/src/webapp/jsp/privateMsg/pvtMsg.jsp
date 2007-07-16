@@ -68,7 +68,9 @@
       </h:panelGrid>
  
  			<h:messages styleClass="alertMessage" id="errorMessages" /> 
-  	
+ 			<!-- Display successfully moving checked messsages to Deleted folder -->
+  			<h:outputText value="#{PrivateMessagesTool.multiDeleteSuccessMsg}" styleClass="success" rendered="#{PrivateMessagesTool.multiDeleteSuccess}" />
+  			
   		<%@include file="msgHeader.jsp"%>
 		<%-- gsilver:this table needs a render atrtibute that will make it not display if there are no messages - and a companion text block classed as "instruction" that will render instead--%>	
 	  <h:dataTable styleClass="listHier lines nolines"cellpadding="0" cellspacing="0"  id="pvtmsgs" width="100%" value="#{PrivateMessagesTool.decoratedPvtMsgs}" var="rcvdItems" 
@@ -267,6 +269,5 @@
      </script>
 
 		 </h:form>
-
 	</sakai:view>
 </f:view>
