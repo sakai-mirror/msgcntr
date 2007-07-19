@@ -96,6 +96,8 @@ public class PrivateMessagesTool
    * List individual private messages details
    */
   private static final String REPLY_SUBJECT_PREFIX = "pvt_reply_prefix";
+  //SAKAI-10505
+  private static final String FORWARD_SUBJECT_PREFIX = "pvt_forward_prefix";
   private static final String ALERT = "pvt_alert";
   private static final String NO_MATCH_FOUND = "pvt_no_match_found";
   private static final String MISSING_BEG_END_DATE = "pvt_missing_date_range";
@@ -114,6 +116,9 @@ public class PrivateMessagesTool
   private static final String ENTER_SEARCH_TEXT = "pvt_enter_search_text";
   private static final String MOVE_MSG_ERROR = "pvt_move_msg_error";
   private static final String NO_MARKED_READ_MESSAGE = "pvt_no_message_mark_read";
+  private static final String NO_MARKED_DELETE_MESSAGE = "pvt_no_message_mark_delete";
+  private static final String NO_MARKED_MOVE_MESSAGE = "pvt_no_message_mark_move";
+  private static final String MULTIDELETE_SUCCESS_MSG = "cdfm_deleted_success";
   
   /** Used to determine if this is combined tool or not */
   private static final String MESSAGECENTER_TOOL_ID = "sakai.messagecenter";
@@ -147,6 +152,8 @@ public class PrivateMessagesTool
   public static final String MESSAGE_STATISTICS_PG="pvtMsgStatistics";
   public static final String MESSAGE_HOME_PG="pvtMsgHpView";
   public static final String MESSAGE_REPLY_PG="pvtMsgReply";
+  //SAKAI-10505
+  public static final String MESSAGE_FORWARD_PG="pvtMsgForward";
   public static final String DELETE_MESSAGE_PG="pvtMsgDelete";
   public static final String REVISE_FOLDER_PG="pvtMsgFolderRevise";
   public static final String MOVE_MESSAGE_PG="pvtMsgMove";
@@ -200,7 +207,12 @@ public class PrivateMessagesTool
   
   //Delete items - Checkbox display and selection - Multiple delete
   private List selectedDeleteItems;
-  private List totalDisplayItems=new ArrayList() ;
+  private boolean multiDeleteSuccess;
+  private String multiDeleteSuccessMsg;
+  private List totalDisplayItems=new ArrayList();
+  
+  // Move to folder - Checkbox display and selection - Multiple move to folder
+  private List selectedMoveToFolderItems;
   
   //reply to 
   private String replyToBody;
@@ -217,6 +229,10 @@ public class PrivateMessagesTool
   
   //return to previous page after send msg
   private String fromMainOrHp = null;
+  
+  // for compose, are we coming from main page?
+  private boolean fromMain;
+  
   //////////////////////
   /** The configuration mode, received, sent,delete, case etc ... */
   public static final String STATE_PVTMSG_MODE = "pvtmsg.mode";
@@ -790,8 +806,39 @@ public class PrivateMessagesTool
   {
     this.selectView=selectView ;
   }
-  public void processChangeSelectView(ValueChangeEvent eve)
+  
+  public boolean isMultiDeleteSuccess() 
   {
+	return multiDeleteSuccess;
+  }
+
+  public void setMultiDeleteSuccess(boolean multiDeleteSuccess) 
+  {
+	this.multiDeleteSuccess = multiDeleteSuccess;
+  }
+
+
+  public String getMultiDeleteSuccessMsg() 
+  {
+	return multiDeleteSuccessMsg;
+  }
+
+  public void setMultiDeleteSuccessMsg(String multiDeleteSuccessMsg) 
+  {
+	this.multiDeleteSuccessMsg = multiDeleteSuccessMsg;
+  }
+
+public boolean isFromMain() {
+	return fromMain;
+}
+
+public String getServerUrl() {
+    return ServerConfigurationService.getServerUrl();
+ }
+
+public void processChangeSelectView(ValueChangeEvent eve)
+  {
+    multiDeleteSuccess = false;
     String currentValue = (String) eve.getNewValue();
   	if (!currentValue.equalsIgnoreCase(THREADED_VIEW) && selectView != null && selectView.equals(THREADED_VIEW))
   	{
@@ -967,12 +1014,14 @@ public class PrivateMessagesTool
   {
     LOG.debug("processActionHome()");
     msgNavMode = "privateMessages";
+    multiDeleteSuccess = false;
     return  MAIN_PG;
   }  
   public String processActionPrivateMessages()
   {
     LOG.debug("processActionPrivateMessages()");                    
     msgNavMode = "privateMessages";            
+    multiDeleteSuccess = false;
     return  MESSAGE_HOME_PG;
   }        
   public String processDisplayForum()
@@ -981,6 +1030,14 @@ public class PrivateMessagesTool
     if (searchPvtMsgs != null)
     	searchPvtMsgs.clear();
     return DISPLAY_MESSAGES_PG;
+  }
+ //SAKAI-10505 
+  public String processDisplayMessages()
+  {
+    LOG.debug("processDisplayMessages()");
+    if (searchPvtMsgs != null)
+    	searchPvtMsgs.clear();
+    return SELECTED_MESSAGE_PG;
   }
   public String processPvtMsgTopic()
   {
@@ -1028,7 +1085,8 @@ public class PrivateMessagesTool
    */ 
   public String processPvtMsgDetail() {
     LOG.debug("processPvtMsgDetail()");
-    
+    multiDeleteSuccess = false;
+
     String msgId=getExternalParameterByKey("current_msg_detail");
     setCurrentMsgUuid(msgId) ; 
     //retrive the detail for this message with currentMessageId    
@@ -1118,6 +1176,29 @@ public class PrivateMessagesTool
     return MESSAGE_REPLY_PG;
   }
   
+  
+  //SAKAI-10505 add forward.
+  /**
+   * called from Single delete Page
+   * @return - pvtMsgForward
+   */ 
+  public String processPvtMsgForward() {
+	    LOG.debug("processPvtMsgForward()");
+
+	    if(getDetailMsg() != null)
+	    {
+	    	if(getDetailMsg().getMsg().getTitle() != null && !getDetailMsg().getMsg().getTitle().startsWith(getResourceBundleString(FORWARD_SUBJECT_PREFIX)))
+	    		replyToSubject = getResourceBundleString(FORWARD_SUBJECT_PREFIX) + ' ' + getDetailMsg().getMsg().getTitle();
+	    	else
+	    		replyToSubject = getDetailMsg().getMsg().getTitle();
+	    }
+	    
+	    //from message detail screen
+	    this.setDetailMsg(getDetailMsg()) ;
+
+	    return MESSAGE_FORWARD_PG;
+	  }
+	  
   /**
    * called from Single delete Page
    * @return - pvtMsgDetail
@@ -1165,6 +1246,7 @@ public class PrivateMessagesTool
   public String processPvtMsgCompose() {
     this.setDetailMsg(new PrivateMessageDecoratedBean(messageManager.createPrivateMessage()));
     setFromMainOrHp();
+    fromMain = (msgNavMode == "") || (msgNavMode == "privateMessages");
     LOG.debug("processPvtMsgCompose()");
     return PVTMSG_COMPOSE;
   }
@@ -1619,6 +1701,7 @@ public class PrivateMessagesTool
    * processDisplayPreviousFolder()
    */
   public String processDisplayPreviousTopic() {
+	multiDeleteSuccess = false;
     String prevTopicTitle = getExternalParameterByKey("previousTopicTitle");
     if(hasValue(prevTopicTitle))
     {
@@ -1651,7 +1734,8 @@ public class PrivateMessagesTool
    * processDisplayNextFolder()
    */
   public String processDisplayNextTopic()
-  {  	  	
+  { 
+	multiDeleteSuccess = false;
     String nextTitle = getExternalParameterByKey("nextTopicTitle");
     if(hasValue(nextTitle))
     {
@@ -1815,7 +1899,107 @@ public class PrivateMessagesTool
     return DISPLAY_MESSAGES_PG;
 
   }
+  
+  
+  //SAKAI-10505
+  //////////////////////Forward SEND  /////////////////
+  public String processPvtMsgForwardSend() {
+    LOG.debug("processPvtMsgForwardSend()");
+    
+    PrivateMessage currentMessage = getDetailMsg().getMsg() ;
+  
+    if(!hasValue(getReplyToSubject()))
+    {
+      setErrorMessage(getResourceBundleString(MISSING_SUBJECT));
+      return null ;
+    }
+    
+    if(getSelectedComposeToList().size()<1)
+    {
+      setErrorMessage(getResourceBundleString(SELECT_MSG_RECIPIENT));
+      return null ;
+    }
+
+        
+    PrivateMessage rrepMsg = messageManager.createPrivateMessage() ;
+       
+    rrepMsg.setTitle(getReplyToSubject()) ; //rrepMsg.setTitle(rMsg.getTitle()) ;
+    rrepMsg.setDraft(Boolean.FALSE);
+    rrepMsg.setDeleted(Boolean.FALSE);
+    
+    rrepMsg.setAuthor(getAuthorString());
+    rrepMsg.setApproved(Boolean.FALSE);
+    rrepMsg.setBody(getReplyToBody()) ;
+    
+    rrepMsg.setLabel(getSelectedLabel());
+    
+    rrepMsg.setInReplyTo(currentMessage) ;
+    
+    //Add the recipientList as String for display in Sent folder
+    // Since some users may be hidden, if some of these are recipients
+    // filter them out (already checked if no recipients)
+    // if only 1 recipient no need to check visibility
+    String sendToString="";
+    String sendToHiddenString="";
+    
+    if (selectedComposeToList.size() == 1) {
+        MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
+        if(membershipItem != null)
+        {
+      		  sendToString +=membershipItem.getName()+"; " ;
+        }          
+    }
+    else {
+    	for (int i = 0; i < selectedComposeToList.size(); i++)
+    	{
+    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
+    		if(membershipItem != null)
+    		{
+    			if (membershipItem.isViewable()) {
+    				sendToString +=membershipItem.getName()+"; " ;
+    			}
+   		       	else {
+   	        		sendToHiddenString += membershipItem.getName() + "; ";
+   	        	}
+   	        }          
+    	}
+    }
+
+    if (! "".equals(sendToString)) {
+  	  sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
+    }
+
+    if ("".equals(sendToHiddenString)) {
+        rrepMsg.setRecipientsAsText(sendToString);
+    }
+    else {
+    	sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
+    	rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
+    }    
+    
+    //Add attachments
+    for(int i=0; i<allAttachments.size(); i++)
+    {
+      prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
+    }            
+    
+    if((SET_AS_YES).equals(getComposeSendAsPvtMsg()))
+    {
+      prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), false);
+    }
+    else{
+      prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), true);
+    }
+    
+    //reset contents
+    resetComposeContents();
+    
+    return DISPLAY_MESSAGES_PG;
+
+  }
  
+ //END SAKAI-10505
+  
   /**
    * process from Compose screen
    * @return - pvtMsg
@@ -1903,14 +2087,23 @@ public class PrivateMessagesTool
   { 
     LOG.debug("processPvtMsgMultiDelete()");
   
+    boolean deleted = false;
     for (Iterator iter = getSelectedDeleteItems().iterator(); iter.hasNext();)
     {
       PrivateMessage element = ((PrivateMessageDecoratedBean) iter.next()).getMsg();
       if (element != null) 
       {
+    	deleted = true;
         prtMsgManager.deletePrivateMessage(element, getPrivateMessageTypeFromContext(msgNavMode)) ;        
       }      
     }
+    
+    if (deleted)
+    {
+    	multiDeleteSuccessMsg = getResourceBundleString(MULTIDELETE_SUCCESS_MSG);
+    	multiDeleteSuccess = true;
+    }
+
     return DISPLAY_MESSAGES_PG;
   }
 
@@ -1925,6 +2118,8 @@ public class PrivateMessagesTool
   
   ///////////////////////////       Process Select All       ///////////////////////////////
   private boolean selectAll = false;  
+  private int numberChecked = 0; // to cover case where user selectes check all
+  
   public boolean isSelectAll()
   {
     return selectAll;
@@ -1932,6 +2127,11 @@ public class PrivateMessagesTool
   public void setSelectAll(boolean selectAll)
   {
     this.selectAll = selectAll;
+  }
+
+  public int getNumberChecked() 
+  {
+	return numberChecked;
   }
 
   /**
@@ -1942,7 +2142,8 @@ public class PrivateMessagesTool
   {
     LOG.debug("processCheckAll()");
     selectAll= true;
-    
+    multiDeleteSuccess = false;
+
     return null;
   }
   
@@ -2611,21 +2812,38 @@ public class PrivateMessagesTool
     	//error
     	setErrorMessage(getResourceBundleString(MOVE_MSG_ERROR));
     	return null;
-    }else{
-	    prtMsgManager.movePvtMsgTopic(detailMsg.getMsg(), oldTopic, newTopic);
+    }
+    else{
+    	if (selectedMoveToFolderItems == null)
+    	{
+    		prtMsgManager.movePvtMsgTopic(detailMsg.getMsg(), oldTopic, newTopic);
+    	}
+    	else
+    	{
+    		for (Iterator movingIter = selectedMoveToFolderItems.iterator(); movingIter.hasNext();)
+    		{
+    			PrivateMessageDecoratedBean decoMessage = (PrivateMessageDecoratedBean) movingIter.next();
+		        final PrivateMessage initPrivateMessage = prtMsgManager.initMessageWithAttachmentsAndRecipients(decoMessage.getMsg());
+    			decoMessage = new PrivateMessageDecoratedBean(initPrivateMessage);
+    			
+    			prtMsgManager.movePvtMsgTopic(decoMessage.getMsg(), oldTopic, newTopic);
+    		}
+    	}
 	    
-	    //reset 
-	    moveToTopic="";
-	    moveToNewTopic="";
-	    
-	    // Return to Messages & Forums page or Messages page
-	    // TODO: once message moved, where to return to?
-	    if (isMessagesandForums()) {
-	    	return MAIN_PG;
-	    }
-	    else {
-	    	return MESSAGE_HOME_PG;
-	    }
+		//reset 
+		moveToTopic="";
+		moveToNewTopic="";
+		selectedMoveToFolderItems = null;
+		
+    	// Return to Messages & Forums page or Messages page
+   		if (isMessagesandForums()) 
+   		{
+   			return MAIN_PG;
+   		}
+   		else
+   		{
+   			return MESSAGE_HOME_PG;
+   		}
     }
   }
   
@@ -2637,7 +2855,15 @@ public class PrivateMessagesTool
   {
     LOG.debug("processPvtMsgCancelToDetailView()");
     this.deleteConfirm=false;
-    return SELECTED_MESSAGE_PG ;
+    
+    // due to adding ability to move multiple messages
+    if (selectedMoveToFolderItems != null)
+    {
+    	selectedMoveToFolderItems = null;
+    	return DISPLAY_MESSAGES_PG;
+    }
+    
+    return SELECTED_MESSAGE_PG;
   }
   
   ///////////////   SEARCH      ///////////////////////
@@ -2669,7 +2895,8 @@ public class PrivateMessagesTool
   public String processSearch() 
   {
     LOG.debug("processSearch()");
-    
+    multiDeleteSuccess = false;
+
     List newls = new ArrayList() ;
 //    for (Iterator iter = getDecoratedPvtMsgs().iterator(); iter.hasNext();)
 //    {
@@ -2869,6 +3096,8 @@ public class PrivateMessagesTool
   public List createDecoratedDisplay(List msg)
   {
     List decLs= new ArrayList() ;
+    numberChecked = 0;
+
     for (Iterator iter = msg.iterator(); iter.hasNext();)
     {
       PrivateMessage element = (PrivateMessage) iter.next();                  
@@ -2878,6 +3107,7 @@ public class PrivateMessagesTool
       if(selectAll)
       {
         dbean.setIsSelected(true);
+        numberChecked++;
       }
        
       //getRecipients() is filtered for this perticular user i.e. returned list of only one PrivateMessageRecipient object
@@ -3096,7 +3326,15 @@ public class PrivateMessagesTool
     FacesContext.getCurrentInstance().addMessage(null,
         new FacesMessage(getResourceBundleString(ALERT) + ' ' + errorMsg));
   }
-  
+
+  private void setInformationMessage(String infoMsg)
+  {
+	    LOG.debug("setInformationMessage(String " + infoMsg + ")");
+	    FacesContext.getCurrentInstance().addMessage(null,
+	        new FacesMessage(infoMsg));
+  }
+
+ 
   /**
    * Enable privacy message
    * @return
@@ -3190,17 +3428,65 @@ public class PrivateMessagesTool
 		return markCheckedMessages(true);
 	}
 	
-	/**
-	 * 
-	 * @param readStatus
-	 * @return
-	 */
-	private String markCheckedMessages(boolean readStatus)
-	{
-		List pvtMsgList = new ArrayList();
+	public String processActionDeleteChecked() {
+	    LOG.debug("processActionDeleteChecked()");
+
+		List pvtMsgList = getPvtMsgListToProcess();
 		boolean msgSelected = false;
-		boolean searchMode = false;
+		selectedDeleteItems = new ArrayList();
 		
+		Iterator pvtMsgListIter = pvtMsgList.iterator(); 
+		while (pvtMsgListIter.hasNext())
+		{
+			PrivateMessageDecoratedBean decoMessage = (PrivateMessageDecoratedBean) pvtMsgListIter.next();
+			if(decoMessage.getIsSelected())
+			{
+				msgSelected = true;
+				selectedDeleteItems.add(decoMessage);
+			}
+		}
+
+		if (!msgSelected)
+		{
+			setErrorMessage(getResourceBundleString(NO_MARKED_DELETE_MESSAGE));
+			return null;
+		}
+		
+		return processPvtMsgMultiDelete();
+	}
+	
+	public String processActionMoveCheckedToFolder() {
+	    LOG.debug("processActionMoveCheckedToFolder()");
+
+	    List pvtMsgList = getPvtMsgListToProcess();
+	    boolean msgSelected = false;
+	    selectedMoveToFolderItems = new ArrayList();
+	    
+		Iterator pvtMsgListIter = pvtMsgList.iterator(); 
+		while (pvtMsgListIter.hasNext())
+		{
+			PrivateMessageDecoratedBean decoMessage = (PrivateMessageDecoratedBean) pvtMsgListIter.next();
+			if(decoMessage.getIsSelected())
+			{
+				msgSelected = true;
+		        selectedMoveToFolderItems.add(decoMessage);
+			}
+		}
+
+		if (!msgSelected)
+		{
+			setErrorMessage(getResourceBundleString(NO_MARKED_MOVE_MESSAGE));
+			return null;
+		}
+		
+	    moveToTopic = selectedTopicId;
+	    return MOVE_MESSAGE_PG;
+		
+	}
+	
+	private List getPvtMsgListToProcess() {
+		List pvtMsgList = new ArrayList();
+		boolean searchMode = false;
 		// determine if we are looking at search results or the main listing
 		if (searchPvtMsgs != null && !searchPvtMsgs.isEmpty())
 		{
@@ -3211,6 +3497,19 @@ public class PrivateMessagesTool
 		{
 			pvtMsgList = decoratedPvtMsgs;
 		}
+		
+		return pvtMsgList;
+	}
+	/**
+	 * 
+	 * @param readStatus
+	 * @return
+	 */
+	private String markCheckedMessages(boolean readStatus)
+	{
+		List pvtMsgList = getPvtMsgListToProcess();
+		boolean msgSelected = false;
+		boolean searchMode = false;
 		
 		Iterator pvtMsgListIter = pvtMsgList.iterator(); 
 		while (pvtMsgListIter.hasNext())
