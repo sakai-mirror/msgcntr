@@ -187,16 +187,17 @@
   	  	</a>
   	  </div>
   	  
- <table width="99%" height="90%">
-<tr>
+ <table width="99%">
+  <tr><td>&nbsp;</td></tr>
+  <tr>
 	<td align="center" valign="middle">
-		<table cellpadding="0" cellspacing="0" width="16%">
+		<table cellpadding="0" cellspacing="0">
 		<tr>
 		  <td>
 		  	<h:graphicImage id="waitIcon" value="#{msgs.wait_icon}" />
 		  </td>
 		  <td>&nbsp;&nbsp;</td>
-		  <td align="right" width="50">
+		  <td>
 			<span id="progress">
 				<h:outputText id="waitText" value="#{msgs.loading_wait}" style="font-size: 14pt;" />
 			</span>
@@ -204,7 +205,7 @@
 		</tr>
 		</table>
 	</td>
-</tr>
+  </tr>
 </table>
 
 <script language="JavaScript"> 
@@ -217,6 +218,7 @@
 	waitText.style.display = 'none';
 	
 	inMyWorkspace = true;
+	adjustMainFrameHeight(self.name);
 </script>
 
 <% } 
