@@ -25,8 +25,7 @@
 	//				and also within script (for Safari).
 	var intervalid, index = 0;
 	var notloading = true;
-	var images = new Array(12);
-	var imagesURI = new Array(12);
+	var inMyWorkspace = false;
 	
 	function getEl(id) {
 		if (document.getElementById) {
@@ -59,7 +58,17 @@
 	 * 2. an entire url (ex: url=http://www.somesite.com)
 	 */
 	function load() {
+		if (inMyWorkspace) {
+			var waitIcon = getEl("waitIcon");
+			waitIcon.style.display = 'block';
 
+			var waitText = getEl("waitText");
+			waitText.style.display = 'block';
+		
+			var toolbar = getEl("toolbar");
+			toolbar.style.display='none';
+		}
+		
 		if (notloading) {
 			notloading = false;
 		
@@ -157,7 +166,7 @@
   
   	<%-- Used to store where to redirect to so javascript can grab it. --%>
     <h:inputHidden id="longPageLoad" value="#{msgs.longPageLoad}" />
-
+	
 	<%-- Firefox browser needs to use AJAX to get actual page. Retrieved page then
 		 stuffed into this div --%>
 	<f:verbatim><div id="result"></f:verbatim>
@@ -171,18 +180,25 @@
   
   if (mfsb.isMyWorkspace()) {
 %>
-<table width="99%" height="90%">
+ 	  <div id="toolbar" class="navIntraTool" >
+  	  	<a href="#" onclick="load(); return false" >
+  	  		<h:graphicImage value="/../library/image/silk/email_go.png" />
+  	  		<h:outputText value="#{msgs.syn_check_messages}" />
+  	  	</a>
+  	  </div>
+  	  
+ <table width="99%" height="90%">
 <tr>
 	<td align="center" valign="middle">
 		<table cellpadding="0" cellspacing="0" width="16%">
 		<tr>
 		  <td>
-		  	<h:graphicImage value="#{msgs.wait_icon}" />
+		  	<h:graphicImage id="waitIcon" value="#{msgs.wait_icon}" />
 		  </td>
 		  <td>&nbsp;&nbsp;</td>
 		  <td align="right" width="50">
 			<span id="progress">
-				<h:outputText value="#{msgs.loading_wait}" style="font-size: 14pt;" />
+				<h:outputText id="waitText" value="#{msgs.loading_wait}" style="font-size: 14pt;" />
 			</span>
 		  </td>
 		</tr>
@@ -191,16 +207,31 @@
 </tr>
 </table>
 
-<% } %>
+<script language="JavaScript"> 
+	// Call javascript function to grab actual long loading page
+	// load();
+	var waitIcon = getEl('waitIcon');
+	waitIcon.style.display = 'none';
 
-	<f:verbatim></div></f:verbatim>
+	var waitText = getEl('waitText');
+	waitText.style.display = 'none';
+	
+	inMyWorkspace = true;
+</script>
 
-  </sakai:view>
-</f:view>
-
+<% } 
+   else {
+%>
 <script language="JavaScript"> 
 	// Call javascript function to grab actual long loading page
 	load();
 </script>
+
+<% } %>
+
+  <f:verbatim></div></f:verbatim>
+
+  </sakai:view>
+</f:view>
 
 </html>
