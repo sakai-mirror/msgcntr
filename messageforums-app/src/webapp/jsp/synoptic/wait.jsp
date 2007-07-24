@@ -182,7 +182,7 @@
 %>
  	  <div id="toolbar" class="navIntraTool" >
   	  	<a href="#" onclick="load(); return false" >
-  	  		<h:graphicImage value="/../library/image/silk/email_go.png" />
+  	  		<img src="/library/image/silk/email_go.png" align="absmiddle" />
   	  		<h:outputText value="#{msgs.syn_check_messages}" />
   	  	</a>
   	  </div>
