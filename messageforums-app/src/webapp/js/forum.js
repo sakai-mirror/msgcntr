@@ -238,9 +238,9 @@ if(typeof($) == "undefined"){
    js = document.createElement('script');
    js.setAttribute('language', 'javascript');
    js.setAttribute('type', 'text/javascript');
-   js.setAttribute('src','/library/js/jquery.js');
+   js.setAttribute('src','/library/js/jquery-1.1.2.js');
    document.getElementsByTagName('head').item(0).appendChild(js);
-//document.write('<script type="text/javascript" src="/library/js/jquery.js"></script>');}
+//document.write('<script type="text/javascript" src="/library/js/jquery-1.1.2.js"></script>');}
 }
 js = document.createElement('script');
 js.setAttribute('language', 'javascript');
