@@ -93,8 +93,8 @@
 				<f:verbatim><div class="hierItemBlockChild"></f:verbatim>
 		      <h:panelGrid columns="2" summary="layout" width="100%" styleClass="specialLink" cellpadding="0" cellspacing="0" columnClasses="bogus,itemAction">
 		      	<h:panelGroup>
-		      	<h:graphicImage url="/images/folder.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages == 0 }" />
-					      <h:graphicImage url="/images/folder_unread.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages > 0 }" />
+		      	<h:graphicImage url="/images/folder.gif" alt="#{msgs.cdfm_topic_folder}" rendered="#{topic.unreadNoMessages == 0 }" />
+					      <h:graphicImage url="/images/folder_unread.gif" alt="#{msgs.cdfm_topic_folder_unread}" rendered="#{topic.unreadNoMessages > 0 }" />
 					  <f:verbatim>&nbsp;&nbsp;</f:verbatim>
 						<h:outputText styleClass="highlight" id="draft" value="#{msgs.cdfm_draft}" rendered="#{topic.topic.draft == 'true'}"/>
 				      <h:outputText id="draft_space" value="  - " rendered="#{topic.topic.draft == 'true'}"/>
