@@ -218,6 +218,8 @@ public class DiscussionForumTool
   private List pendingMsgs = new ArrayList();
   
   private String userId;
+  
+  private boolean showForumLinksInNav = true;
 
   // compose
   private MessageForumsMessageManager messageManager;
@@ -296,6 +298,8 @@ public class DiscussionForumTool
     {
     	disableLongDesc = true;
     }
+    
+    showForumLinksInNav = ServerConfigurationService.getBoolean("mc.showForumLinksInNav", true);
   }
 
   /**
@@ -5504,41 +5508,21 @@ public class DiscussionForumTool
 	  try
 	  {
 		String currentUserId = getUserId();
-  	    if(!"false".equalsIgnoreCase(ServerConfigurationService.getString
-		  ("separateIdEid@org.sakaiproject.user.api.UserDirectoryService")))
-  	    {
+  	    
+  	    
 		  String userString = "";
-		  String userLastName = UserDirectoryService.getUser(currentUserId).getLastName();
-		  String userFirstName = UserDirectoryService.getUser(currentUserId).getFirstName();
-		  if((userLastName != null && userLastName.length() > 0) ||
-		    (userFirstName != null && userFirstName.length() > 0))
+		  userString = UserDirectoryService.getUser(currentUserId).getDisplayName();
+		  
+		  if((userString != null && userString.length() > 0))
 		  {
-			userString += userLastName + ", ";
-			userString += userFirstName;
+
 			return userString;
 		  }
 		  else
 		  {
-			return UserDirectoryService.getUserEid(currentUserId);
+			return UserDirectoryService.getUser(currentUserId).getDisplayId();
 		  }
-		}
-  	    else
-  	    {
-  	      String userString = "";
-  	      String userLastName = UserDirectoryService.getUser(currentUserId).getLastName();
-		  String userFirstName = UserDirectoryService.getUser(currentUserId).getFirstName();
-		  if((userLastName != null && userLastName.length() > 0) ||
-		    (userFirstName != null && userFirstName.length() > 0))
-		  {
-			userString += userLastName + ", ";
-			userString += userFirstName;
-			return userString;
-		  }
-		  else
-		  {
-			return UserDirectoryService.getUserEid(currentUserId);
-		  }
-  	    }
+		
 	  }
   	  catch(Exception e)
   	  {
@@ -5792,5 +5776,9 @@ public class DiscussionForumTool
 	 }
 	 public boolean isNoItemSelected() {
 		 return selectedAssign == null || selectedAssign.equalsIgnoreCase(DEFAULT_GB_ITEM);
+	 }
+	 
+	 public boolean getShowForumLinksInNav() {
+		 return showForumLinksInNav;
 	 }
 }
