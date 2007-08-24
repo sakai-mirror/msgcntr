@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -178,7 +179,10 @@ public class MessageForumSynopticBean {
 	private transient Boolean pmEnabled = null;
 	private transient Boolean anyMFToolInSite = null;
 	private transient List myWorkspaceContents = null;
-
+	private transient List currentUserMembershipsBySite = null;
+	private transient List userRoles = null;
+	private transient Map userSites = null;
+	
 	/** Used to determine if MessageCenter tool part of site */
 	private final String MESSAGE_CENTER_ID = "sakai.messagecenter";
 	private final String FORUMS_TOOL_ID = "sakai.forums";
@@ -378,31 +382,22 @@ public class MessageForumSynopticBean {
 	 * 		List of role ids user has for all sites passed in
 	 */
 	private List getUserRoles(List siteList) {
-		final List roles = new ArrayList();
-		final Iterator siteIter = siteList.iterator();
+		if (userRoles == null) {
+			userRoles = new ArrayList();
+			final Iterator siteIter = siteList.iterator();
 		
-		while (siteIter.hasNext()) {
+			while (siteIter.hasNext()) {
+				String siteId = (String) siteIter.next();
 			
-			Site curSite = null;
+				final String curRole = AuthzGroupService.getUserRole(SessionManager.getCurrentSessionUserId(), "/site/" + siteId);
 			
-			try {
-				curSite = getSite((String) siteIter.next());
-			}
-			catch (IdUnusedException e) {
-				// Mucho weirdness, found by getSites() but now cannot find
-				LOG.error("IdUnusedException while accessing site to determine user role");
-			}
-			
-			if (curSite != null) {
-				final String curRole = AuthzGroupService.getUserRole(SessionManager.getCurrentSessionUserId(), "/site/" + curSite.getId());
-			
-				if (curRole != null && ! roles.contains(curRole)) {
-					roles.add(curRole);
+				if (curRole != null && ! userRoles.contains(curRole)) {
+					userRoles.add(curRole);
 				}
 			}
 		}
 		
-		return roles;
+		return userRoles;
 	}
 
 	/**
@@ -1285,7 +1280,22 @@ public class MessageForumSynopticBean {
 	 */
 	private Site getSite(String siteId) 
 		throws IdUnusedException {
-		return SiteService.getSite(siteId);
+
+		Site site = null;
+		
+		if (userSites == null) {
+			userSites = new HashMap();
+		}
+
+		if (! userSites.containsKey(siteId)) {
+			site = SiteService.getSite(siteId);
+			userSites.put(siteId, site);
+		}
+		else {
+			site = (Site) userSites.get(siteId);
+		}
+		
+		return site;
 	}
 	
 	/**
@@ -1322,9 +1332,8 @@ public class MessageForumSynopticBean {
 		while (lsi.hasNext()) {
 			Site site = (Site) lsi.next();
 
-			// filter out unpublished or no messsage center
-			if (site.isPublished() && (isMessageForumsPageInSite(site)
-					|| isForumsPageInSite(site) || isMessagesPageInSite(site))) {
+			// filter out unpublished or no message center
+			if (site.isPublished()) {
 				siteList.add(site.getId());
 			}
 		}
@@ -1355,7 +1364,7 @@ public class MessageForumSynopticBean {
 	    		pf = pvtMessageManager.initializationHelper(pf, area);
 	    		List pvtTopics = pf.getTopics();
 	    		Collections.sort(pvtTopics, PrivateTopicImpl.TITLE_COMPARATOR);   //changed to date comparator
-	      
+
 	    		receivedTopic = (Topic) pvtTopics.iterator().next();
 	    		receivedTopicUuid = receivedTopic.getUuid();
 	    	} 
