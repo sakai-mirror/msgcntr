@@ -3,7 +3,7 @@
  * $Id: UIPermissionsManagerImpl.java 9227 2006-05-15 15:02:42Z cwen@iupui.edu $
  ***********************************************************************************
  *
- * Copyright (c) 2003, 2004, 2005, 2006, 2007 The Sakai Foundation.
+ * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
@@ -53,6 +53,7 @@ import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.thread_local.cover.ThreadLocalManager;
 
@@ -189,7 +190,12 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     {
       return true;
     }
-    
+    /* oncourse dept. admin check */
+    if (isAdminToolsUser())
+    {
+      return true;
+    }
+
     try
     {
       Iterator iter = getAreaItemsByCurrentUser();
@@ -224,6 +230,12 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     {
       return true;
     }
+    /* oncourse dept. admin check */
+    if (isAdminToolsUser())
+    {
+      return true;
+    }
+    
     if (securityService.unlock(SiteService.SECURE_UPDATE_SITE, getContextSiteId())){
     	return true;
     }
@@ -265,6 +277,12 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     {
       return true;
     }
+    /* oncourse dept. admin check */
+    if (isAdminToolsUser())
+    {
+      return true;
+    }
+
     try
     {
       Iterator iter = getForumItemsByCurrentUser(forum);
@@ -308,7 +326,6 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
       {
         DBMembershipItem item = (DBMembershipItem) iter.next();
         if (item.getPermissionLevel().getNewResponse().booleanValue()
-        	&& forum != null
             && forum.getDraft().equals(Boolean.FALSE)
             && forum.getLocked().equals(Boolean.FALSE)
             && topic.getDraft().equals(Boolean.FALSE)
@@ -424,6 +441,12 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     {
       return true;
     }
+    /* oncourse dept. admin check */
+    if (isAdminToolsUser())
+    {
+      return true;
+    }
+
     if (securityService.unlock(SiteService.SECURE_UPDATE_SITE, getContextSiteId())){
     	return true;
     }
@@ -878,14 +901,18 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
    * (non-Javadoc)
    * @see org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager#getCurrentUserMemberships()
    */
-  public List getCurrentUserMemberships()
+  public List getCurrentUserMemberships() {
+	return getCurrentUserMemberships(getContextId());  
+  }
+  
+  public List getCurrentUserMemberships(String siteId)
   {
 	  List userMemberships = new ArrayList();
 	  // first, add the user's role
-	  final String currRole = getCurrentUserRole();
+	  final String currRole = getCurrentUserRole(siteId);
 	  userMemberships.add(currRole);
 	  // now, add any groups the user is a member of
-	  Iterator groupIter = getGroupNamesByCurrentUser();
+	  Iterator groupIter = getGroupNamesByCurrentUser(siteId);
 	  while (groupIter.hasNext())
 	  {
 		  final String groupName = (String)groupIter.next();
@@ -926,13 +953,17 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
    * the current user is a member of
    * @return
    */
-  private Iterator getGroupNamesByCurrentUser()
+  private Iterator getGroupNamesByCurrentUser() {
+	  return getGroupNamesByCurrentUser(toolManager.getCurrentPlacement().getContext());
+  }
+  
+  private Iterator getGroupNamesByCurrentUser(String siteId)
   {
     List memberof = new ArrayList();
     try
     {
-      Collection groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext())
-          .getGroups();
+      Collection groups = SiteService.getSite(siteId).getGroups();
+      
       for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();)
       {
         Group currentGroup = (Group) groupIterator.next();
@@ -1295,11 +1326,14 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
   /**
    * @return
    */
-  private String getCurrentUserRole()
+  private String getCurrentUserRole() {
+	  return getCurrentUserRole(getContextId());
+  }
+  
+  private String getCurrentUserRole(String siteId)
   {
     LOG.debug("getCurrentUserRole()");
-    return authzGroupService.getUserRole(getCurrentUserId(), "/site/"
-        + getContextId());
+    return authzGroupService.getUserRole(getCurrentUserId(), "/site/" + siteId);
   }
 
   /**
@@ -1378,6 +1412,12 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     {
       return true;
     }
+    /* oncourse dept. admin check */
+    if (isAdminToolsUser())
+    {
+      return true;
+    }
+
     return false;
   }
   
@@ -1469,4 +1509,20 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
   	ThreadLocalManager.set("message_center_membership_topic", topicItems);
 	ThreadLocalManager.set("message_center_permission_set", new Boolean(true));
   }
+  
+  /* oncourse dept. admin check */
+  private boolean isAdminToolsUser()
+  {
+  	LOG.debug(" isAdminToolsUser()");
+  	try 
+  	{
+  		return securityService.isAdminToolsUser(UserDirectoryService.getUser(getCurrentUserId()));
+  	} 
+  	catch (UserNotDefinedException e) 
+  	{
+  		LOG.error("error in UIPermissionsManagerImpl.isAdminToolsUser:" + e);
+  		return false;
+  	}
+  }
+
 }
