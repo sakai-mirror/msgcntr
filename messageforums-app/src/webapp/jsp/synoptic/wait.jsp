@@ -178,7 +178,6 @@
   ValueBinding binding = app.createValueBinding("#{mfSynopticBean}");
   MessageForumSynopticBean mfsb = (MessageForumSynopticBean) binding.getValue(context);
   
-  if (mfsb.isMyWorkspace()) {
 %>
  	  <div id="toolbar" class="navIntraTool" >
   	  	<a href="#" onclick="load(); return false" >
@@ -220,16 +219,6 @@
 	inMyWorkspace = true;
 	adjustMainFrameHeight(self.name);
 </script>
-
-<% } 
-   else {
-%>
-<script language="JavaScript"> 
-	// Call javascript function to grab actual long loading page
-	load();
-</script>
-
-<% } %>
 
   <f:verbatim></div></f:verbatim>
 
