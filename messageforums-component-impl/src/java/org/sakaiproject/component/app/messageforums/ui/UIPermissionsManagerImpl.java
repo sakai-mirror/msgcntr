@@ -901,18 +901,14 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
    * (non-Javadoc)
    * @see org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager#getCurrentUserMemberships()
    */
-  public List getCurrentUserMemberships() {
-	return getCurrentUserMemberships(getContextId());  
-  }
-  
-  public List getCurrentUserMemberships(String siteId)
+  public List getCurrentUserMemberships()
   {
 	  List userMemberships = new ArrayList();
 	  // first, add the user's role
-	  final String currRole = getCurrentUserRole(siteId);
+	  final String currRole = getCurrentUserRole();
 	  userMemberships.add(currRole);
 	  // now, add any groups the user is a member of
-	  Iterator groupIter = getGroupNamesByCurrentUser(siteId);
+	  Iterator groupIter = getGroupNamesByCurrentUser();
 	  while (groupIter.hasNext())
 	  {
 		  final String groupName = (String)groupIter.next();
@@ -953,17 +949,13 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
    * the current user is a member of
    * @return
    */
-  private Iterator getGroupNamesByCurrentUser() {
-	  return getGroupNamesByCurrentUser(toolManager.getCurrentPlacement().getContext());
-  }
-  
-  private Iterator getGroupNamesByCurrentUser(String siteId)
+  private Iterator getGroupNamesByCurrentUser()
   {
     List memberof = new ArrayList();
     try
     {
-      Collection groups = SiteService.getSite(siteId).getGroups();
-      
+      Collection groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext())
+          .getGroups();
       for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();)
       {
         Group currentGroup = (Group) groupIterator.next();
@@ -1326,14 +1318,11 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
   /**
    * @return
    */
-  private String getCurrentUserRole() {
-	  return getCurrentUserRole(getContextId());
-  }
-  
-  private String getCurrentUserRole(String siteId)
+  private String getCurrentUserRole()
   {
     LOG.debug("getCurrentUserRole()");
-    return authzGroupService.getUserRole(getCurrentUserId(), "/site/" + siteId);
+    return authzGroupService.getUserRole(getCurrentUserId(), "/site/"
+        + getContextId());
   }
 
   /**

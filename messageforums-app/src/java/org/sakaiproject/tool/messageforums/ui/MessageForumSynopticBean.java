@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -42,26 +43,21 @@ import org.sakaiproject.api.app.messageforums.Area;
 import org.sakaiproject.api.app.messageforums.AreaManager;
 import org.sakaiproject.api.app.messageforums.DiscussionForum;
 import org.sakaiproject.api.app.messageforums.DiscussionTopic;
-// import org.sakaiproject.api.app.messageforums.DiscussionForumService;
-import org.sakaiproject.api.app.messageforums.MessageForumsForumManager;
 import org.sakaiproject.api.app.messageforums.MessageForumsMessageManager;
 import org.sakaiproject.api.app.messageforums.MessageForumsTypeManager;
 import org.sakaiproject.api.app.messageforums.PrivateForum;
 import org.sakaiproject.api.app.messageforums.PrivateMessage;
 import org.sakaiproject.api.app.messageforums.Topic;
-import org.sakaiproject.api.app.messageforums.UniqueArrayList;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.api.app.messageforums.ui.PrivateMessageManager;
 import org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager;
 import org.sakaiproject.authz.cover.AuthzGroupService;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateTopicImpl;
 import org.sakaiproject.component.cover.ServerConfigurationService;
-import org.sakaiproject.content.api.GroupAwareEntity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.tool.cover.SessionManager;
-import org.sakaiproject.site.api.Group;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SitePage;
 import org.sakaiproject.site.api.ToolConfiguration;
@@ -183,7 +179,10 @@ public class MessageForumSynopticBean {
 	private transient Boolean pmEnabled = null;
 	private transient Boolean anyMFToolInSite = null;
 	private transient List myWorkspaceContents = null;
-
+	private transient List currentUserMembershipsBySite = null;
+	private transient List userRoles = null;
+	private transient Map userSites = null;
+	
 	/** Used to determine if MessageCenter tool part of site */
 	private final String MESSAGE_CENTER_ID = "sakai.messagecenter";
 	private final String FORUMS_TOOL_ID = "sakai.forums";
@@ -210,9 +209,6 @@ public class MessageForumSynopticBean {
 	/** Needed if within a site so we only need stats for this site */
 	private MessageForumsMessageManager messageManager;
 
-	/** Needed to grab unread counts for sites current user has group membership in */
-	private MessageForumsForumManager forumsManager;
-	
 	/** Needed to get topics if tool within a site */
 	private DiscussionForumManager forumManager;
 
@@ -230,10 +226,6 @@ public class MessageForumSynopticBean {
 	
 	public void setMessageManager(MessageForumsMessageManager messageManager) {
 		this.messageManager = messageManager;
-	}
-
-	public void setForumsManager(MessageForumsForumManager forumsManager) {
-		this.forumsManager = forumsManager;
 	}
 
 	public void setForumManager(DiscussionForumManager forumManager) {
@@ -323,32 +315,6 @@ public class MessageForumSynopticBean {
 	}
 
 	/**
-	 * Need to grab the correct count for the role user has for each site.
-	 * Use for sites where user is not part of any group within a site.
-	 */
-	private List filterMessageCountsByRole(List dfCounts) {
-		if (dfCounts.isEmpty()) {
-			return dfCounts;
-		}
-
-		List resultList = new ArrayList();
-		
-		for (Iterator dfCountIter = dfCounts.iterator(); dfCountIter.hasNext();) {
-			final Object [] aCount = (Object []) dfCountIter.next();
-			
-			List siteRoles = uiPermissionsManager.getCurrentUserMemberships((String) aCount[0]);
-			
-			String roleId = ((String) siteRoles.get(0));
-				
-			if (roleId.equals((String) aCount[1])) {
-				resultList.add(aCount);
-			}
-		}
-		
-		return resultList;
-	}
-
-	/**
 	 * Removes from message counts messages that the user currently
 	 * does not have read access to.
 	 * 
@@ -373,7 +339,7 @@ public class MessageForumSynopticBean {
 		final Iterator currentIter = currentList.iterator();
 		
 		while (currentIter.hasNext()) {
-			final Object [] resultValues = new Object [3];
+			final Object [] resultValues = new Object [2];
 			Object [] removeValues;
 			Object [] currentValues = null;
 			
@@ -389,11 +355,9 @@ public class MessageForumSynopticBean {
 			if (pos != -1) {
 				removeValues = (Object []) removeList.get(pos);
 
-				if (((String) currentValues[1]).equals(removeValues[1])) {
-					resultValues[0] = currentValues[0];
-					resultValues[2] = new Integer( ((Integer) currentValues[2]).intValue() - 
+				resultValues[0] = currentValues[0];
+				resultValues[1] = new Integer( ((Integer) currentValues[1]).intValue() - 
 													((Integer) removeValues[2]).intValue() );
-				}
 				
 				resultList.add(resultValues);
 				
@@ -418,28 +382,22 @@ public class MessageForumSynopticBean {
 	 * 		List of role ids user has for all sites passed in
 	 */
 	private List getUserRoles(List siteList) {
-		final List roles = new UniqueArrayList();
-		final Iterator siteIter = siteList.iterator();
+		if (userRoles == null) {
+			userRoles = new ArrayList();
+			final Iterator siteIter = siteList.iterator();
 		
-		while (siteIter.hasNext()) {
-			try {
-				List thisSiteRoles = uiPermissionsManager.getCurrentUserMemberships(getSite((String) siteIter.next()).getId());
-
-				for (Iterator i = thisSiteRoles.iterator(); i.hasNext();) {
-					String roleGroupName = (String) i.next();
-					
-					if (!roles.contains(roleGroupName)) {
-						roles.addAll(thisSiteRoles);						
-					}
+			while (siteIter.hasNext()) {
+				String siteId = (String) siteIter.next();
+			
+				final String curRole = AuthzGroupService.getUserRole(SessionManager.getCurrentSessionUserId(), "/site/" + siteId);
+			
+				if (curRole != null && ! userRoles.contains(curRole)) {
+					userRoles.add(curRole);
 				}
-			}
-			catch (IdUnusedException e) {
-				// Mucho weirdness, found by getSites() earlier but now cannot find
-				LOG.error("IdUnusedException while accessing site to determine user roles and group memberships.");
 			}
 		}
 		
-		return roles;
+		return userRoles;
 	}
 
 	/**
@@ -466,37 +424,62 @@ public class MessageForumSynopticBean {
 		final Iterator siteIter = siteList.iterator();
 
 		while (siteIter.hasNext()) {
-			final String siteId = (String) siteIter.next();
+			
+			Site site;
+			
+			try {
+				site = getSite((String) siteIter.next());
+			}
+			catch (IdUnusedException e) {
+				// Weirdness - SiteService pulled this id and now it
+				// can't find the site it pulled it from
+				LOG.error("IdUnusedException trying to get site to remove non-read access messasges.");
+				continue;
+			}
 
 			// does current site contain counts to remove. if so, return index where
-			// once processed, site id removed, so regenerate site list
-			int pos = indexOf(siteId, getSiteIds(removeMessageCounts));
+			int pos = indexOf(site.getId(), getSiteIds(removeMessageCounts));
 
 			// found, so get it and add to result list
 			if (pos != -1) {
 				resultSet = (Object []) removeMessageCounts.get(pos);
 				
-				while (siteId.equals((String) resultSet[0])) {
+				while (site.getId().equals((String) resultSet[0])) {
 					// permissions based on roles, so need to check if user's role has messages
 					// that need to be removed from totals (either total or unread)
-					List roleAndGroups = uiPermissionsManager.getCurrentUserMemberships(siteId);
+					final String curRole = AuthzGroupService.getUserRole(
+												SessionManager.getCurrentSessionUserId(),
+														("/site/" + site.getId()) );
 				
-					if (roleAndGroups.contains((String) resultSet[1])) {
+					if (curRole.equals((String) resultSet[1])) {
 						resultList.add(resultSet);
-					}
-
-					removeMessageCounts.remove(pos++);
 					
-					pos = indexOf(siteId, getSiteIds(removeMessageCounts));
-					
-					if (pos != -1) {
-						resultSet = (Object []) removeMessageCounts.get(pos);
+						// remove all rows of removeMessageCounts for this site
+						// since I've found the one I was looking for
+						while (pos != -1) {
+							removeMessageCounts.remove(pos);
+							
+							pos = indexOf(site.getId(), getSiteIds(removeMessageCounts));
+						}
+						
+						// we're done removing rows, onto next site
+						resultSet = new Object [2];
+						resultSet[0] = "";
 					}
 					else {
-						// nope, no more for this site so do this to stop loop
-						resultSet = new Object [3];
-						resultSet[0] = "";
-					}  // end if setting up for next iteration of while
+						// this row is not it but may have others so remove it
+						// to set up for next iteration of the loop
+						removeMessageCounts.remove(pos++);
+
+						if (pos < removeMessageCounts.size()) {
+							resultSet = (Object []) removeMessageCounts.get(pos);
+						}
+						else {
+							// nope, no more for this site so do this to stop loop
+							resultSet = new Object [2];
+							resultSet[0] = "";
+						}
+					} 
 				}   // end while (site id = remove message site id)
 			}  // end if (pos != -1)
 		}  // end while (sites to check)
@@ -504,180 +487,6 @@ public class MessageForumSynopticBean {
 		return resultList;
 	}
 
-	/**
-	 * Returns a list of all sites that the current user has
-	 * multiple memberships (ie, grouped).
-	 */
-	private List getMultiMembershipSites(List siteList) {
-		List results = new ArrayList();
-		
-		for (Iterator siteIter = siteList.iterator(); siteIter.hasNext();) {
-			final String siteId = (String) siteIter.next();
-			
-			List roles = uiPermissionsManager.getCurrentUserMemberships(siteId);
-			
-			if (roles.size() > 1) {
-				results.add(siteId);
-			}
-		}
-		
-		return results;
-	}
-
-	private List filterAndAggragateGroupCounts(List counts)
-	{
-		if (counts.isEmpty())
-		{
-			return counts;
-		}
-		
-		List results = new ArrayList();
-		Object [] anotherCount;
-		
-		Iterator countIter = counts.iterator(); 
-
-		Object [] aCount = (Object []) countIter.next();
-		int forumCount = ((Integer) aCount[3]).intValue();
-		Long currentTopicId = (Long) aCount[1];
-		String currentContextId = (String) aCount[0];
-		String oldContextId;
-		
-		while (countIter.hasNext())
-		{
-			anotherCount = (Object []) countIter.next();
-
-			// if still in current site, add this count
-			if (currentContextId.equals((String) anotherCount[0]))
-			{
-				if (currentTopicId.longValue() != ((Long) anotherCount[1]))
-				{
-					forumCount += ((Integer) anotherCount[3]).intValue();
-					
-					currentTopicId = (Long) anotherCount[1];
-				}
-			}
-			else
-			{
-				// new site, save final count
-				Object [] finalCount = new Object [2];
-				finalCount[0] = currentContextId;
-				finalCount[1] = forumCount;
-				results.add(finalCount);
-
-				// set up for new site
-				forumCount = ((Integer) anotherCount[3]).intValue();
-				currentTopicId = (Long) anotherCount[1];
-				oldContextId = currentContextId;
-				currentContextId = (String) anotherCount[0];
-			}
-		}
-
-		// last set needs to be saved into list 
-		Object [] finalCount = new Object [2];
-		finalCount[0] = currentContextId;
-		finalCount[1] = forumCount;
-		results.add(finalCount);			
-		
-		return results;		
-	}
-
-	/**
-	 * Returns a count whose context id (index 0) matches the
-	 * value passed in. Otherwise null is returned.
-	 */
-	private Object [] getReadCount(List counts, String contextId)
-	{
-		for (Iterator countsIter = counts.iterator(); countsIter.hasNext();)
-		{
-			Object [] count = (Object []) countsIter.next();
-			
-			if (contextId.equals((String) count [0]))
-			{
-				// we found the count, remove from list for efficiency (?)
-/*				while (contextId.equals((String) count [0]))
-				{
-					counts.remove(count);
-					
-					if (countsIter.hasNext())
-					{
-						count = (Object []) countsIter.next();
-					}
-					else
-					{
-						count = new Object [2];
-						count[0] = "";
-					}
-				}
-*/
-				return count;
-			}
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * Returns the unread message count for each site.
-	 */
-	private List computeGroupedSitesUnreadCounts(List totalCounts, List readCounts)
-	{
-		if (readCounts.isEmpty())
-		{
-			return totalCounts;
-		}
-		
-		List results = new ArrayList();
-		
-		for (Iterator totalCountsIter = totalCounts.iterator(); totalCountsIter.hasNext();)
-		{
-			Object [] totalCount = (Object []) totalCountsIter.next();
-			Object [] readCount = getReadCount(readCounts, (String) totalCount[0]);
-			
-			if (readCount == null)
-			{
-				results.add(totalCount);
-			}
-			else
-			{
-				Object [] finalCount = new Object [2];
-				
-				finalCount[0] = totalCount[0];
-				finalCount[1] = ((Integer) totalCount[1]).intValue() - ((Integer) readCount[1]).intValue();
-				
-				results.add(finalCount);
-			}
-		}
-		
-		return results;
-	}
-	
-	/**
-	 * Returns unread message counts for sites this user is a 
-	 * member of a group. Need this since memberships caused
-	 * overlapping access and counts too high.
-	 */
-	private List getGroupedSitesCounts(List groupedSites) 
-	{
-		if (groupedSites.isEmpty()) {
-			return groupedSites;
-		}
-		
-		List results;
-
-		final List roleList = getUserRoles(groupedSites);
-
-
-		List dfTopicCounts = messageManager.findDiscussionForumMessageCountsForGroupedSitesByTopic(groupedSites, roleList);
-		List dfTopicReadCounts = messageManager.findDiscussionForumReadMessageCountsForGroupedSitesByTopic(groupedSites, roleList);
-		
-		dfTopicCounts = filterAndAggragateGroupCounts(dfTopicCounts);
-		dfTopicReadCounts = filterAndAggragateGroupCounts(dfTopicReadCounts);
-		
-		results = computeGroupedSitesUnreadCounts(dfTopicCounts, dfTopicReadCounts);
-		
-		return results;
-	}
-	
 	/**
 	 * Determines the number of unread messages for each site.
 	 * Filters out messages user does not have read permission for.
@@ -689,62 +498,69 @@ public class MessageForumSynopticBean {
 	 * 		List of unread message counts grouped by site
 	 */
 	private List compileDFMessageCount(List siteList) {
-		List unreadDFMessageCounts = new ArrayList();
-
 		// retrieve what possible roles user could be in sites
 		final List roleList = getUserRoles(siteList);
-
-		final List siteListMinusGrouped = new ArrayList();
-		siteListMinusGrouped.addAll(siteList);
-		
-		// get List of sites where user is part of a group since
-		// need to process differently since could affect which messages
-		// able to view.
-		final List groupedSites = getMultiMembershipSites(siteList);
-		
-		siteListMinusGrouped.removeAll(groupedSites);
-
-		final List groupedSitesCounts = getGroupedSitesCounts(groupedSites);
 		
 		// ******* Pulls total discussion forum message counts from DB *******
-		// If grouped in all sites, no processing needed
-		if (! siteListMinusGrouped.isEmpty()) {
-			List discussionForumMessageCounts = messageManager
-						.findDiscussionForumMessageCountsForAllSites(siteListMinusGrouped, roleList);
+		List unreadDFMessageCounts = new ArrayList();
+		List discussionForumMessageCounts = messageManager
+						.findDiscussionForumMessageCountsForAllSites(siteList);
 
-			discussionForumMessageCounts = filterMessageCountsByRole(discussionForumMessageCounts);
-		
-			// if still messages, keep processing
+		// if still messages, keep processing
+		if (! discussionForumMessageCounts.isEmpty()) {
+			List discussionForumRemoveMessageCounts = messageManager
+						.findDiscussionForumMessageRemoveCountsForAllSites(siteList, roleList);
+
+			discussionForumRemoveMessageCounts = selectCorrectRemoveMessageCount(
+													discussionForumRemoveMessageCounts, siteList);
+
+			// if still read messages to remove, keep processing
+			if (! discussionForumRemoveMessageCounts.isEmpty()) {
+				discussionForumMessageCounts = filterNoAccessMessages(
+													discussionForumMessageCounts,
+													discussionForumRemoveMessageCounts);
+			}
+
+			// if messages left, get read messages
 			if (! discussionForumMessageCounts.isEmpty()) {
 				// Pulls read discussion forum message counts from DB
 				List discussionForumReadMessageCounts = messageManager
-											.findDiscussionForumReadMessageCountsForAllSites(siteListMinusGrouped, roleList);
+											.findDiscussionForumReadMessageCountsForAllSites();
 
 				// if no read messages, totals are current message counts
 				if (discussionForumReadMessageCounts.isEmpty()) {
-					for (Iterator iter = discussionForumMessageCounts.iterator(); iter.hasNext();) {
-						Object [] count = (Object []) iter.next();
-						
-						Object [] finalCount = new Object [2];
-						finalCount[0] = count[0];
-						finalCount[1] = count[2];
-						
-						unreadDFMessageCounts.add(finalCount);
-					}
+					unreadDFMessageCounts = discussionForumMessageCounts;
 				}
 				else {
-					// else get correct read count
-					discussionForumReadMessageCounts = filterMessageCountsByRole(discussionForumReadMessageCounts);
-				
-					// subtract read from total to get unread counts
-					unreadDFMessageCounts = computeUnreadDFMessages(
-												discussionForumMessageCounts,
-												discussionForumReadMessageCounts);
-				} // end (discussionForumReadMessageCounts.isEmpty()) - after retrieving read messages from db 
-			} // end (! discussionForumMessageCounts.isEmpty()) - after initial retrieval of messages from db
-		} // end (! discussionForumMessageCounts.isEmpty())
+					// else need to subtract read messages to get unread messages
+					List discussionForumRemoveReadMessageCounts = messageManager
+						.findDiscussionForumReadMessageRemoveCountsForAllSites(getUserRoles(siteList));
 
-		unreadDFMessageCounts.addAll(groupedSitesCounts);
+					// need to find correct read message counts for site and role
+					discussionForumRemoveReadMessageCounts = 
+						selectCorrectRemoveMessageCount(discussionForumRemoveReadMessageCounts, siteList);
+
+					// if still messages to remove, remove them
+					if (! discussionForumRemoveReadMessageCounts.isEmpty()) {
+						discussionForumReadMessageCounts = filterNoAccessMessages(
+															discussionForumReadMessageCounts,
+															discussionForumRemoveReadMessageCounts);
+					}
+
+					// if after filtering there are no read message counts, current
+					// message counts are the result
+					if (discussionForumReadMessageCounts.isEmpty()) {
+						unreadDFMessageCounts = discussionForumMessageCounts;
+					} 
+					else {
+						// else subtract read from total to get unread counts
+						unreadDFMessageCounts = computeUnreadDFMessages(
+													discussionForumMessageCounts,
+													discussionForumReadMessageCounts);
+					} // end setting final unread message counts where subtraction needed
+				} // end (discussionForumReadMessageCounts.isEmpty()) - after retrieving read messages from db 
+			} // end (! discussionForumMessageCounts.isEmpty()) - after fitering messsage not accessible
+		} // end (! discussionForumMessageCounts.isEmpty()) - after initial retrieval of messages from db
 		
 		return unreadDFMessageCounts;
 	}
@@ -1069,8 +885,7 @@ public class MessageForumSynopticBean {
 			}
 		}
 
-		if (isMessageForumsPageInSite() || isForumsPageInSite()) 
-		{
+		if (isMessageForumsPageInSite() || isForumsPageInSite()) {
 			// Number of unread forum messages is a little harder
 			// need to loop through all topics and add them up
 			final List topicsList = forumManager.getDiscussionForums();
@@ -1078,15 +893,13 @@ public class MessageForumSynopticBean {
 
 			final Iterator forumIter = topicsList.iterator();
 
-			while (forumIter.hasNext()) 
-			{
+			while (forumIter.hasNext()) {
 				final DiscussionForum df = (DiscussionForum) forumIter.next();
 
 				final List topics = df.getTopics();
 				final Iterator topicIter = topics.iterator();
 
-				while (topicIter.hasNext()) 
-				{
+				while (topicIter.hasNext()) {
 					final DiscussionTopic topic = (DiscussionTopic) topicIter.next();
 					
 					if (uiPermissionsManager.isRead(topic, df))
@@ -1109,8 +922,7 @@ public class MessageForumSynopticBean {
 			dcms.setUnreadForumsAmt(unreadForum);
 			dcms.setMcPageURL(getMCPageURL());
 		}
-		else 
-		{
+		else {
 			// TODO: what to put on page? Alert? Leave Blank?
 		}
 		
@@ -1227,8 +1039,8 @@ public class MessageForumSynopticBean {
 			if (pos != -1) {
 				final Object [] dfReadMessageCountForASite = (Object []) readMessages.get(pos);
 				
-				siteDFInfo[1] = new Integer(((Integer) dfMessageCountForASite[2]).intValue()
-												- ((Integer) dfReadMessageCountForASite[2]).intValue());
+				siteDFInfo[1] = new Integer(((Integer) dfMessageCountForASite[1]).intValue()
+												- ((Integer) dfReadMessageCountForASite[1]).intValue());
 				
 				// done with it, remove from list
 				readMessages.remove(pos);
@@ -1236,7 +1048,7 @@ public class MessageForumSynopticBean {
 			} 
 			else {
 				// No messages read for this site so message count = unread message count
-				siteDFInfo[1] = (Integer) dfMessageCountForASite[2];
+				siteDFInfo[1] = (Integer) dfMessageCountForASite[1];
 			}
 
 			unreadDFMessageCounts.add(siteDFInfo);
@@ -1338,9 +1150,10 @@ public class MessageForumSynopticBean {
 	 * @return
 	 */
 	private boolean isToolInSite(Site thisSite, String toolId) {
-		final Collection toolsInSite = thisSite.getTools(toolId);
+		Collection toolsInSite = thisSite.getTools(toolId);
 
-		return ! toolsInSite.isEmpty();		
+		return ! toolsInSite.isEmpty();
+		
 	}
 
 	/**
@@ -1467,7 +1280,22 @@ public class MessageForumSynopticBean {
 	 */
 	private Site getSite(String siteId) 
 		throws IdUnusedException {
-		return SiteService.getSite(siteId);
+
+		Site site = null;
+		
+		if (userSites == null) {
+			userSites = new HashMap();
+		}
+
+		if (! userSites.containsKey(siteId)) {
+			site = SiteService.getSite(siteId);
+			userSites.put(siteId, site);
+		}
+		else {
+			site = (Site) userSites.get(siteId);
+		}
+		
+		return site;
 	}
 	
 	/**
@@ -1498,15 +1326,14 @@ public class MessageForumSynopticBean {
 			return mySites;
 		}
 
-		final List siteList = new UniqueArrayList();
+		final List siteList = new ArrayList();
 
 		// only display sites that are published and have Message Center in them
 		while (lsi.hasNext()) {
 			Site site = (Site) lsi.next();
 
-			// filter out unpublished or no messsage center
-			if (site.isPublished() && (isMessageForumsPageInSite(site)
-					|| isForumsPageInSite(site) || isMessagesPageInSite(site))) {
+			// filter out unpublished or no message center
+			if (site.isPublished()) {
 				siteList.add(site.getId());
 			}
 		}
@@ -1537,7 +1364,7 @@ public class MessageForumSynopticBean {
 	    		pf = pvtMessageManager.initializationHelper(pf, area);
 	    		List pvtTopics = pf.getTopics();
 	    		Collections.sort(pvtTopics, PrivateTopicImpl.TITLE_COMPARATOR);   //changed to date comparator
-	      
+
 	    		receivedTopic = (Topic) pvtTopics.iterator().next();
 	    		receivedTopicUuid = receivedTopic.getUuid();
 	    	} 

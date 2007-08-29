@@ -130,7 +130,6 @@ public interface UIPermissionsManager
    * @return
    */
   public List getCurrentUserMemberships();
-  public List getCurrentUserMemberships(String siteId);
   
   public Set getAreaItemsSet(Area area);
 
