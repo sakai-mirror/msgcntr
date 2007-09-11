@@ -266,16 +266,6 @@ public class DiscussionForumTool
   private MembershipManager membershipManager;
   private PermissionLevelManager permissionLevelManager;  
   
-
-  private Boolean instructor = null;
-  private Boolean newForum = null;
-  private Boolean displayPendingMsgQueue = null;
-  private List siteRoles = null;
-  private Boolean forumsTool = null;
-  private Boolean messagesandForums = null;
-  private List postingOptions = null;
-
-
   /**
    * 
    */
@@ -353,11 +343,7 @@ public class DiscussionForumTool
   public boolean isInstructor()
   {
     LOG.debug("isInstructor()");
-    if (instructor == null)
-    {
-       instructor = forumManager.isInstructor();
-    }
-    return instructor.booleanValue();
+    return forumManager.isInstructor();
   }
 
   /**
@@ -715,10 +701,7 @@ public class DiscussionForumTool
   public boolean getNewForum()
   {
     LOG.debug("getNewForum()");
-    if (newForum == null){
-       newForum = uiPermissionsManager.isNewForum();
-    }
-    return newForum.booleanValue();
+    return uiPermissionsManager.isNewForum();
   }
 
   /**
@@ -2147,18 +2130,16 @@ public class DiscussionForumTool
     	decoTopic.setTotalNoMessages(forumManager.getTotalViewableMessagesWhenMod(topic));
     	decoTopic.setUnreadNoMessages(forumManager.getNumUnreadViewableMessagesWhenMod(topic));
     }
-    boolean hasNextTopic = forumManager.hasNextTopic(topic);
-    boolean hasPreviousTopic = forumManager.hasPreviousTopic(topic);
-    decoTopic.setHasNextTopic(hasNextTopic);
-    decoTopic.setHasPreviousTopic(hasPreviousTopic);
-    if (hasNextTopic)
+    decoTopic.setHasNextTopic(forumManager.hasNextTopic(topic));
+    decoTopic.setHasPreviousTopic(forumManager.hasPreviousTopic(topic));
+    if (forumManager.hasNextTopic(topic))
     {
       DiscussionTopic nextTopic= forumManager.getNextTopic(topic);
         
               decoTopic.setNextTopicId(nextTopic.getId());
              
     }
-    if (hasPreviousTopic)
+    if (forumManager.hasPreviousTopic(topic))
     {    
         decoTopic
           .setPreviousTopicId(forumManager.getPreviousTopic(topic).getId());
@@ -2176,11 +2157,6 @@ public class DiscussionForumTool
     
     final boolean isRead = decoTopic.getIsRead();
     final boolean isNewResponse = decoTopic.getIsNewResponse();
-
-    boolean decoTopicGetIsDeleteAny = decoTopic.getIsDeleteAny();
-    boolean decoTopicGetIsDeleteOwn = decoTopic.getIsDeleteOwn();
-    boolean decoTopicGetIsReviseAny = decoTopic.getIsReviseAny();
-    boolean decoTopicGetIsReviseOwn = decoTopic.getIsReviseOwn();
     
     while (iter.hasNext())
     {
@@ -2195,8 +2171,8 @@ public class DiscussionForumTool
           {
           	decoMsg.setRead(messageManager.isMessageReadForUser(topic.getId(),
               message.getId()));
-          	decoMsg.setRevise(decoTopicGetIsReviseAny
-          			|| (decoTopicGetIsReviseOwn && decoMsg.getMessage().getCreatedBy().equals(UserDirectoryService.getCurrentUser().getId())));
+          	decoMsg.setRevise(decoTopic.getIsReviseAny() 
+          			|| (decoTopic.getIsReviseOwn() && decoMsg.getMessage().getCreatedBy().equals(UserDirectoryService.getCurrentUser().getId())));
           	decoTopic.addMessage(decoMsg);
           }
         }
@@ -2506,9 +2482,10 @@ public class DiscussionForumTool
     Message dMsg = constructMessage();
 
     forumManager.saveMessage(dMsg);
-    DiscussionTopic dSelectedTopic = (DiscussionTopic) forumManager
-        .getTopicByIdWithMessages(selectedTopic.getTopic().getId());
-    selectedTopic.setTopic(dSelectedTopic);
+    setSelectedForumForCurrentTopic((DiscussionTopic) forumManager
+        .getTopicByIdWithMessages(selectedTopic.getTopic().getId()));
+    selectedTopic.setTopic((DiscussionTopic) forumManager
+        .getTopicByIdWithMessages(selectedTopic.getTopic().getId()));
     selectedTopic.getTopic().setBaseForum(selectedForum.getForum());
     //selectedTopic.addMessage(new DiscussionMessageBean(dMsg, messageManager));
     selectedTopic.insertMessage(new DiscussionMessageBean(dMsg, messageManager));
@@ -3585,25 +3562,18 @@ public class DiscussionForumTool
    */
   public boolean isDisplayPendingMsgQueue()
   {
-     if (displayPendingMsgQueue == null){
 	  List membershipList = uiPermissionsManager.getCurrentUserMemberships();
 	  int numModTopicWithPerm = forumManager.getNumModTopicsWithModPermission(membershipList);
 	  
 	  if (numModTopicWithPerm < 1)
-          {
-             displayPendingMsgQueue = false;
-          }
-          else
-          {
+		  return false;
 	  
-	     if (refreshPendingMsgs)
-	     {
-	     	   refreshPendingMessages();
-	     }
-	     displayPendingMsgQueue = true;
-          }
-     }
-     return displayPendingMsgQueue.booleanValue();
+	  if (refreshPendingMsgs)
+	  {
+	  	refreshPendingMessages();
+	  }
+	  
+	  return true;
   }
   
   public int getNumPendingMessages()
@@ -4923,13 +4893,9 @@ public class DiscussionForumTool
   }
   public List getSiteRoles()
   {
-    if (siteRoles == null || siteMembers == null){
-        siteRoles = new ArrayList();
     //for group awareness
     //return getSiteMembers(false);
-  	siteRoles.addAll(getSiteMembers(true));
-    }
-    return siteRoles;
+  	return getSiteMembers(true);
   }
 
   public List getSiteMembers(boolean includeGroup)
@@ -5390,7 +5356,6 @@ public class DiscussionForumTool
     
      public List getPostingOptions()
       {
-        if (postingOptions == null){
         List postingOptions = new ArrayList();
         postingOptions.add(new SelectItem(PermissionBean.getResourceBundleString(PermissionBean.NONE),
         									PermissionBean.getResourceBundleString(PermissionBean.NONE)));
@@ -5398,7 +5363,6 @@ public class DiscussionForumTool
         									PermissionBean.getResourceBundleString(PermissionBean.OWN)));
         postingOptions.add(new SelectItem(PermissionBean.getResourceBundleString(PermissionBean.ALL),
         									PermissionBean.getResourceBundleString(PermissionBean.ALL)));
-        }
         return postingOptions;
       }
      
@@ -5724,20 +5688,14 @@ public class DiscussionForumTool
 	 * @return TRUE if within Messages & Forums tool, FALSE otherwise
 	 */
 	public boolean isMessagesandForums() {		
-             if (messagesandForums == null){
-		messagesandForums =  messageManager.currentToolMatch(MESSAGECENTER_TOOL_ID);
-             }
-            return messagesandForums.booleanValue();
+		return messageManager.currentToolMatch(MESSAGECENTER_TOOL_ID);
 	}
 	
 	/**
 	 * @return TRUE if within Forums tool, FALSE otherwise
 	 */
 	public boolean isForumsTool() {
-            if (forumsTool == null){
-		forumsTool = messageManager.currentToolMatch(FORUMS_TOOL_ID);
-            }
-            return forumsTool;
+		return messageManager.currentToolMatch(FORUMS_TOOL_ID);
 	}
 	
    private String gotoMain() {

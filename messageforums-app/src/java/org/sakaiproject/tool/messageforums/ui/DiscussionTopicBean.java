@@ -55,27 +55,9 @@ public class DiscussionTopicBean
   private ArrayList contributorsList = new ArrayList();
   private ArrayList accessorList = new ArrayList();
   private String gradeAssign;
-  private Boolean nonePermission = null;
+  private boolean nonePermission = true;
   private boolean sorted = false;
-
   
-  private Boolean isRead = null;
-  private Boolean isReviseAny = null; 
-  private Boolean isReviseOwn = null;
-  private Boolean isDeleteAny = null;
-  private Boolean isDeleteOwn = null;
-  private Boolean isMarkAsRead = null;
-  private Boolean isModeratedAndHasPerm = null;
-  
-  private Boolean changeSettings = null;
-  private Boolean isMovePostings = null;
-  private Boolean isNewResponse = null;
-  private Boolean isNewResponseToResponse = null;
-  private Boolean postToGradebook = null;
-  private String locked = "";
-  private String moderated = "";
-  private String mustRespondBeforeReading = "";
-  private String parentForumId = "";
 
   private List messages = new ArrayList();
 
@@ -274,17 +256,14 @@ public class DiscussionTopicBean
     }
     this.readFullDesciption = readFullDesciption;
   }
- 
+
   /**
    * @return Returns the parentForumId.
    */
   public String getParentForumId()
   {
     LOG.debug("getParentForumId()");
-    if (parentForumId.equals("")){
-    	parentForumId = topic.getBaseForum().getId().toString();
-    }
-    return parentForumId;
+    return topic.getBaseForum().getId().toString();
   }
 
   /**
@@ -293,18 +272,12 @@ public class DiscussionTopicBean
   public String getMustRespondBeforeReading()
   {
     LOG.debug("getMustRespondBeforeReading()");
-    if (mustRespondBeforeReading.equals("")){
-	    if (topic == null || topic.getMustRespondBeforeReading() == null
-	        || topic.getMustRespondBeforeReading().booleanValue() == false)
-	    {
-	      mustRespondBeforeReading = Boolean.FALSE.toString();
-	    }
-	    else
-	    {
-	      mustRespondBeforeReading = Boolean.TRUE.toString();
-	    }
+    if (topic == null || topic.getMustRespondBeforeReading() == null
+        || topic.getMustRespondBeforeReading().booleanValue() == false)
+    {
+      return Boolean.FALSE.toString();
     }
-    return mustRespondBeforeReading;
+    return Boolean.TRUE.toString();
   }
 
   /**
@@ -332,18 +305,12 @@ public class DiscussionTopicBean
   public String getLocked()
   {
     LOG.debug("getLocked()");
-    if (locked.equals("")){
-	    if (topic == null || topic.getLocked() == null
-	        || topic.getLocked().booleanValue() == false)
-	    {
-	      locked = Boolean.FALSE.toString();
-	    }
-	    else
-	    {
-	      locked =  Boolean.TRUE.toString();
-	    }
+    if (topic == null || topic.getLocked() == null
+        || topic.getLocked().booleanValue() == false)
+    {
+      return Boolean.FALSE.toString();
     }
-    return locked;
+    return Boolean.TRUE.toString();
   }
 
   /**
@@ -381,18 +348,12 @@ public class DiscussionTopicBean
   public String getModerated()
   {
     LOG.debug("getModerated()");
-    if (moderated.equals("")){
-	    if (topic == null || topic.getModerated() == null
-	        || topic.getModerated().booleanValue() == false)
-	    {
-	      moderated = Boolean.FALSE.toString();
-	    }
-	    else
-	    {
-	      moderated = Boolean.TRUE.toString();
-	    }
+    if (topic == null || topic.getModerated() == null
+        || topic.getModerated().booleanValue() == false)
+    {
+      return Boolean.FALSE.toString();
     }
-    return moderated;
+    return Boolean.TRUE.toString();
   }
 
   /**
@@ -472,11 +433,8 @@ public class DiscussionTopicBean
   public boolean getIsNewResponse()
   {
     LOG.debug("getIsNewResponse()");
-    if (isNewResponse == null){
-    	isNewResponse = uiPermissionsManager.isNewResponse(topic, (DiscussionForum) topic
-    			.getBaseForum());
-    }
-    return isNewResponse.booleanValue();
+    return uiPermissionsManager.isNewResponse(topic, (DiscussionForum) topic
+        .getBaseForum());
   }
 
   /**
@@ -485,25 +443,18 @@ public class DiscussionTopicBean
   public boolean getIsNewResponseToResponse()
   {
     LOG.debug("getIsNewResponseToResponse()");
-    if (isNewResponseToResponse == null){
-    	isNewResponseToResponse = uiPermissionsManager.isNewResponseToResponse(topic,
-    			(DiscussionForum) topic.getBaseForum());
-    }
-    return isNewResponseToResponse.booleanValue();
+    return uiPermissionsManager.isNewResponseToResponse(topic,
+        (DiscussionForum) topic.getBaseForum());
   }
 
-  
   /**
    * @return
    */
   public boolean getIsMovePostings()
   {
     LOG.debug("getIsMovePostings()");
-    if (isMovePostings == null){
-    	isMovePostings = uiPermissionsManager.isMovePostings(topic, (DiscussionForum) topic
-    			.getBaseForum());
-    }
-    return isMovePostings.booleanValue();
+    return uiPermissionsManager.isMovePostings(topic, (DiscussionForum) topic
+        .getBaseForum());
   }
 
   /**
@@ -512,11 +463,8 @@ public class DiscussionTopicBean
   public boolean isChangeSettings()
   {
     LOG.debug("isChangeSettings()");
-    if (changeSettings == null){
-    	changeSettings = uiPermissionsManager.isChangeSettings(topic, (DiscussionForum) topic
-    			.getBaseForum());
-    }
-    return changeSettings.booleanValue();
+    return uiPermissionsManager.isChangeSettings(topic, (DiscussionForum) topic
+        .getBaseForum());
   }
 
   /**
@@ -525,11 +473,8 @@ public class DiscussionTopicBean
   public boolean isPostToGradebook()
   {
     LOG.debug("isPostToGradebook()");
-    if (postToGradebook == null){
-    	postToGradebook = uiPermissionsManager.isPostToGradebook(topic,
-    			(DiscussionForum) topic.getBaseForum());
-    }
-    return postToGradebook.booleanValue();
+    return uiPermissionsManager.isPostToGradebook(topic,
+        (DiscussionForum) topic.getBaseForum());
   }
   
   public boolean getIsPostToGradebook()
@@ -537,18 +482,15 @@ public class DiscussionTopicBean
     LOG.debug("getIsPostToGradebook()");
     return isPostToGradebook();
   }
-  
+
   /**
    * @return
    */
   public boolean getIsRead()
   {
     LOG.debug("getIsRead()");
-    if (isRead == null){
-    	isRead = uiPermissionsManager.isRead(topic, (DiscussionForum) topic
-		        .getBaseForum());
-    }
-    return isRead.booleanValue();
+    return uiPermissionsManager.isRead(topic, (DiscussionForum) topic
+        .getBaseForum());
   }
 
   /**
@@ -557,11 +499,8 @@ public class DiscussionTopicBean
   public boolean getIsReviseAny()
   {
     LOG.debug("getIsReviseAny()");
-    if (isReviseAny == null){
-    	isReviseAny = uiPermissionsManager.isReviseAny(topic, (DiscussionForum) topic
-		        .getBaseForum());
-    }
-    return isReviseAny.booleanValue();
+    return uiPermissionsManager.isReviseAny(topic, (DiscussionForum) topic
+        .getBaseForum());
   }
 
   /**
@@ -570,11 +509,8 @@ public class DiscussionTopicBean
   public boolean getIsReviseOwn()
   {
     LOG.debug("getIsReviseOwn()");
-    if (isReviseOwn == null){
-    	isReviseOwn = uiPermissionsManager.isReviseOwn(topic, (DiscussionForum) topic
-		        .getBaseForum());
-    }
-    return isReviseOwn.booleanValue();
+    return uiPermissionsManager.isReviseOwn(topic, (DiscussionForum) topic
+        .getBaseForum());
   }
 
   /**
@@ -583,11 +519,8 @@ public class DiscussionTopicBean
   public boolean getIsDeleteAny()
   {
     LOG.debug("getIsDeleteAny()");
-    if (isDeleteAny == null){
-    	isDeleteAny = uiPermissionsManager.isDeleteAny(topic, (DiscussionForum) topic
-		        .getBaseForum());
-    }
-    return isDeleteAny.booleanValue();
+    return uiPermissionsManager.isDeleteAny(topic, (DiscussionForum) topic
+        .getBaseForum());
   }
 
   /**
@@ -596,11 +529,8 @@ public class DiscussionTopicBean
   public boolean getIsDeleteOwn()
   {
     LOG.debug("getIsDeleteOwn()");
-    if (isDeleteOwn == null){
-    	isDeleteOwn = uiPermissionsManager.isDeleteOwn(topic, (DiscussionForum) topic
-		        .getBaseForum());
-    }
-    return isDeleteOwn.booleanValue();
+    return uiPermissionsManager.isDeleteOwn(topic, (DiscussionForum) topic
+        .getBaseForum());
   }
 
   /**
@@ -609,21 +539,15 @@ public class DiscussionTopicBean
   public boolean getIsMarkAsRead()
   {
     LOG.debug("getIsMarkAsRead()");
-    if (isMarkAsRead == null){
-    	isMarkAsRead = uiPermissionsManager.isMarkAsRead(topic, (DiscussionForum) topic
-		        .getBaseForum());
-    }
-    return isMarkAsRead.booleanValue();
+    return uiPermissionsManager.isMarkAsRead(topic, (DiscussionForum) topic
+        .getBaseForum());
   }
   
   public boolean getIsModeratedAndHasPerm()
   {
 	  LOG.debug("getIsModeratedAndHasPerm()");
-	  if (isModeratedAndHasPerm == null){
-	    	isModeratedAndHasPerm = topic.getModerated().booleanValue()
-		  	&& uiPermissionsManager.isModeratePostings(topic, (DiscussionForum) topic.getBaseForum());
-	  }
-	  return isModeratedAndHasPerm.booleanValue();
+	  return topic.getModerated().booleanValue()
+	  	&& uiPermissionsManager.isModeratePostings(topic, (DiscussionForum) topic.getBaseForum());
   }
 
   /**
@@ -691,31 +615,25 @@ public class DiscussionTopicBean
 
 	public boolean getNonePermission()
 	{
-		if (nonePermission == null){
-	/*		if(uiPermissionsManager.isChangeSettings(topic, (DiscussionForum)topic.getBaseForum()) 
-					|| uiPermissionsManager.isDeleteAny(topic, (DiscussionForum)topic.getBaseForum())
-					|| uiPermissionsManager.isDeleteOwn(topic, (DiscussionForum)topic.getBaseForum())
-					|| uiPermissionsManager.isMarkAsRead(topic, (DiscussionForum)topic.getBaseForum())
-					|| uiPermissionsManager.isMovePostings(topic, (DiscussionForum)topic.getBaseForum())
+		nonePermission = true;
+/*		if(uiPermissionsManager.isChangeSettings(topic, (DiscussionForum)topic.getBaseForum()) 
+				|| uiPermissionsManager.isDeleteAny(topic, (DiscussionForum)topic.getBaseForum())
+				|| uiPermissionsManager.isDeleteOwn(topic, (DiscussionForum)topic.getBaseForum())
+				|| uiPermissionsManager.isMarkAsRead(topic, (DiscussionForum)topic.getBaseForum())
+				|| uiPermissionsManager.isMovePostings(topic, (DiscussionForum)topic.getBaseForum())
+				|| uiPermissionsManager.isNewResponse(topic, (DiscussionForum)topic.getBaseForum())
+				|| uiPermissionsManager.isNewResponseToResponse(topic, (DiscussionForum)topic.getBaseForum())
+				|| uiPermissionsManager.isPostToGradebook(topic, (DiscussionForum)topic.getBaseForum())
+				|| uiPermissionsManager.isRead(topic, (DiscussionForum)topic.getBaseForum())
+				|| uiPermissionsManager.isReviseAny(topic, (DiscussionForum)topic.getBaseForum())
+				|| uiPermissionsManager.isReviseOwn(topic, (DiscussionForum)topic.getBaseForum()))*/
+			if(uiPermissionsManager.isChangeSettings(topic, (DiscussionForum)topic.getBaseForum())
 					|| uiPermissionsManager.isNewResponse(topic, (DiscussionForum)topic.getBaseForum())
-					|| uiPermissionsManager.isNewResponseToResponse(topic, (DiscussionForum)topic.getBaseForum())
-					|| uiPermissionsManager.isPostToGradebook(topic, (DiscussionForum)topic.getBaseForum())
-					|| uiPermissionsManager.isRead(topic, (DiscussionForum)topic.getBaseForum())
-					|| uiPermissionsManager.isReviseAny(topic, (DiscussionForum)topic.getBaseForum())
-					|| uiPermissionsManager.isReviseOwn(topic, (DiscussionForum)topic.getBaseForum()))*/
-				if(uiPermissionsManager.isChangeSettings(topic, (DiscussionForum)topic.getBaseForum())
-						|| uiPermissionsManager.isNewResponse(topic, (DiscussionForum)topic.getBaseForum())
-						|| uiPermissionsManager.isRead(topic, (DiscussionForum)topic.getBaseForum()))
-				{
-					nonePermission = false;
-				}
-				else
-				{
-					nonePermission = true;
-				}
-					
+					|| uiPermissionsManager.isRead(topic, (DiscussionForum)topic.getBaseForum()))
+		{
+			nonePermission = false;
 		}
-		return nonePermission.booleanValue();
+		return nonePermission;
 	}
 
 	public void setNonePermission(boolean nonePermission)
