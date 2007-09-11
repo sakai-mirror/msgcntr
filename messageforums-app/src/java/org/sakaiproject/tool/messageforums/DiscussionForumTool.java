@@ -1609,7 +1609,7 @@ public class DiscussionForumTool
 	    	}
 	    }
 
-	    recursiveGetThreadedMsgs(msgsList, orderedList, selectedThreadHead);
+	    recursiveGetThreadedMsgsFromList(msgsList, orderedList, selectedThreadHead);
 	    selectedThread.addAll(orderedList);
 	    
 	    return THREAD_VIEW;
@@ -4154,6 +4154,7 @@ public class DiscussionForumTool
 	{
   
 	  	List msgsList = selectedTopic.getMessages();
+	  	Collections.reverse(msgsList);
 	  	if (msgsList != null && !msgsList.isEmpty())
 	  		msgsList = filterModeratedMessages(msgsList, selectedTopic.getTopic(), (DiscussionForum)selectedTopic.getTopic().getBaseForum());
 	  	
