@@ -9,7 +9,7 @@
 <f:view>
 <sakai:view>
 	<h:form id="msgForum">
-<!--jsp/discussionForum/message/dfViewMessage.jsp-->
+<!--jh  jsp/discussionForum/message/dfViewMessage.jsp-->
 		
 		  <h:panelGrid columns="2" summary="layout" width="100%" styleClass="navPanel">
 		    <h:panelGroup styleClass="breadCrumb">
