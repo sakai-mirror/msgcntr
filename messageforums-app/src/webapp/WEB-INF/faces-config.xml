@@ -57,14 +57,6 @@
       <renderer-class>org.sakaiproject.tool.messageforums.jsf.HierPvtMsgDataTableRender</renderer-class>
     </renderer>
     </render-kit>
-    <!-- =================== Validators ============== -->
-    <validator>
-    	<description>Required Validator that trims first</description>
-    	<validator-id>MessageTitle</validator-id>
-    	<validator-class>
-    		org.sakaiproject.tool.messageforums.jsf.MessageTitleValidator
-    	</validator-class>
-    </validator>
     <!-- =================== Navigation ============== -->
     <navigation-rule>
         <from-view-id>/jsp/*</from-view-id>
@@ -417,7 +409,7 @@
         <description>Synoptic Message Bean</description>
         <managed-bean-name>mfSynopticBean</managed-bean-name>
         <managed-bean-class>org.sakaiproject.tool.messageforums.ui.MessageForumSynopticBean</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
+        <managed-bean-scope>session</managed-bean-scope>
         <managed-property>
         	<description>Message Manager</description>
         	<property-name>messageManager</property-name>

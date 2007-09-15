@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.hibernate.Hibernate;
@@ -104,7 +105,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
 
   public void init()
   {
-	LOG.info("init()");
+     LOG.info("init()");
     ;
   }
 
@@ -1075,7 +1076,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       String bodyString = body.toString();
       
       /** determines if default in sakai.properties is set, if not will make a reasonable default */
-      String defaultEmail = "postmaster@" + ServerConfigurationService.getServerName();
+      String defaultEmail = "notifications@" + ServerConfigurationService.getServerName();
       String systemEmail = ServerConfigurationService.getString("msgcntr.notification.from.address", defaultEmail);
       
       /** determine if current user is equal to recipient */
@@ -1449,7 +1450,7 @@ return topicTypeUuid;
    */
   public String getResourceBundleString(String key) 
   {
-//	 ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
+//	 ResourceBundle rb = ResourceBundle.getBundle(MESSAGECENTER_BUNDLE);
 
       return areaManager.getResourceBundleString(key);
   }

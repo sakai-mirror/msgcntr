@@ -102,6 +102,18 @@ public interface UIPermissionsManager
    * @param topic
    * @return
    */
+  public boolean isViewReadbyAny(DiscussionTopic topic, DiscussionForum forum);
+
+  /**
+   * @param topic
+   * @return
+   */
+  public boolean isViewReadbyOwn(DiscussionTopic topic, DiscussionForum forum);
+  
+  /**
+   * @param topic
+   * @return
+   */
   public boolean isDeleteAny(DiscussionTopic topic, DiscussionForum forum);
 
   /**
@@ -130,7 +142,6 @@ public interface UIPermissionsManager
    * @return
    */
   public List getCurrentUserMemberships();
-  public List getCurrentUserMemberships(String siteId);
   
   public Set getAreaItemsSet(Area area);
 

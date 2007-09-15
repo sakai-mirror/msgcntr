@@ -94,6 +94,16 @@ public class UserPermissionManagerImpl extends HibernateDaoSupport implements Us
         return permission == null ? false : permission.getReviseOwn().booleanValue();
     }
 
+    public boolean canViewReadbyAny(Topic topic, String typeId) {
+        MessagePermissions permission = permissionManager.getTopicMessagePermissionForRole(topic, getCurrentUserRole(), typeId);
+        return permission == null ? false : permission.getViewReadbyAny().booleanValue();
+    }
+
+    public boolean canViewReadbyOwn(Topic topic, String typeId) {
+        MessagePermissions permission = permissionManager.getTopicMessagePermissionForRole(topic, getCurrentUserRole(), typeId);
+        return permission == null ? false : permission.getViewReadbyOwn().booleanValue();
+    }
+    
     public boolean canDeleteAny(Topic topic, String typeId) {
         MessagePermissions permission = permissionManager.getTopicMessagePermissionForRole(topic, getCurrentUserRole(), typeId);
         return permission == null ? false : permission.getDeleteAny().booleanValue();
@@ -124,6 +134,16 @@ public class UserPermissionManagerImpl extends HibernateDaoSupport implements Us
         return permission == null ? false : permission.getReviseOwn().booleanValue();
     }
 
+    public boolean canViewReadbyAny(BaseForum forum, String typeId) {
+        MessagePermissions permission = permissionManager.getForumMessagePermissionForRole(forum, getCurrentUserRole(), typeId);
+        return permission == null ? false : permission.getViewReadbyAny().booleanValue();
+    }
+
+    public boolean canViewReadbyOwn(BaseForum forum, String typeId) {
+        MessagePermissions permission = permissionManager.getForumMessagePermissionForRole(forum, getCurrentUserRole(), typeId);
+        return permission == null ? false : permission.getViewReadbyOwn().booleanValue();
+    }
+    
     public boolean canDeleteAny(BaseForum forum, String typeId) {
         MessagePermissions permission = permissionManager.getForumMessagePermissionForRole(forum, getCurrentUserRole(), typeId);
         return permission == null ? false : permission.getDeleteAny().booleanValue();
@@ -152,6 +172,16 @@ public class UserPermissionManagerImpl extends HibernateDaoSupport implements Us
     public boolean canReviseOwn(Area area, String typeId) {
         MessagePermissions permission = permissionManager.getAreaMessagePermissionForRole(getCurrentUserRole(), typeId);
         return permission == null ? false : permission.getReviseOwn().booleanValue();
+    }
+
+    public boolean canViewReadbyAny(Area area, String typeId) {
+        MessagePermissions permission = permissionManager.getAreaMessagePermissionForRole(getCurrentUserRole(), typeId);
+        return permission == null ? false : permission.getViewReadbyAny().booleanValue();
+    }
+
+    public boolean canViewReadbyOwn(Area area, String typeId) {
+        MessagePermissions permission = permissionManager.getAreaMessagePermissionForRole(getCurrentUserRole(), typeId);
+        return permission == null ? false : permission.getViewReadbyOwn().booleanValue();
     }
 
     public boolean canDeleteAny(Area area, String typeId) {

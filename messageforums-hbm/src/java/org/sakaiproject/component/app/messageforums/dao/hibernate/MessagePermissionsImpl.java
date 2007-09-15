@@ -39,6 +39,10 @@ public class MessagePermissionsImpl implements MessagePermissions {
 
     private Boolean reviseOwn;
 
+    private Boolean viewReadbyAny;
+
+    private Boolean viewReadbyOwn;
+    
     private Boolean deleteAny;
 
     private Boolean deleteOwn;
@@ -127,6 +131,22 @@ public class MessagePermissionsImpl implements MessagePermissions {
 
     public void setReviseOwn(Boolean reviseOwn) {
         this.reviseOwn = reviseOwn;
+    }
+
+    public Boolean getViewReadbyAny() {
+        return viewReadbyAny;
+    }
+
+    public void setViewReadbyAny(Boolean viewReadbyAny) {
+        this.viewReadbyAny = viewReadbyAny;
+    }
+
+    public Boolean getViewReadbyOwn() {
+        return viewReadbyOwn;
+    }
+
+    public void setViewReadbyOwn(Boolean viewReadbyOwn) {
+        this.viewReadbyOwn = viewReadbyOwn;
     }
 
     public String getRole() {

@@ -308,7 +308,6 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
       {
         DBMembershipItem item = (DBMembershipItem) iter.next();
         if (item.getPermissionLevel().getNewResponse().booleanValue()
-        	&& forum != null
             && forum.getDraft().equals(Boolean.FALSE)
             && forum.getLocked().equals(Boolean.FALSE)
             && topic.getDraft().equals(Boolean.FALSE)
@@ -651,6 +650,109 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
   }
 
   /**   
+   * @see org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager#isViewReadbyAny(org.sakaiproject.api.app.messageforums.DiscussionTopic,
+   *      org.sakaiproject.api.app.messageforums.DiscussionForum)
+   */
+  public boolean isViewReadbyAny(DiscussionTopic topic, DiscussionForum forum)
+  {
+    if (LOG.isDebugEnabled())
+    {
+      LOG.debug("isViewReadbyAny(DiscussionTopic " + topic + ", DiscussionForum"
+          + forum + ")");
+    }
+    try
+    {
+      if (checkBaseConditions(topic, forum))
+      {
+        return true;
+      }
+       if (topic.getLocked() == null || topic.getLocked().equals(Boolean.TRUE))
+    {
+      LOG.debug("This topic is locked " + topic);
+      return false;
+    }
+    if (topic.getDraft() == null || topic.getDraft().equals(Boolean.TRUE))
+    {
+      LOG.debug("This topic is at draft stage " + topic);
+    }
+      Iterator iter = getTopicItemsByCurrentUser(topic);
+      while (iter.hasNext())
+      {
+        DBMembershipItem item = (DBMembershipItem) iter.next();
+        if (item.getPermissionLevel().getViewReadbyAny().booleanValue()
+            && forum.getDraft().equals(Boolean.FALSE)
+            && forum.getLocked().equals(Boolean.FALSE)
+            && topic.getDraft().equals(Boolean.FALSE)
+            && topic.getLocked().equals(Boolean.FALSE))
+        {
+          return true;
+        }
+      }
+
+    }
+    catch (Exception e)
+    {
+      LOG.error(e.getMessage(), e);
+      return false;
+    }
+    return false;
+  }
+
+  /**   
+   * @see org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager#isViewReadbyOwn(org.sakaiproject.api.app.messageforums.DiscussionTopic,
+   *      org.sakaiproject.api.app.messageforums.DiscussionForum)
+   */
+  public boolean isViewReadbyOwn(DiscussionTopic topic, DiscussionForum forum)
+  {
+    if (LOG.isDebugEnabled())
+    {
+      LOG.debug("isViewReadbyOwn(DiscussionTopic " + topic + ", DiscussionForum"
+          + forum + ")");
+    }
+    if (checkBaseConditions(topic, forum))
+    {
+      return true;
+    }
+    try
+    {
+      if (checkBaseConditions(topic, forum))
+      {
+        return true;
+      }
+      
+       if (topic.getLocked() == null || topic.getLocked().equals(Boolean.TRUE))
+    {
+      LOG.debug("This topic is locked " + topic);
+      return false;
+    }
+    if (topic.getDraft() == null || topic.getDraft().equals(Boolean.TRUE))
+    {
+      LOG.debug("This topic is at draft stage " + topic);
+    }
+      Iterator iter = getTopicItemsByCurrentUser(topic);
+      while (iter.hasNext())
+      {
+        DBMembershipItem item = (DBMembershipItem) iter.next();
+        if (item.getPermissionLevel().getViewReadbyOwn().booleanValue()
+            && forum.getDraft().equals(Boolean.FALSE)
+            && forum.getLocked().equals(Boolean.FALSE)
+            && topic.getDraft().equals(Boolean.FALSE)
+            && topic.getLocked().equals(Boolean.FALSE))
+        {
+          return true;
+        }
+      }
+
+    }
+    catch (Exception e)
+    {
+      LOG.error(e.getMessage(), e);
+      return false;
+    }
+    return false;
+  }
+  
+  /**   
    * @see org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager#isDeleteAny(org.sakaiproject.api.app.messageforums.DiscussionTopic,
    *      org.sakaiproject.api.app.messageforums.DiscussionForum)
    */
@@ -878,18 +980,14 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
    * (non-Javadoc)
    * @see org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager#getCurrentUserMemberships()
    */
-  public List getCurrentUserMemberships() {
-	return getCurrentUserMemberships(getContextId());  
-  }
-  
-  public List getCurrentUserMemberships(String siteId)
+  public List getCurrentUserMemberships()
   {
 	  List userMemberships = new ArrayList();
 	  // first, add the user's role
-	  final String currRole = getCurrentUserRole(siteId);
+	  final String currRole = getCurrentUserRole();
 	  userMemberships.add(currRole);
 	  // now, add any groups the user is a member of
-	  Iterator groupIter = getGroupNamesByCurrentUser(siteId);
+	  Iterator groupIter = getGroupNamesByCurrentUser();
 	  while (groupIter.hasNext())
 	  {
 		  final String groupName = (String)groupIter.next();
@@ -930,17 +1028,13 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
    * the current user is a member of
    * @return
    */
-  private Iterator getGroupNamesByCurrentUser() {
-	  return getGroupNamesByCurrentUser(toolManager.getCurrentPlacement().getContext());
-  }
-  
-  private Iterator getGroupNamesByCurrentUser(String siteId)
+  private Iterator getGroupNamesByCurrentUser()
   {
     List memberof = new ArrayList();
     try
     {
-      Collection groups = SiteService.getSite(siteId).getGroups();
-      
+      Collection groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext())
+          .getGroups();
       for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();)
       {
         Group currentGroup = (Group) groupIterator.next();
@@ -1303,14 +1397,11 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
   /**
    * @return
    */
-  private String getCurrentUserRole() {
-	  return getCurrentUserRole(getContextId());
-  }
-  
-  private String getCurrentUserRole(String siteId)
+  private String getCurrentUserRole()
   {
     LOG.debug("getCurrentUserRole()");
-    return authzGroupService.getUserRole(getCurrentUserId(), "/site/" + siteId);
+    return authzGroupService.getUserRole(getCurrentUserId(), "/site/"
+        + getContextId());
   }
 
   /**

@@ -45,8 +45,13 @@
     </property>      
   </class>
 
+
   <query name="findUnreadStatusForMessage">
     <![CDATA[from org.sakaiproject.component.app.messageforums.dao.hibernate.UnreadStatusImpl as us where us.messageId = :messageId and us.topicId = :topicId and us.userId = :userId]]>
+  </query>
+
+  <query name="findReadby">
+    <![CDATA[from org.sakaiproject.component.app.messageforums.dao.hibernate.UnreadStatusImpl as us where us.messageId = :messageId and us.topicId = :topicId]]>
   </query>
 
 </hibernate-mapping>

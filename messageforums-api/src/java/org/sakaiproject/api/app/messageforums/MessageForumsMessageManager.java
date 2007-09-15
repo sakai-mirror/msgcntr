@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import java.util.ArrayList;
+
 public interface MessageForumsMessageManager {
 
     public Attachment createAttachment();
@@ -53,7 +55,11 @@ public interface MessageForumsMessageManager {
     public boolean isMessageReadForUser(Long topicId, Long messageId);
 
     public UnreadStatus findUnreadStatus(Long topicId, Long messageId);
+
+    public String findUnreadStatusByMessage(Long topicId, Long messageId);
     
+    public ArrayList findUnreadStatusByMessageList(Long topicId,  Long messageId);
+
     public UnreadStatus findUnreadStatusByUserId(Long topicId, Long messageId, String userId);
 
     public void deleteUnreadStatus(Long topicId, Long messageId);
@@ -80,14 +86,14 @@ public interface MessageForumsMessageManager {
     
     public int findReadViewableMessageCountByTopicId(Long topicId);
 
-    public List findDiscussionForumMessageCountsForAllSites(final List siteList, final List roleList);
+    public List findDiscussionForumMessageCountsForAllSites(final List siteList);
     
-    public List findDiscussionForumReadMessageCountsForAllSites(final List siteList, final List roleList);
-
-    public List findDiscussionForumMessageCountsForGroupedSitesByTopic(final List siteList, final List roleList); // added
-
-    public List findDiscussionForumReadMessageCountsForGroupedSitesByTopic(final List siteList, final List roleList); // added
+    public List findDiscussionForumMessageRemoveCountsForAllSites(List siteList, List roleList);
     
+    public List findDiscussionForumReadMessageCountsForAllSites();
+
+    public List findDiscussionForumReadMessageRemoveCountsForAllSites(List roleList);
+
     public List findMessagesByTopicId(Long topicId);
 
     public Attachment getAttachmentById(Long attachmentId);

@@ -23,6 +23,7 @@ package org.sakaiproject.component.app.messageforums;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,7 +46,6 @@ import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.tool.cover.ToolManager;
-import org.sakaiproject.util.ResourceLoader;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -156,25 +156,6 @@ public class AreaManagerImpl extends HibernateDaoSupport implements AreaManager 
             saveArea(area);
         }
         return area;
-    }
-    
-    public Area getDiscussionArea(String contextId) {
-    	if (contextId == null) {
-    		return getDiscusionArea();
-    	}
-    	Area area = this.getAreaByContextIdAndTypeId(contextId, typeManager.getDiscussionForumType());
-    	
-    	if (area == null) {
-    		area = createArea(typeManager.getDiscussionForumType(), contextId);
-    		area.setName(getResourceBundleString(FORUMS_TITLE));
-            area.setEnabled(Boolean.TRUE);
-            area.setHidden(Boolean.TRUE);
-            area.setLocked(Boolean.FALSE);
-            area.setModerated(Boolean.FALSE);
-            saveArea(area);
-    	}
-    	
-    	return area;
     }
 
     public boolean isPrivateAreaEnabled() {
@@ -344,7 +325,7 @@ public class AreaManagerImpl extends HibernateDaoSupport implements AreaManager 
      */
     public String getResourceBundleString(String key) 
     {
-    	final ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
+    	final ResourceBundle rb = ResourceBundle.getBundle(MESSAGECENTER_BUNDLE);
         return rb.getString(key);
     }	
 }

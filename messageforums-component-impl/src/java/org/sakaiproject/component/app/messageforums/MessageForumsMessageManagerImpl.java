@@ -66,6 +66,10 @@ import org.sakaiproject.tool.cover.ToolManager;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
+import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.cover.UserDirectoryService;
+import org.sakaiproject.user.api.UserNotDefinedException;
+
 public class MessageForumsMessageManagerImpl extends HibernateDaoSupport implements MessageForumsMessageManager {
 
     private static final Log LOG = LogFactory.getLog(MessageForumsMessageManagerImpl.class);    
@@ -135,8 +139,13 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
     /**
      * FOR SYNOPTIC TOOL:
      * 		Returns the count of discussion forum messages grouped by site
-      */
-    public List findDiscussionForumMessageCountsForAllSites(final List siteList, final List roleList) {
+     * 
+     * @param siteList
+     * 			List of site ids user is a part of
+     * 
+     * @return List
+     */
+    public List findDiscussionForumMessageCountsForAllSites(final List siteList) {
     	if (siteList == null) {
             LOG.error("findDiscussionForumMessageCountsForAllSites failed with null site list.");
             throw new IllegalArgumentException("Null Argument");
@@ -146,74 +155,86 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
                public Object doInHibernate(Session session) throws HibernateException, SQLException {
                    Query q = session.getNamedQuery("findDiscussionForumMessageCountsForAllSites");
                     q.setParameterList("siteList", siteList);
+                   return q.list();
+               }
+    	};
+
+        return (List) getHibernateTemplate().execute(hcb);        
+
+    }
+
+    /**
+     * FOR SYNOPTIC TOOL:
+     * 		Returns the count of discussion forum messages grouped by site
+     * 		that user not have READ access to
+     * 
+     * @param siteList
+     * 			List of site ids user is a part of
+     * 
+     * @return List
+     */
+    public List findDiscussionForumMessageRemoveCountsForAllSites(final List siteList, final List roleList) {
+    	if (siteList == null) {
+            LOG.error("findDiscussionForumMessageCountsForAllSites failed with null site list.");
+            throw new IllegalArgumentException("Null Argument");
+    	}	
+        
+    	HibernateCallback hcb = new HibernateCallback() {
+               public Object doInHibernate(Session session) throws HibernateException, SQLException {
+                   Query q = session.getNamedQuery("findDiscussionForumMessageRemoveCountsForAllSites");
+                    q.setParameterList("siteList", siteList);
                     q.setParameterList("roleList", roleList);
                     q.setParameter("userId", getCurrentUser(), Hibernate.STRING);
                    return q.list();
                }
     	};
-
-        return (List) getHibernateTemplate().execute(hcb);
+        
+        return (List) getHibernateTemplate().execute(hcb);        
+            
     }
 
     /**
      * FOR SYNOPTIC TOOL:
      * 		Returns the count of read discussion forum messages grouped by site
+     * 
+     * @return List
      */
-    public List findDiscussionForumReadMessageCountsForAllSites(final List siteList, final List roleList) {
+    public List findDiscussionForumReadMessageCountsForAllSites() {
         
     	HibernateCallback hcb = new HibernateCallback() {
                public Object doInHibernate(Session session) throws HibernateException, SQLException {
                    Query q = session.getNamedQuery("findDiscussionForumReadMessageCountsForAllSites");
-                   q.setParameterList("siteList", siteList);
-                   q.setParameterList("roleList", roleList);
                    	q.setParameter("userId", getCurrentUser(), Hibernate.STRING);
                    return q.list();
                }
     	};
         
-        return (List) getHibernateTemplate().execute(hcb);
+        return (List) getHibernateTemplate().execute(hcb);        
+            
     }
 
     /**
      * FOR SYNOPTIC TOOL:
-     * 		Returns the count of discussion forum messages grouped by topics within a site
-     * 		Used by sites that are grouped
+     * 		Returns the count of read discussion forum messages grouped by site
+     * 		that user does not have READ access to
+     * 
+     * @return List
      */
-    public List findDiscussionForumMessageCountsForGroupedSitesByTopic(final List siteList, final List roleList) {
+    public List findDiscussionForumReadMessageRemoveCountsForAllSites(final List roleList) {
         
     	HibernateCallback hcb = new HibernateCallback() {
                public Object doInHibernate(Session session) throws HibernateException, SQLException {
-                   Query q = session.getNamedQuery("findDiscussionForumMessageCountsForGroupedSitesByTopic");
-                   q.setParameterList("siteList", siteList);
-                   q.setParameterList("roleList", roleList);
+                   Query q = session.getNamedQuery("findDiscussionForumReadMessageRemoveCountsForAllSites");
                    	q.setParameter("userId", getCurrentUser(), Hibernate.STRING);
+                   	q.setParameterList("roleList", roleList);
                    return q.list();
                }
     	};
         
-        return (List) getHibernateTemplate().execute(hcb);
+        return (List) getHibernateTemplate().execute(hcb);        
+            
     }
-
-    /**
-     * FOR SYNOPTIC TOOL:
-     * 		Returns the count of discussion forum messages grouped by topics within a site
-     * 		Used by sites that are grouped
-     */
-    public List findDiscussionForumReadMessageCountsForGroupedSitesByTopic(final List siteList, final List roleList) {
-        
-    	HibernateCallback hcb = new HibernateCallback() {
-               public Object doInHibernate(Session session) throws HibernateException, SQLException {
-                   Query q = session.getNamedQuery("findDiscussionForumReadMessageCountsForGroupedSitesByTopic");
-                   q.setParameterList("siteList", siteList);
-                   q.setParameterList("roleList", roleList);
-                   	q.setParameter("userId", getCurrentUser(), Hibernate.STRING);
-                   return q.list();
-               }
-    	};
-        
-        return (List) getHibernateTemplate().execute(hcb);
-    }
-
+    
     /**
      * FOR STATISTICS TOOL:
      * 		Returns the number of read messages by topic for specified user
@@ -444,6 +465,109 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         };
 
         return ((Integer) getHibernateTemplate().execute(hcb)).intValue();        
+    }
+
+    public String findUnreadStatusByMessage(final Long topicId, final Long messageId){
+        List tempList;
+
+        if (messageId == null || topicId == null) {
+            LOG.error("findUnreadStatusByUserId failed with topicId: " + topicId + ", messageId: " + messageId);
+            throw new IllegalArgumentException("Null Argument");
+        }
+
+        LOG.debug("findUnreadStatusByMessage executing with topicId: " + topicId + ", messageId: " + messageId);
+
+        HibernateCallback hcb = new HibernateCallback() {
+            public Object doInHibernate(Session session) throws HibernateException, SQLException {
+                Query q = session.getNamedQuery("findReadby");
+                q.setParameter("topicId", topicId, Hibernate.LONG);
+                q.setParameter("messageId", messageId, Hibernate.LONG);
+                return q.list();
+            }
+        };
+
+      tempList = (List) getHibernateTemplate().execute(hcb);
+      String names = null;
+
+      if(tempList != null)
+      {
+        //System.out.println("findunreadstatusbymessage1 - 6");
+        for(int i=0; i<tempList.size(); i++)
+        {
+		if (i != 0) names = names + ", " ;
+		String userId = ((UnreadStatus)tempList.get(i)).getUserId();
+		try {
+                	User u = UserDirectoryService.getUser(userId);
+			if ( (u.getLastName()).equals("") ) {
+				try {
+                     			names = names + UserDirectoryService.getUserEid(userId) ;
+                		} catch(UserNotDefinedException e1){
+                        		names = names + " ";
+                		}
+			}
+			else {
+				if (i == 0) names = u.getFirstName() + " " + u.getLastName();
+				else names = names + u.getFirstName() + " " + u.getLastName();
+			}
+		} catch(UserNotDefinedException e1){
+			names = names + " ";
+		}
+        }
+      }
+      return names;
+    }
+
+    public ArrayList findUnreadStatusByMessageList(final Long topicId, final Long messageId){
+        List tempList;
+
+        if (messageId == null || topicId == null) {
+            LOG.error("findUnreadStatusByUserId failed with topicId: " + topicId + ", messageId: " + messageId);
+            throw new IllegalArgumentException("Null Argument");
+        }
+
+        LOG.debug("findUnreadStatusByMessage executing with topicId: " + topicId + ", messageId: " + messageId);
+
+        HibernateCallback hcb = new HibernateCallback() {
+            public Object doInHibernate(Session session) throws HibernateException, SQLException {
+                Query q = session.getNamedQuery("findReadby");
+                q.setParameter("topicId", topicId, Hibernate.LONG);
+                q.setParameter("messageId", messageId, Hibernate.LONG);
+                return q.list();
+            }
+        };
+
+      tempList = (List) getHibernateTemplate().execute(hcb);
+      String names = null;
+
+      if(tempList != null)
+      {
+        for(int i=0; i<tempList.size(); i++)
+        {
+                if (i != 0) names = names + ", " ;
+                String userId = ((UnreadStatus)tempList.get(i)).getUserId();
+                try {
+                        User u = UserDirectoryService.getUser(userId);
+                        if ( (u.getLastName()).equals("") ) {
+                                try {
+                                        names = names + UserDirectoryService.getUserEid(userId) ;
+                                } catch(UserNotDefinedException e1){
+                                        names = names + " ";
+                                }
+                        }
+                        else {
+                                if (i == 0) names = u.getFirstName() + " " + u.getLastName();
+                                else names = names + u.getFirstName() + " " + u.getLastName();
+                        }
+                } catch(UserNotDefinedException e1){
+                        names = names + " ";
+                }
+        }
+      }
+      ArrayList<String> returnList = new ArrayList<String>();
+      returnList.add( String.valueOf(tempList.size() ) );
+      returnList.add(names);
+
+      return returnList;
     }
 
     public UnreadStatus findUnreadStatusByUserId(final Long topicId, final Long messageId, final String userId){

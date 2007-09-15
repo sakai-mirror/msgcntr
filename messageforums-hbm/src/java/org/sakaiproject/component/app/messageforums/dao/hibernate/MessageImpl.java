@@ -25,12 +25,16 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.api.app.messageforums.Attachment;
 import org.sakaiproject.api.app.messageforums.Message;
 import org.sakaiproject.api.app.messageforums.Topic;
+
+import org.sakaiproject.api.app.messageforums.MessageForumsMessageManager;
+import org.sakaiproject.component.cover.ComponentManager;
 
 public class MessageImpl extends MutableEntityImpl implements Message
 {
@@ -52,7 +56,7 @@ public class MessageImpl extends MutableEntityImpl implements Message
   private Boolean hasAttachments = Boolean.FALSE;
   private String gradeComment;
   private String gradeAssignmentName; 
-  private Boolean deleted;
+  private String readbyNames; 
 
   public static Comparator ATTACHMENT_COMPARATOR;
   public static Comparator SUBJECT_COMPARATOR;
@@ -142,6 +146,34 @@ public class MessageImpl extends MutableEntityImpl implements Message
     this.author = author;
   }
 
+  public String getReadby()
+  {
+       MessageForumsMessageManager mfmm =
+                (org.sakaiproject.api.app.messageforums.MessageForumsMessageManager)ComponentManager.get("org.sakaiproject.api.app.messageforums.MessageForumsMessageManager");
+	return mfmm.findUnreadStatusByMessage(getTopic().getId(), this.getId() );
+  }
+ 
+  public String getReadbyNum()
+  {
+       MessageForumsMessageManager mfmm =
+                (org.sakaiproject.api.app.messageforums.MessageForumsMessageManager)ComponentManager.get("org.sakaiproject.api.app.messageforums.MessageForumsMessageManager");
+       ArrayList<String> readbyList = new ArrayList<String>();
+       readbyList = mfmm.findUnreadStatusByMessageList(getTopic().getId(), this.getId() );
+       setReadbyNames(readbyList.get(1) );
+       return readbyList.get(0);
+       //return mfmm.findUnreadStatusByMessage(getTopic().getId(), this.getId() );
+  }
+  
+  public String getReadbyNames()
+  {
+        return this.readbyNames;  
+  }
+  
+  public void setReadbyNames(String readbyNames)
+  {
+        this.readbyNames = readbyNames;  
+  }
+ 
   public String getBody()
   {
     return body;
@@ -210,15 +242,6 @@ public class MessageImpl extends MutableEntityImpl implements Message
   public void setTypeUuid(String typeUuid)
   {
     this.typeUuid = typeUuid;
-  }
-
-  public Boolean getDeleted() {
-	  return deleted;
-  }
-
-  public void setDeleted(Boolean deleted) 
-  {
-	this.deleted = deleted;
   }
 
   public String toString()

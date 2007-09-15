@@ -52,6 +52,14 @@ public interface MessagePermissions {
 
     public Boolean getReviseOwn();
 
+    public Boolean getViewReadbyAny();
+
+    public void setViewReadbyAny(Boolean viewReadbyAny);
+
+    public Boolean getViewReadbyOwn();
+
+    public void setViewReadbyOwn(Boolean viewReadbyOwn);
+    
     public Boolean getMarkAsRead();
 
     public void setMarkAsRead(Boolean markAsRead);

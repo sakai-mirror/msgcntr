@@ -46,7 +46,8 @@
     <property name="reviseAny" column="REVISE_ANY" not-null="true"/>
     <property name="reviseOwn" column="REVISE_OWN" not-null="true"/>
     <property name="moderatePostings" column="MODERATE_POSTINGS" not-null="true"/>        
-               
+    <property name="viewReadbyAny" column="VIEW_READBY_ANY" not-null="true"/>
+    <property name="viewReadbyOwn" column="VIEW_READBY_OWN" not-null="true"/>               
   </class>
 
   <query name="findPermissionLevelByTypeUuid">

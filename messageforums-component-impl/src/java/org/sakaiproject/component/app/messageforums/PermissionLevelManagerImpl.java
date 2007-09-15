@@ -351,7 +351,9 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(true));
 		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
 		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(true));
-
+		  mask.put(PermissionLevel.VIEW_READBY_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.VIEW_READBY_ANY, new Boolean(true));
+		  
 		  return createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_OWNER, typeUuid, mask);
 	  }
 	  else
@@ -389,7 +391,9 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
 		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(true));
 		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
-
+		  mask.put(PermissionLevel.VIEW_READBY_OWN, new Boolean(true));
+		  mask.put(PermissionLevel.VIEW_READBY_ANY, new Boolean(false));
+		  
 		  return createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_AUTHOR, typeUuid, mask);
 	  }
 	  else
@@ -426,7 +430,9 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
 		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(true));
 		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
-
+		  mask.put(PermissionLevel.VIEW_READBY_OWN, new Boolean(true));
+		  mask.put(PermissionLevel.VIEW_READBY_ANY, new Boolean(false));
+		  
 		  return createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONEDITING_AUTHOR, typeUuid, mask);
 	  }
 	  else
@@ -463,7 +469,9 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
 		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
 		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
-
+		  mask.put(PermissionLevel.VIEW_READBY_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.VIEW_READBY_ANY, new Boolean(false));
+		  
 		  return createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_REVIEWER, typeUuid, mask);
 	  }
 	  else
@@ -501,6 +509,8 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
 		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
 		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  mask.put(PermissionLevel.VIEW_READBY_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.VIEW_READBY_ANY, new Boolean(false));
 		  
 		  return createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_CONTRIBUTOR, typeUuid, mask);
 	  }
@@ -538,6 +548,8 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
 		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
 		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  mask.put(PermissionLevel.VIEW_READBY_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.VIEW_READBY_ANY, new Boolean(false));
 
 		  return createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONE, typeUuid, mask);
 	  }
@@ -603,6 +615,10 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
     		return permissionLevel.getReviseAny();
     	else if (customPermName.equals(PermissionLevel.REVISE_OWN))
     		return permissionLevel.getReviseOwn();
+    	else if (customPermName.equals(PermissionLevel.VIEW_READBY_ANY))
+    		return permissionLevel.getViewReadbyAny();
+    	else if (customPermName.equals(PermissionLevel.VIEW_READBY_OWN))
+    		return permissionLevel.getViewReadbyOwn();
     	else if (customPermName.equals(PermissionLevel.CHANGE_SETTINGS))
     		return permissionLevel.getChangeSettings();
     	else 
@@ -624,6 +640,8 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		customPerms.add(PermissionLevel.READ);
 		customPerms.add(PermissionLevel.REVISE_ANY);
 		customPerms.add(PermissionLevel.REVISE_OWN);
+		customPerms.add(PermissionLevel.VIEW_READBY_ANY);
+		customPerms.add(PermissionLevel.VIEW_READBY_OWN);
 		customPerms.add(PermissionLevel.CHANGE_SETTINGS);
 		
 		return customPerms;

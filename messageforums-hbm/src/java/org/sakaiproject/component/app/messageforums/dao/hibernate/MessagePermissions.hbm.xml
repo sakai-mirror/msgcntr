@@ -33,6 +33,12 @@
     <property name="reviseOwn">
       <column name="REVISE_OWN" not-null="true" />
     </property>
+    <property name="viewReadbyAny">
+      <column name="VIEW_READBY_ANY" not-null="true" />
+    </property>
+    <property name="viewReadbyOwn">
+      <column name="VIEW_READBY_OWN" not-null="true" />
+    </property>
     <property name="deleteAny">
       <column name="DELETE_ANY" not-null="true" />
     </property>

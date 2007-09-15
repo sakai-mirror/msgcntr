@@ -23,6 +23,7 @@ package org.sakaiproject.tool.messageforums.ui;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.faces.model.SelectItem;
 
@@ -295,6 +296,34 @@ public class PermissionBean {
     this.item.getPermissionLevel().setReviseOwn(new Boolean(reviseOwn));
   }
 
+  public boolean getViewReadbyAny()
+  {
+    if (item != null && item.getPermissionLevel() != null
+        && item.getPermissionLevel().getViewReadbyAny() != null)
+      return item.getPermissionLevel().getViewReadbyAny().booleanValue();
+    else
+      return false;
+  }
+
+  public void setViewReadbyAny(boolean viewReadbyAny)
+  {
+    this.item.getPermissionLevel().setViewReadbyAny(new Boolean(viewReadbyAny));
+  }
+
+  public boolean getViewReadbyOwn()
+  {
+    if (item != null && item.getPermissionLevel() != null
+        && item.getPermissionLevel().getViewReadbyOwn() != null)
+      return item.getPermissionLevel().getViewReadbyOwn().booleanValue();
+    else
+      return false;
+  }
+
+  public void setViewReadbyOwn(boolean viewReadbyOwn)
+  {
+    this.item.getPermissionLevel().setViewReadbyOwn(new Boolean(viewReadbyOwn));
+  }
+  
   /**
    * @return Returns the deletePosting.
    */
@@ -374,6 +403,43 @@ public class PermissionBean {
     }
   }
 
+  public String getViewReadby()
+  {
+    String test = getResourceBundleString(NONE);
+	  
+    if(getViewReadbyAny())
+    {
+      test = getResourceBundleString(ALL);
+    }
+    if(getViewReadbyOwn())
+    {
+      test = getResourceBundleString(OWN);
+    }         
+//    return getResourceBundleString(NONE);
+    return test;
+  }
+
+  /**
+   * @param reviseReadby The reviseReadby to set.
+   */
+  public void setViewReadby(String viewReadby)
+  {
+    if(viewReadby.equals(getResourceBundleString(ALL)))
+    {
+      setViewReadbyAny(true);
+      setViewReadbyOwn(false);
+    }
+    else if(viewReadby.equals(getResourceBundleString(OWN)))
+    {
+      setViewReadbyAny(false);
+      setViewReadbyOwn(true);
+    }
+    else if(viewReadby.equals(getResourceBundleString(NONE)))
+    {
+      setViewReadbyAny(false);
+      setViewReadbyOwn(false);
+    }
+  }
   /**
    * @return Returns the item.
    */
@@ -393,7 +459,7 @@ public class PermissionBean {
 	 */
   public static String getResourceBundleString(String key) 
   {
-      final ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
+      final ResourceBundle rb = ResourceBundle.getBundle(MESSAGECENTER_BUNDLE);
       return rb.getString(key);
   }
 

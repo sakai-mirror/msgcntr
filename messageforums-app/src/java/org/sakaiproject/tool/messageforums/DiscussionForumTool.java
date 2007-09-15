@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.faces.application.FacesMessage;
@@ -90,7 +91,8 @@ import org.sakaiproject.tool.messageforums.ui.PermissionBean;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.util.FormattedText;
-import org.sakaiproject.util.ResourceLoader;
+
+//import org.sakaiproject.api.app.messageforums;
 
 /**
  * @author <a href="mailto:rshastri@iupui.edu">Rashmi Shastri</a>
@@ -154,7 +156,6 @@ public class DiscussionForumTool
   private static final String FORUM_ID = "forumId";
   private static final String MESSAGE_ID = "messageId";
   private static final String REDIRECT_PROCESS_ACTION = "redirectToProcessAction";
-  private static final String FROMPAGE = "fromPage";
 
   private static final String MESSAGECENTER_TOOL_ID = "sakai.messagecenter";
   private static final String FORUMS_TOOL_ID = "sakai.forums";
@@ -206,16 +207,12 @@ public class DiscussionForumTool
   private static final String MSG_REPLY_PREFIX = "cdfm_reply_prefix";
   private static final String NO_GRADE_PTS = "cdfm_no_points_for_grade";
   private static final String NO_ASSGN = "cdfm_no_assign_for_grade";
-  private static final String CONFIRM_DELETE_MESSAGE="cdfm_delete_msg";
-  private static final String INSUFFICIENT_PRIVILEGES_TO_DELETE = "cdfm_insufficient_privileges_delete_msg";
   
   private static final String FROM_PAGE = "msgForum:mainOrForumOrTopic";
   private String fromPage = null; // keep track of originating page for common functions
   
   private List forums = new ArrayList();
   private List pendingMsgs = new ArrayList();
-  
-  private String userId;
 
   // compose
   private MessageForumsMessageManager messageManager;
@@ -266,7 +263,6 @@ public class DiscussionForumTool
   private MessageForumsTypeManager typeManager;
   private MembershipManager membershipManager;
   private PermissionLevelManager permissionLevelManager;  
-  
   /**
    * 
    */
@@ -476,11 +472,11 @@ public class DiscussionForumTool
           return forums;
         }
         // TODO: put this logic in database layer
-        if (forum.getDraft().equals(Boolean.FALSE)||(forum.getDraft().equals(Boolean.TRUE)&& forum.getCreatedBy().equals(getUserId()) 
+        if (forum.getDraft().equals(Boolean.FALSE)||(forum.getDraft().equals(Boolean.TRUE)&& forum.getCreatedBy().equals(SessionManager.getCurrentSessionUserId()) 
             )||SecurityService.isSuperUser()
             ||isInstructor()
             ||forum.getCreatedBy().equals(
-            getUserId()))
+            SessionManager.getCurrentSessionUserId()))
         { 
           //DiscussionForumBean decoForum = getDecoratedForum(forum);
         	DiscussionForumBean decoForum = getDecoratedForumWithPersistentForumAndTopics(forum);
@@ -1032,13 +1028,10 @@ public class DiscussionForumTool
    */
   public DiscussionTopicBean getSelectedTopic()
   {
-  	if (!selectedTopic.isSorted()) 
-  	{
-  		rearrageTopicMsgsThreaded();
-  		setMessageBeanPreNextStatus();
-  		selectedTopic.setSorted(true);
-  	}
-  	return selectedTopic;
+  	rearrageTopicMsgsThreaded();
+  	setMessageBeanPreNextStatus();
+ 
+    return selectedTopic;
   }
   
   /**
@@ -1201,7 +1194,7 @@ public class DiscussionForumTool
     	setErrorMessage(getResourceBundleString(SHORT_DESC_TOO_LONG));
     	return null;
     }
-    
+
     setPermissionMode(PERMISSION_MODE_TOPIC);
     if(selectedTopic!=null && selectedTopic.getTopic()!=null && 
         (selectedTopic.getTopic().getTitle()==null 
@@ -1210,7 +1203,9 @@ public class DiscussionForumTool
       setErrorMessage(getResourceBundleString(VALID_TOPIC_TITLE_WARN));
       return TOPIC_SETTING_REVISE;
     }
-	  
+selectedTopic.getTopic().getId();
+selectedTopic.isTopicModerated();
+
     // if the topic is not moderated, all of the messages must be approved
     if (selectedTopic != null && selectedTopic.getTopic().getId() != null &&
     		!selectedTopic.isTopicModerated())
@@ -1263,18 +1258,18 @@ public class DiscussionForumTool
   {
   	LOG.debug("saveTopicSettings(" + draft + ")");
   	setPermissionMode(PERMISSION_MODE_TOPIC);
-    if (selectedTopic != null)
+  	if (selectedTopic != null)
     {
       DiscussionTopic topic = selectedTopic.getTopic();
       if (selectedForum != null)
       {
-        topic.setBaseForum(selectedForum.getForum());
-        saveTopicSelectedAssignment(topic);
+   	    topic.setBaseForum(selectedForum.getForum());
+   	    saveTopicSelectedAssignment(topic);
         saveTopicAttach(topic);
         setObjectPermissions(topic);
         if (draft)
         {        	
-          forumManager.saveTopicAsDraft(topic);          
+        	forumManager.saveTopicAsDraft(topic);          
         }
         else
         {        	
@@ -1286,7 +1281,7 @@ public class DiscussionForumTool
         //    .saveTopicMessagePermissions(topic, topicMessagePermissions);
       }
     }
-    return gotoMain();
+  	return gotoMain();
   }
 
   /**
@@ -1511,23 +1506,6 @@ public class DiscussionForumTool
 	  return selectedThreadHead;
   }
   
-  public List getPFSelectedThread() 
-  {
-	List results = new ArrayList();
-	List messages = getSelectedThread();
-	
-	for (Iterator iter = messages.iterator(); iter.hasNext();)
-	{
-		DiscussionMessageBean message = (DiscussionMessageBean) iter.next();
-		
-		if (! message.getDeleted())
-		{
-			results.add(message);
-		}
-	}
-	
-	return results;
-  }
   /**
    * @return Returns an array of Messages for the current selected thread
    */
@@ -1610,7 +1588,7 @@ public class DiscussionForumTool
 	    	}
 	    }
 
-	    recursiveGetThreadedMsgsFromList(msgsList, orderedList, selectedThreadHead);
+	    recursiveGetThreadedMsgs(msgsList, orderedList, selectedThreadHead);
 	    selectedThread.addAll(orderedList);
 	    
 	    return THREAD_VIEW;
@@ -1697,6 +1675,7 @@ public class DiscussionForumTool
 
     String messageId = getExternalParameterByKey(MESSAGE_ID);
     String topicId = getExternalParameterByKey(TOPIC_ID);
+  
     if (messageId == null)
     {
       setErrorMessage(getResourceBundleString(MESSAGE_REFERENCE_NOT_FOUND));
@@ -1745,7 +1724,8 @@ public class DiscussionForumTool
     getSelectedTopic();
     //get thread from message
     getThreadFromMessage();
-    refreshSelectedMessageSettings(message);
+    selectedMessage.setRevise(selectedTopic.getIsReviseAny() 
+			|| (selectedTopic.getIsReviseOwn() && message.getCreatedBy().equals(UserDirectoryService.getCurrentUser().getId())));  
     // selectedTopic= new DiscussionTopicBean(message.getTopic());
     return MESSAGE_VIEW;
   }
@@ -1817,8 +1797,6 @@ public class DiscussionForumTool
 			
 	    messageManager.markMessageReadForUser(selectedTopic.getTopic().getId(),
 	        selectedMessage.getMessage().getId(), true);
-	    
-	    refreshSelectedMessageSettings(message);  
     }
     
     return null;
@@ -1852,8 +1830,6 @@ public class DiscussionForumTool
 			
 	    messageManager.markMessageReadForUser(selectedTopic.getTopic().getId(),
 	        selectedMessage.getMessage().getId(), true);
-	    
-	    refreshSelectedMessageSettings(message);  
     }
     
     return null;
@@ -1899,10 +1875,10 @@ public class DiscussionForumTool
       DiscussionTopic topic = (DiscussionTopic) iter.next();
 //    TODO: put this logic in database layer
       if (topic.getDraft().equals(Boolean.FALSE)||
-          (topic.getDraft().equals(Boolean.TRUE)&&topic.getCreatedBy().equals(getUserId()))
+          (topic.getDraft().equals(Boolean.TRUE)&&topic.getCreatedBy().equals(SessionManager.getCurrentSessionUserId()))
           ||isInstructor()
           ||SecurityService.isSuperUser()||topic.getCreatedBy().equals(
-          getUserId()))
+          SessionManager.getCurrentSessionUserId()))
       { 
         topic = (DiscussionTopic) forumManager.getTopicByIdWithAttachments(topic
             .getId());
@@ -1954,10 +1930,10 @@ public class DiscussionForumTool
       DiscussionTopic topic = (DiscussionTopic) iter.next();
 //    TODO: put this logic in database layer
       if (topic.getDraft().equals(Boolean.FALSE)||
-          (topic.getDraft().equals(Boolean.TRUE)&&topic.getCreatedBy().equals(getUserId()))
+          (topic.getDraft().equals(Boolean.TRUE)&&topic.getCreatedBy().equals(SessionManager.getCurrentSessionUserId()))
           ||isInstructor()
           ||SecurityService.isSuperUser()||topic.getCreatedBy().equals(
-          getUserId()))
+          SessionManager.getCurrentSessionUserId()))
       { 
         if (topic != null)
         {
@@ -2175,10 +2151,8 @@ public class DiscussionForumTool
           {
           	decoMsg.setRead(messageManager.isMessageReadForUser(topic.getId(),
               message.getId()));
-          	boolean isOwn = decoMsg.getMessage().getCreatedBy().equals(getUserId());
           	decoMsg.setRevise(decoTopic.getIsReviseAny() 
-          			|| (decoTopic.getIsReviseOwn() && isOwn));
-          	decoMsg.setUserCanDelete(decoTopic.getIsDeleteAny() || (isOwn && decoTopic.getIsDeleteOwn()));
+          			|| (decoTopic.getIsReviseOwn() && decoMsg.getMessage().getCreatedBy().equals(UserDirectoryService.getCurrentUser().getId())));
           	decoTopic.addMessage(decoMsg);
           }
         }
@@ -2552,7 +2526,6 @@ public class DiscussionForumTool
       aMsg.setAuthor(getUserNameOrEid());
       
       aMsg.setDraft(Boolean.FALSE);
-      aMsg.setDeleted(Boolean.FALSE);
 
       // if the topic is moderated, we want to leave approval null.
 	  // if the topic is not moderated, all msgs are approved
@@ -2624,7 +2597,7 @@ public class DiscussionForumTool
       }
       return MESSAGE_COMPOSE;
     }
-    if (redirectTo.equals(MESSAGE_VIEW))
+    if (redirectTo.equals("dfViewMessage"))
     {
       if ((expand != null) && (expand.equalsIgnoreCase("true")))
       {
@@ -2654,10 +2627,7 @@ public class DiscussionForumTool
 
   public String getUserId()
   {
-	  if (userId == null)
-    	userId = SessionManager.getCurrentSessionUserId();
-	  
-	  return userId;
+    return SessionManager.getCurrentSessionUserId();
   }
 
   public boolean getFullAccess()
@@ -2972,37 +2942,11 @@ public class DiscussionForumTool
 
     return null;
   }
-  
-  /**
-   * If deleting, the parameter determines where to navigate back to
-   */
-  public void setFromPage(String fromPage) {
-	  this.fromPage = fromPage;
-  }
-  
-  /**
-   * Since delete message can be called from 2 places, this
-   * parameter determines where to navigate back to
-   */
-  public String getFromPage() 
-  {
-	  return (fromPage != null) ? fromPage : "";
-  }
 
-  /**
-   * Set detail screen for Delete confirmation view
-   */
   public String processDfMsgDeleteConfirm()
   {
-	  // if coming from thread view, need to set message info
-  	fromPage = getExternalParameterByKey(FROMPAGE);
-    if (fromPage != null) {
-    	processActionDisplayMessage();
-    }
-
     deleteMsg = true;
-    setErrorMessage(getResourceBundleString(CONFIRM_DELETE_MESSAGE));
-    return MESSAGE_VIEW;
+    return null;
   }
 
   public String processDfReplyMsgPost()
@@ -3474,93 +3418,73 @@ public class DiscussionForumTool
     return ALL_MESSAGES;
   }
 
-  /**
-   * Is the detail view normal or delete screen?
-   */
   public boolean getDeleteMsg()
   {
     return deleteMsg;
   }
 
-  private String getEventReference(Message message) {
-	  String eventRef;
-	  
-	  if (isForumsTool()) {
-		  eventRef = "/Forums/";
-	  }
-	  else {
-		  eventRef="/Messages&Forums/";
-	  }
-	  
-	  eventRef += message.getId() + "/del by/" + getUserNameOrEid();
-	  
-	  return eventRef;
-  }
-  
-  /**
-   * Deletes the message by setting boolean deleted switch to TRUE.
-   */
   public String processDfMsgDeleteConfirmYes()
   {
-	  DiscussionTopic topic = selectedTopic.getTopic();
-	  DiscussionForum forum = selectedForum.getForum();
-	  if(!uiPermissionsManager.isDeleteAny(topic, forum) && !(selectedMessage.getIsOwn() && uiPermissionsManager.isDeleteOwn(topic, forum)))
-	  {
-		  setErrorMessage(getResourceBundleString(INSUFFICIENT_PRIVILEGES_TO_DELETE));
-		  this.deleteMsg = false;
-		  return null;
-	  }
-	  
-	  Message message = selectedMessage.getMessage();
+    List delList = new ArrayList();
+    messageManager.getChildMsgs(selectedMessage.getMessage().getId(), delList);
+    
+    if(delList.size() > 0)
+    {
+    	if(!selectedTopic.getIsDeleteAny())
+    	{
+    		errorSynch = true;
+    		return null;
+    	}
+    }
 
-	  // 'delete' this message
-	  message.setDeleted(Boolean.TRUE);
+    selectedTopic.removeMessage(selectedMessage);
+    Topic tempTopic = forumManager.getTopicByIdWithMessages(selectedTopic
+        .getTopic().getId());
+    tempTopic.removeMessage(selectedMessage.getMessage());
+    // selectedTopic.getTopic().removeMessage(selectedMessage.getMessage());
+    for (int i = 0; i < delList.size(); i++)
+    {
+      selectedTopic.removeMessage(new DiscussionMessageBean((Message) delList
+          .get(i), messageManager));
+      // tempTopic.removeMessage((Message) delList.get(i));
+      // selectedTopic.getTopic().removeMessage((Message) delList.get(i));
+    }
 
-	  // reload topic for this message so we can save it
-	  message.setTopic((DiscussionTopic) forumManager
-			  .getTopicByIdWithMessages(selectedTopic.getTopic().getId()));
+    messageManager.deleteMsgWithChild(selectedMessage.getMessage().getId());
 
-	  // does the actual save to 'delete' this message
-	  forumManager.saveMessage(message);
+    try
+    {
+      DiscussionTopic topic = null;
+      try
+      {
+        topic = forumManager.getTopicById(selectedTopic.getTopic().getId());
+      }
+      catch (NumberFormatException e)
+      {
+        LOG.error(e.getMessage(), e);
+      }
+      setSelectedForumForCurrentTopic(topic);
+      selectedTopic = getDecoratedTopic(topic);
+    }
+    catch (Exception e)
+    {
+      LOG.error(e.getMessage(), e);
+      setErrorMessage(e.getMessage());
+      this.deleteMsg = false;
+      return gotoMain();
+    }
 
-	  // reload the topic, forum and reset the topic's base forum
-	  selectedTopic = getDecoratedTopic(selectedTopic.getTopic());
-	  setSelectedForumForCurrentTopic((DiscussionTopic) forumManager
-			  .getTopicByIdWithMessages(selectedTopic.getTopic().getId()));   
-	  selectedTopic.getTopic().setBaseForum(selectedForum.getForum());
+    this.deleteMsg = false;
 
-	  this.deleteMsg = false;
-
-	  // TODO: document it was done for tracking purposes
-//	  EventTrackingService.post(EventTrackingService.newEvent("forum.msg.delete", getEventReference(message), true));
-	  LOG.info("Forum message " + message.getId() + " has been deleted by " + getUserId());
-
-	  // go to thread view or all messages depending on
-	  // where come from
-	  if (!"".equals(fromPage)) {
-		  final String where = fromPage;
-		  fromPage = null;
-		  processActionGetDisplayThread();
-		  return where;
-	  }
-	  else {
-		  return ALL_MESSAGES;
-	  }
+    return ALL_MESSAGES;
   }
 
   public String processDfMsgDeleteCancel()
   {
     this.deleteMsg = false;
     this.errorSynch = false;
-    
-    if (!"".equals(fromPage)) {
-    	final String where = fromPage;
-    	fromPage = null;
-    	return where;
-    }
-    else {
-    	return null;
-    }
+
+    return null;
   }
   
   /**
@@ -3725,7 +3649,6 @@ public class DiscussionForumTool
 	  {
 		  messageManager.markMessageApproval(msgId, false);
 		  selectedMessage = new DiscussionMessageBean(messageManager.getMessageByIdWithAttachments(msgId), messageManager);
-		  refreshSelectedMessageSettings(selectedMessage.getMessage());
 		  setSuccessMessage(getResourceBundleString("cdfm_denied_alert"));
 		  getThreadFromMessage();
 	  }
@@ -3765,7 +3688,6 @@ public class DiscussionForumTool
 	  {
 		  messageManager.markMessageApproval(msgId, true);
 		  selectedMessage = new DiscussionMessageBean(messageManager.getMessageByIdWithAttachments(msgId), messageManager);
-		  refreshSelectedMessageSettings(selectedMessage.getMessage());
 		  setSuccessMessage(getResourceBundleString("cdfm_approved_alert"));
 		  getThreadFromMessage();
 	  }
@@ -4174,7 +4096,6 @@ public class DiscussionForumTool
 	{
   
 	  	List msgsList = selectedTopic.getMessages();
-	  	Collections.reverse(msgsList);
 	  	if (msgsList != null && !msgsList.isEmpty())
 	  		msgsList = filterModeratedMessages(msgsList, selectedTopic.getTopic(), (DiscussionForum)selectedTopic.getTopic().getBaseForum());
 	  	
@@ -4273,13 +4194,8 @@ public class DiscussionForumTool
          * dmb.setDepth(currentMsg.getDepth() + 1); returnList.add(dmb);
          * this.recursiveGetThreadedMsgsFromList(msgsList, returnList, dmb);
          */
-    	if (!thisMsgBean.getDeleted())
-    	{
-    		childCount[0]++;
-    	}
-    	
-    	if(!thisMsgBean.isRead() && !thisMsgBean.getDeleted())
-    	{
+    	childCount[0]++;
+    	if(!thisMsgBean.isRead()){
     		childUnread[0]++;
     	}
         thisMsgBean.setDepth(currentMsg.getDepth() + 1);
@@ -5208,7 +5124,6 @@ public class DiscussionForumTool
   	Area area = null;
   	//Topic topic = null;
   	DiscussionTopic topic = null;
-  	
     /** get membership item set */    
     if (target instanceof DiscussionForum){
     	forum = ((DiscussionForum) target);
@@ -5238,14 +5153,13 @@ public class DiscussionForumTool
     }
         
     if(permissions!=null ){
-      Iterator iter = permissions.iterator();
+    	Iterator iter = permissions.iterator();
       while (iter.hasNext())
       {
         PermissionBean permBean = (PermissionBean) iter.next();
         //for group awareness
         //DBMembershipItem membershipItem = permissionLevelManager.createDBMembershipItem(permBean.getItem().getName(), permBean.getSelectedLevel(), DBMembershipItem.TYPE_ROLE);
-        DBMembershipItem membershipItem = permissionLevelManager.createDBMembershipItem(permBean.getItem().getName(), permBean.getSelectedLevel(), permBean.getItem().getType());
-        
+		DBMembershipItem membershipItem = permissionLevelManager.createDBMembershipItem(permBean.getItem().getName(), permBean.getSelectedLevel(), permBean.getItem().getType());
         
         if (PermissionLevelManager.PERMISSION_LEVEL_NAME_CUSTOM.equals(membershipItem.getPermissionLevelName())){
           PermissionsMask mask = new PermissionsMask();                
@@ -5263,11 +5177,11 @@ public class DiscussionForumTool
           mask.put(PermissionLevel.DELETE_ANY, new Boolean(permBean.getDeleteAny()));
           mask.put(PermissionLevel.REVISE_OWN, new Boolean(permBean.getReviseOwn()));
           mask.put(PermissionLevel.REVISE_ANY, new Boolean(permBean.getReviseAny()));
-          
+          mask.put(PermissionLevel.VIEW_READBY_OWN, new Boolean(permBean.getViewReadbyOwn()));
+          mask.put(PermissionLevel.VIEW_READBY_ANY, new Boolean(permBean.getViewReadbyAny())); 
           PermissionLevel level = permissionLevelManager.createPermissionLevel(permBean.getSelectedLevel(), typeManager.getCustomLevelType(), mask);
           membershipItem.setPermissionLevel(level);
         }
-                
         // save DBMembershiptItem here to get an id so we can add to the set
         permissionLevelManager.saveDBMembershipItem(membershipItem);
         membershipItemSet.add(membershipItem);
@@ -5386,7 +5300,19 @@ public class DiscussionForumTool
         									PermissionBean.getResourceBundleString(PermissionBean.ALL)));
         return postingOptions;
       }
-     
+    
+     public List getViewReadbyOptions()
+      {
+        List readbyOptions = new ArrayList();
+        readbyOptions.add(new SelectItem(PermissionBean.getResourceBundleString(PermissionBean.NONE),
+                                                                                PermissionBean.getResourceBundleString(PermissionBean.NONE)));
+        readbyOptions.add(new SelectItem(PermissionBean.getResourceBundleString(PermissionBean.OWN),
+                                                                                PermissionBean.getResourceBundleString(PermissionBean.OWN)));
+        readbyOptions.add(new SelectItem(PermissionBean.getResourceBundleString(PermissionBean.ALL),
+                                                                                PermissionBean.getResourceBundleString(PermissionBean.ALL)));
+        return readbyOptions;
+      }
+ 
      /**
       * @return Returns the levels.
       */
@@ -5482,7 +5408,7 @@ public class DiscussionForumTool
 		 */
 	    public static String getResourceBundleString(String key) 
 	    {
-	        final ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
+	        final ResourceBundle rb = ResourceBundle.getBundle(MESSAGECENTER_BUNDLE);
 	        return rb.getString(key);
 	    }
 
@@ -5580,33 +5506,7 @@ public class DiscussionForumTool
 			return true;
 	}
 	
-	/**
-	 * With ability to delete messages, need to filter out
-	 * messages that are from print friendly view so we don't
-	 * need to do it within the UI rendering.
-	 */
-	public List getpFMessages() 
-	{
-		List results = new ArrayList();
-		List messages = getMessages();
-		
-		for (Iterator iter = messages.iterator(); iter.hasNext();)
-		{
-			DiscussionMessageBean message = (DiscussionMessageBean) iter.next();
-			
-			if (!message.getDeleted()) {
-				results.add(message);
-			}
-		}
-		
-		return results;
-	}
-
-	/**
-	 * Returns list of DecoratedMessageBean objects, ie, the messages
-	 */
-	public List getMessages() 
-	{
+	public List getMessages() {
 		List messages = new ArrayList();
 		
 		//if(displayUnreadOnly) 
@@ -5617,7 +5517,7 @@ public class DiscussionForumTool
 		
 		if (messages != null && !messages.isEmpty())
 			messages = filterModeratedMessages(messages, selectedTopic.getTopic(), selectedForum.getForum());
-
+		
 		return messages;
 	}
 
@@ -5633,11 +5533,6 @@ public class DiscussionForumTool
 		List viewableMsgs = new ArrayList();
 		if (messages != null || messages.size() > 0)
 		{
-			if (forum == null) 
-			{
-				forum = selectedForum.getForum();
-			}
-
 			boolean hasModeratePerm = uiPermissionsManager.isModeratePostings(topic, forum);
 			
 			if (hasModeratePerm)
@@ -5778,17 +5673,5 @@ public class DiscussionForumTool
 		 selectedTopic = getDecoratedTopic(topic);
 		 setTopicBeanAssign();
 		 getSelectedTopic();
-	 }
-	 
-	 /**
-	  * Used to refresh any settings (such as revise) that need to be refreshed
-	  * after various actions that re-set the selectedMessage (navigating to prev/next msg, moderating, etc) 
-	  * @param message
-	  */
-	 private void refreshSelectedMessageSettings(Message message) {
-		 boolean isOwn = message.getCreatedBy().equals(getUserId());
-		 selectedMessage.setRevise(selectedTopic.getIsReviseAny() 
-					|| (selectedTopic.getIsReviseOwn() && isOwn));  
-		 selectedMessage.setUserCanDelete(selectedTopic.getIsDeleteAny() || (isOwn && selectedTopic.getIsDeleteOwn()));
 	 }
 }

@@ -36,6 +36,8 @@ public interface PermissionLevel extends MutableEntity{
 	public static final String DELETE_ANY = "deleteAny";
 	public static final String REVISE_OWN = "reviseOwn";
 	public static final String REVISE_ANY = "reviseAny";	
+	public static final String VIEW_READBY_OWN = "viewReadbyOwn";
+	public static final String VIEW_READBY_ANY = "viewReadbyAny";
 	
 	public String getName();
 
@@ -100,6 +102,14 @@ public interface PermissionLevel extends MutableEntity{
 	public Boolean getReviseOwn();
 
 	public void setReviseOwn(Boolean reviseOwn);
+
+	public Boolean getViewReadbyAny();
+
+	public void setViewReadbyAny(Boolean viewReadbyAny);
+
+	public Boolean getViewReadbyOwn();
+
+	public void setViewReadbyOwn(Boolean viewReadbyOwn);
 	
 	public PermissionLevel clone();
 

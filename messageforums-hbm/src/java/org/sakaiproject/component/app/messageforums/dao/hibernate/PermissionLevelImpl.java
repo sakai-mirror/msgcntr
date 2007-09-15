@@ -43,6 +43,8 @@ public class PermissionLevelImpl extends MutableEntityImpl
 	private Boolean read;
 	private Boolean reviseAny;
 	private Boolean reviseOwn;
+	private Boolean viewReadbyAny;
+	private Boolean viewReadbyOwn;
 	private Boolean moderatePostings;
 	
 	
@@ -173,7 +175,23 @@ public class PermissionLevelImpl extends MutableEntityImpl
 	public void setReviseOwn(Boolean reviseOwn) {
 		this.reviseOwn = reviseOwn;
 	}
- 
+
+	public Boolean getViewReadbyAny() {
+		return viewReadbyAny;
+	}
+
+	public void setViewReadbyAny(Boolean viewReadbyAny) {
+		this.viewReadbyAny = viewReadbyAny;
+	}
+
+	public Boolean getViewReadbyOwn() {
+		return viewReadbyOwn;
+	}
+
+	public void setViewReadbyOwn(Boolean viewReadbyOwn) {
+		this.viewReadbyOwn = viewReadbyOwn;
+	}	
+		
 	public int compareTo(Object obj) {
 		
 		PermissionLevelImpl pli = (PermissionLevelImpl) obj;				
@@ -186,6 +204,8 @@ public class PermissionLevelImpl extends MutableEntityImpl
 	public String toString() {		
 		StringBuffer buffer = new StringBuffer("[");
 		buffer.append(changeSettings);		
+		//buffer.append("," + deleteAny);
+		//buffer.append("," + deleteOwn);
 		buffer.append("," + markAsRead);
 		//buffer.append("," + movePosting);
 		buffer.append("," + newForum);
@@ -197,8 +217,8 @@ public class PermissionLevelImpl extends MutableEntityImpl
 		buffer.append("," + reviseAny);
 		buffer.append("," + reviseOwn);
 		buffer.append("," + moderatePostings);
-		buffer.append("," + deleteAny);
-		buffer.append("," + deleteOwn);
+		buffer.append("," + viewReadbyAny);
+		buffer.append("," + viewReadbyOwn);
 		buffer.append("]");
 		
 		return buffer.toString();
@@ -264,16 +284,26 @@ public class PermissionLevelImpl extends MutableEntityImpl
     returnValue = (bThis == null) ? obj.getRead() == null : bThis.equals(obj.getRead());
     if(!returnValue)
     	return returnValue;
-	bThis = this.getReviseAny();         
+    bThis = this.getReviseAny();         
     returnValue = (bThis == null) ? obj.getReviseAny() == null : bThis.equals(obj.getReviseAny());
     if(!returnValue)
     	return returnValue;
-	bThis = this.getReviseOwn();
+    bThis = this.getReviseOwn();
     returnValue = (bThis == null) ? obj.getReviseOwn() == null : bThis.equals(obj.getReviseOwn());
     if(!returnValue)
     	return returnValue;
-	bThis = this.getModeratePostings();         
+    bThis = this.getModeratePostings();         
     returnValue = (bThis == null) ? obj.getModeratePostings() == null : bThis.equals(obj.getModeratePostings());
+    if(!returnValue)
+    	return returnValue;
+    
+    bThis = this.getViewReadbyAny();         
+    returnValue = (bThis == null) ? obj.getViewReadbyAny() == null : bThis.equals(obj.getViewReadbyAny());
+    if(!returnValue)
+    	return returnValue;
+
+    bThis = this.getViewReadbyOwn();
+    returnValue = (bThis == null) ? obj.getViewReadbyOwn() == null : bThis.equals(obj.getViewReadbyOwn());
     if(!returnValue)
     	return returnValue;
 	
@@ -330,6 +360,12 @@ public class PermissionLevelImpl extends MutableEntityImpl
     		result = result + temp;
     		bThis = this.getModeratePostings();         
     		temp = (bThis == null) ? 0 : bThis.hashCode();
+    		bThis = this.getViewReadbyAny();         
+    		result = result + temp;
+    		temp = (bThis == null) ? 0 : bThis.hashCode();
+    		result = result + temp;
+    		bThis = this.getViewReadbyOwn();         
+    		temp = (bThis == null) ? 0 : bThis.hashCode();
     		result = result + temp;
     }
     catch(Exception e){
@@ -365,6 +401,8 @@ public class PermissionLevelImpl extends MutableEntityImpl
 		pli.setTypeUuid(this.getTypeUuid());
 		pli.setUuid(this.getUuid());
 		pli.setVersion(this.getVersion());
+		pli.setViewReadbyAny(this.getViewReadbyAny());
+		pli.setViewReadbyOwn(this.getViewReadbyOwn());
 		
 		return pli;
 	}
