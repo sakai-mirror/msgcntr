@@ -903,26 +903,29 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
    */
   public List getCurrentUserMemberships()
   {
-	  if (ThreadLocalManager.get("message_center_permission_set") == null || !((Boolean)ThreadLocalManager.get("message_center_permission_set")).booleanValue())
-	  {
-	    initMembershipForSite();
-	  }
-	  
 	  List userMemberships = new ArrayList();
 	  // first, add the user's role
 	  final String currRole = getCurrentUserRole();
 	  userMemberships.add(currRole);
 	  // now, add any groups the user is a member of
-
-	  Collection groups = (Collection) ThreadLocalManager.get("message_center_current_member_groups");
-	  Iterator groupIter = groups.iterator();
-
-	  while (groupIter.hasNext())
-	  {
-		  Group currentGroup = (Group) groupIter.next();  
-		  if (currentGroup != null) {
-			  userMemberships.add(currentGroup.getTitle());
+	  try {
+		  Collection groups;
+		  if (ThreadLocalManager.get("message_center_current_member_groups") != null) {
+			  groups = (Collection) ThreadLocalManager.get("message_center_current_member_groups");
+		  } else {
+			  groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext()).getGroupsWithMember(getCurrentUserId());
 		  }
+	
+		  Iterator groupIter = groups.iterator();
+		  while (groupIter.hasNext())
+		  {
+			  Group currentGroup = (Group) groupIter.next();  
+			  if (currentGroup != null) {
+				  userMemberships.add(currentGroup.getTitle());
+			  }
+		  }
+	  } catch (IdUnusedException iue) {
+		  LOG.debug("No memberships found");
 	  }
 	  
 	  return userMemberships;
