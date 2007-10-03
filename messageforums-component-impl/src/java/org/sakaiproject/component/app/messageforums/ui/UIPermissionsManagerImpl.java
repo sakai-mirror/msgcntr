@@ -3,7 +3,7 @@
  * $Id: UIPermissionsManagerImpl.java 9227 2006-05-15 15:02:42Z cwen@iupui.edu $
  ***********************************************************************************
  *
- * Copyright (c) 2003, 2004, 2005, 2006, 2007 The Sakai Foundation.
+ * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
@@ -53,6 +53,7 @@ import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.thread_local.cover.ThreadLocalManager;
 
@@ -885,11 +886,25 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
 	  final String currRole = getCurrentUserRole();
 	  userMemberships.add(currRole);
 	  // now, add any groups the user is a member of
-	  Iterator groupIter = getGroupNamesByCurrentUser();
-	  while (groupIter.hasNext())
-	  {
-		  final String groupName = (String)groupIter.next();
-		  userMemberships.add(groupName);
+
+	  try {
+		  Collection groups;
+		  if (ThreadLocalManager.get("message_center_current_member_groups") != null) {
+			  groups = (Collection) ThreadLocalManager.get("message_center_current_member_groups");
+		  } else {
+			  groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext()).getGroupsWithMember(getCurrentUserId());
+		  }
+	
+		  Iterator groupIter = groups.iterator();
+		  while (groupIter.hasNext())
+		  {
+			  Group currentGroup = (Group) groupIter.next();  
+			  if (currentGroup != null) {
+				  userMemberships.add(currentGroup.getTitle());
+			  }
+		  }
+	  } catch (IdUnusedException iue) {
+		  LOG.debug("No memberships found");
 	  }
 	  
 	  return userMemberships;
@@ -901,17 +916,11 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     List memberof = new ArrayList();
     try
     {
-      Collection groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext())
-          .getGroups();
+      Collection groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext()).getGroupsWithMember(getCurrentUserId());
       for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();)
       {
         Group currentGroup = (Group) groupIterator.next();
-
-        Member member = currentGroup.getMember(getCurrentUserId());
-        if (member != null && member.getUserId().equals(getCurrentUserId()))
-        {
-          memberof.add(currentGroup.getId());
-        }
+        memberof.add(currentGroup.getId());
       }
     }
     catch (IdUnusedException e)
@@ -931,17 +940,13 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     List memberof = new ArrayList();
     try
     {
-      Collection groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext())
-          .getGroups();
+      Collection groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext()).getGroupsWithMember(getCurrentUserId());
+
       for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();)
       {
         Group currentGroup = (Group) groupIterator.next();
 
-        Member member = currentGroup.getMember(getCurrentUserId());
-        if (member != null && member.getUserId().equals(getCurrentUserId()))
-        {
-          memberof.add(currentGroup.getTitle());
-        }
+        memberof.add(currentGroup.getTitle());
       }
     }
     catch (IdUnusedException e)
@@ -996,16 +1001,13 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     		for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();)
     		{
     			Group currentGroup = (Group) groupIterator.next();  
-    			currentGroup.getTitle();
 
-    			if(currentGroup.getMember(getCurrentUserId()) != null)
-    			{
-    				DBMembershipItem groupItem = forumManager.getDBMember(areaItemsInThread, currentGroup.getTitle(),
-    						DBMembershipItem.TYPE_GROUP);
-    				if (groupItem != null){
-    					areaItems.add(groupItem);
-    				}
-    			}
+				DBMembershipItem groupItem = forumManager.getDBMember(areaItemsInThread, currentGroup.getTitle(),
+						DBMembershipItem.TYPE_GROUP);
+				if (groupItem != null){
+					areaItems.add(groupItem);
+				}
+
     		}
     	}
     }
@@ -1082,16 +1084,12 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     		for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();)
     		{
     			Group currentGroup = (Group) groupIterator.next();  
-    			currentGroup.getTitle();
 
-    			if(currentGroup.getMember(getCurrentUserId()) != null)
-    			{
-    				DBMembershipItem groupItem = forumManager.getDBMember(thisForumItemSet, currentGroup.getTitle(),
-    						DBMembershipItem.TYPE_GROUP);
-    				if (groupItem != null){
-    					forumItems.add(groupItem);
-    				}
-    			}
+				DBMembershipItem groupItem = forumManager.getDBMember(thisForumItemSet, currentGroup.getTitle(),
+						DBMembershipItem.TYPE_GROUP);
+				if (groupItem != null){
+					forumItems.add(groupItem);
+				}
     		}
     	}
     }
@@ -1178,15 +1176,11 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     		for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();)
     		{
     			Group currentGroup = (Group) groupIterator.next();  
-    			currentGroup.getTitle();
 
-    			if(currentGroup.getMember(getCurrentUserId()) != null)
-    			{
-    				DBMembershipItem groupItem = forumManager.getDBMember(thisTopicItemSet, currentGroup.getTitle(),
-    						DBMembershipItem.TYPE_GROUP);
-    				if (groupItem != null){
-    					topicItems.add(groupItem);
-    				}
+				DBMembershipItem groupItem = forumManager.getDBMember(thisTopicItemSet, currentGroup.getTitle(),
+						DBMembershipItem.TYPE_GROUP);
+				if (groupItem != null){
+					topicItems.add(groupItem);
     			}
     		}
     	}
@@ -1403,19 +1397,13 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     }
     try
     {
-      Collection groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext())
-          .getGroups();
+      Collection groups = SiteService.getSite(toolManager.getCurrentPlacement().getContext()).getGroupsWithMember(getCurrentUserId());
       for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();)
       {
         Group currentGroup = (Group) groupIterator.next();
         if (currentGroup.getId().equals(groupId))
         {
-          Member member = currentGroup.getMember(getCurrentUserId());
-          if (member != null && member.getUserId().equals(getCurrentUserId()))
-          {
             return true;
-
-          }
         }
       }
     }

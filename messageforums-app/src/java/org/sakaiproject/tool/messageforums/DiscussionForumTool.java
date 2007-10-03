@@ -466,7 +466,7 @@ public class DiscussionForumTool
       						for(int j=0; j<msgList.size(); j++)
       						{
       							Message tempMsg = (Message)msgList.get(j);
-      							if(tempMsg != null && !tempMsg.getDraft().booleanValue())
+      							if(tempMsg != null && !tempMsg.getDraft().booleanValue() && !tempMsg.getDeleted().booleanValue())
       							{
       								msgIds.add(tempMsg.getId());
       							}
@@ -477,6 +477,8 @@ public class DiscussionForumTool
       		}
       	}
       }
+      
+      Map msgIdReadStatusMap = forumManager.getReadStatusForMessagesWithId(msgIds, getUserId());
 
       iterForum = tempForum.iterator();
       while (iterForum.hasNext())
@@ -499,7 +501,7 @@ public class DiscussionForumTool
             getUserId()))
         { 
           //DiscussionForumBean decoForum = getDecoratedForum(forum);
-        	DiscussionForumBean decoForum = getDecoratedForumWithPersistentForumAndTopics(forum);
+        	DiscussionForumBean decoForum = getDecoratedForumWithPersistentForumAndTopics(forum, msgIdReadStatusMap);
         	decoForum.setGradeAssign("Default_0");
           for(int i=0; i<assignments.size(); i++)
           {
@@ -1669,8 +1671,7 @@ public class DiscussionForumTool
 	    	selectedThreadHead = new DiscussionMessageBean(
 	    			threadMessage, messageManager);
 	    }
-	    DiscussionTopic topic=forumManager.getTopicById(new Long(
-	        getExternalParameterByKey(TOPIC_ID)));
+	    DiscussionTopic topic=forumManager.getTopicById(new Long(topicId));
 	    selectedMessage = selectedThreadHead;
 	    setSelectedForumForCurrentTopic(topic);
 	    selectedTopic = new DiscussionTopicBean(topic, selectedForum.getForum(),
@@ -1686,12 +1687,12 @@ public class DiscussionForumTool
 	    {
 	      DiscussionForum forum = forumManager
 	          .getForumById(new Long(currentForumId));
-	      selectedForum = getDecoratedForum(forum);
+	      selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
 	      setForumBeanAssign();
 	      selectedTopic.getTopic().setBaseForum(forum);
 	    }
-	    selectedTopic = getDecoratedTopic(forumManager.getTopicById(new Long(
-	        getExternalParameterByKey(TOPIC_ID))));
+	    // don't need this here b/c done in processActionGetDisplayThread();
+	    // selectedTopic = getDecoratedTopic(topic);
 	    
 	    return processActionGetDisplayThread();	  
   }
@@ -1726,19 +1727,19 @@ public class DiscussionForumTool
       return gotoMain();
     }
     // Message message=forumManager.getMessageById(new Long(messageId));
+    messageManager.markMessageReadForUser(new Long(topicId),
+            new Long(messageId), true);
     Message message = messageManager.getMessageByIdWithAttachments(new Long(
         messageId));
-    messageManager.markMessageReadForUser(new Long(topicId),
-        new Long(messageId), true);
+
     if (message == null)
     {
       setErrorMessage(getResourceBundleString(MESSAGE_WITH_ID) + messageId + getResourceBundleString(NOT_FOUND_WITH_QUOTE));
       return gotoMain();
     }
-    message = messageManager.getMessageByIdWithAttachments(message.getId());
+
     selectedMessage = new DiscussionMessageBean(message, messageManager);
-    DiscussionTopic topic=forumManager.getTopicById(new Long(
-        getExternalParameterByKey(TOPIC_ID)));
+    DiscussionTopic topic=forumManager.getTopicById(new Long(topicId));
     setSelectedForumForCurrentTopic(topic);
     selectedTopic = new DiscussionTopicBean(topic, selectedForum.getForum(),
         uiPermissionsManager, forumManager);
@@ -1753,12 +1754,11 @@ public class DiscussionForumTool
     {
       DiscussionForum forum = forumManager
           .getForumById(new Long(currentForumId));
-      selectedForum = getDecoratedForum(forum);
+      selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
       setForumBeanAssign();
       selectedTopic.getTopic().setBaseForum(forum);
     }
-    selectedTopic = getDecoratedTopic(forumManager.getTopicById(new Long(
-        getExternalParameterByKey(TOPIC_ID))));
+    selectedTopic = getDecoratedTopic(topic);
     setTopicBeanAssign();
     getSelectedTopic();
     //get thread from message
@@ -1895,61 +1895,99 @@ public class DiscussionForumTool
    */
   private DiscussionForumBean getDecoratedForum(DiscussionForum forum)
   {
-    if (LOG.isDebugEnabled())
-    {
-      LOG.debug("getDecoratedForum(DiscussionForum" + forum + ")");
-    }
-    forum = forumManager.getForumByIdWithTopics(forum.getId());
-    DiscussionForumBean decoForum = new DiscussionForumBean(forum,
-        uiPermissionsManager, forumManager);
-    if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
-    {
-    	decoForum.setReadFullDesciption(true);
-    }
-    List temp_topics = forum.getTopics();
-    if (temp_topics == null)
-    {
-      return decoForum;
-    }
-    Iterator iter = temp_topics.iterator();
-    while (iter.hasNext())
-    {
-      DiscussionTopic topic = (DiscussionTopic) iter.next();
-//    TODO: put this logic in database layer
-      if (topic.getDraft().equals(Boolean.FALSE)||
-          (topic.getDraft().equals(Boolean.TRUE)&&topic.getCreatedBy().equals(getUserId()))
-          ||isInstructor()
-          ||SecurityService.isSuperUser()||topic.getCreatedBy().equals(
-          getUserId()))
-      { 
-        topic = (DiscussionTopic) forumManager.getTopicByIdWithAttachments(topic
-            .getId());
-        if (topic != null)
-        {
-          DiscussionTopicBean decoTopic = new DiscussionTopicBean(topic, forum,
-              uiPermissionsManager, forumManager);
-          if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
-          {
-          	decoTopic.setReadFullDesciption(true);
-          }
-          if (uiPermissionsManager.isModeratePostings(topic, forum))
-          {
-        	  decoTopic.setTotalNoMessages(forumManager.getTotalNoMessages(topic));
-        	  decoTopic.setUnreadNoMessages(forumManager.getUnreadNoMessages(topic));
-          }
-          else
-          {
-        	  decoTopic.setTotalNoMessages(forumManager.getTotalViewableMessagesWhenMod(topic));
-          	  decoTopic.setUnreadNoMessages(forumManager.getNumUnreadViewableMessagesWhenMod(topic));
-          }
-          decoForum.addTopic(decoTopic);
-        }
-      } 
-    }
-    return decoForum;
+	  if (LOG.isDebugEnabled())
+	  {
+		  LOG.debug("getDecoratedForum(DiscussionForum" + forum + ")");
+	  }
+	  forum = forumManager.getForumByIdWithTopicsAttachmentsAndMessages(forum.getId());
+	  DiscussionForumBean decoForum = new DiscussionForumBean(forum,
+			  uiPermissionsManager, forumManager);
+	  if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+	  {
+		  decoForum.setReadFullDesciption(true);
+	  }
+	  List temp_topics = forum.getTopics();
+	  if (temp_topics == null)
+	  {
+		  return decoForum;
+	  }
+
+	  // to store all of the messages associated with the topics
+	  List msgIds = new ArrayList();
+	  for (Iterator topicIter = temp_topics.iterator(); topicIter.hasNext();) {
+		  DiscussionTopic topic = (DiscussionTopic) topicIter.next();
+		  if(topic != null)
+		  {
+			  List msgList = topic.getMessages();
+			  if(msgList != null)
+			  {
+				  for(int j=0; j<msgList.size(); j++)
+				  {
+					  Message tempMsg = (Message)msgList.get(j);
+					  if(tempMsg != null && !tempMsg.getDraft().booleanValue() && !tempMsg.getDeleted())
+					  {
+						  msgIds.add(tempMsg.getId());
+					  }
+				  }
+			  }
+		  }
+	  }
+
+	  Map msgIdReadStatusMap = forumManager.getReadStatusForMessagesWithId(msgIds, getUserId());
+
+	  Iterator iter = temp_topics.iterator();
+	  while (iter.hasNext())
+	  {
+		  DiscussionTopic topic = (DiscussionTopic) iter.next();
+//		  TODO: put this logic in database layer
+		  if (topic != null && topic.getDraft().equals(Boolean.FALSE)||
+				  (topic.getDraft().equals(Boolean.TRUE)&&topic.getCreatedBy().equals(getUserId()))
+				  ||isInstructor()
+				  ||SecurityService.isSuperUser()||topic.getCreatedBy().equals(
+						  getUserId()))
+		  { 
+
+			  DiscussionTopicBean decoTopic = new DiscussionTopicBean(topic, forum,
+					  uiPermissionsManager, forumManager);
+			  if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+			  {
+				  decoTopic.setReadFullDesciption(true);
+			  }
+
+			  List topicMsgs = topic.getMessages();
+			  if (topicMsgs == null || topicMsgs.size() == 0) {
+				  decoTopic.setTotalNoMessages(0);
+				  decoTopic.setUnreadNoMessages(0);
+			  } else if (!topic.getModerated().booleanValue() || uiPermissionsManager.isModeratePostings(topic, forum)) {
+				  int totalMsgs = 0;
+				  int totalUnread = 0;
+				  for (Iterator msgIter = topicMsgs.iterator(); msgIter.hasNext();) {
+					  Message message = (Message) msgIter.next();
+					  Boolean readStatus = (Boolean)msgIdReadStatusMap.get(message.getId());
+					  if (readStatus != null) {
+						  totalMsgs++;
+						  if (!readStatus.booleanValue()) {
+							  totalUnread++;
+						  }
+					  }
+				  }
+
+				  decoTopic.setTotalNoMessages(totalMsgs);
+				  decoTopic.setUnreadNoMessages(totalUnread);
+
+			  } else {  // topic is moderated
+				  decoTopic.setTotalNoMessages(forumManager.getTotalViewableMessagesWhenMod(topic));
+				  decoTopic.setUnreadNoMessages(forumManager.getNumUnreadViewableMessagesWhenMod(topic));
+			  }
+
+			  decoForum.addTopic(decoTopic);
+		  }
+
+	  }
+	  return decoForum;
   }
 
-  private DiscussionForumBean getDecoratedForumWithPersistentForumAndTopics(DiscussionForum forum)
+  private DiscussionForumBean getDecoratedForumWithPersistentForumAndTopics(DiscussionForum forum, Map msgIdReadStatusMap)
   {
     if (LOG.isDebugEnabled())
     {
@@ -1985,14 +2023,28 @@ public class DiscussionForumTool
           {
           	decoTopic.setReadFullDesciption(true);
           }
-
-          if (uiPermissionsManager.isModeratePostings(topic, forum))
-          {
-        	  decoTopic.setTotalNoMessages(forumManager.getTotalNoMessages(topic));
-        	  decoTopic.setUnreadNoMessages(forumManager.getUnreadNoMessages(topic));
-          }
-          else
-          {
+          
+          List topicMsgs = topic.getMessages();
+          if (topicMsgs == null || topicMsgs.size() == 0) {
+        	  decoTopic.setTotalNoMessages(0);
+        	  decoTopic.setUnreadNoMessages(0);
+          } else if (!topic.getModerated().booleanValue() || uiPermissionsManager.isModeratePostings(topic, forum)) {
+        	  int totalMsgs = 0;
+        	  int totalUnread = 0;
+        	  for (Iterator msgIter = topicMsgs.iterator(); msgIter.hasNext();) {
+        		  Message message = (Message) msgIter.next();
+        		  Boolean readStatus = (Boolean)msgIdReadStatusMap.get(message.getId());
+        		  if (readStatus != null) {
+        			  totalMsgs++;
+        			  if (!readStatus.booleanValue()) {
+        				  totalUnread++;
+        			  }
+        		  }
+        	  }
+        	  
+        	  decoTopic.setTotalNoMessages(totalMsgs);
+        	  decoTopic.setUnreadNoMessages(totalUnread);
+          } else {
         	  decoTopic.setTotalNoMessages(forumManager.getTotalViewableMessagesWhenMod(topic));
           	  decoTopic.setUnreadNoMessages(forumManager.getNumUnreadViewableMessagesWhenMod(topic));
           }
@@ -2142,16 +2194,7 @@ public class DiscussionForumTool
     {
     	decoTopic.setReadFullDesciption(true);
     }
-    if (!decoTopic.isTopicModerated() || decoTopic.getIsModeratedAndHasPerm())
-    {
-    	decoTopic.setTotalNoMessages(forumManager.getTotalNoMessages(topic));
-    	decoTopic.setUnreadNoMessages(forumManager.getUnreadNoMessages(topic));
-    }
-    else
-    {
-    	decoTopic.setTotalNoMessages(forumManager.getTotalViewableMessagesWhenMod(topic));
-    	decoTopic.setUnreadNoMessages(forumManager.getNumUnreadViewableMessagesWhenMod(topic));
-    }
+
     boolean hasNextTopic = forumManager.hasNextTopic(topic);
     boolean hasPreviousTopic = forumManager.hasPreviousTopic(topic);
     decoTopic.setHasNextTopic(hasNextTopic);
@@ -2159,22 +2202,54 @@ public class DiscussionForumTool
     if (hasNextTopic)
     {
       DiscussionTopic nextTopic= forumManager.getNextTopic(topic);
-        
-              decoTopic.setNextTopicId(nextTopic.getId());
-             
+      decoTopic.setNextTopicId(nextTopic.getId());
     }
     if (hasPreviousTopic)
     {    
-        decoTopic
-          .setPreviousTopicId(forumManager.getPreviousTopic(topic).getId());
-       
+        decoTopic.setPreviousTopicId(forumManager.getPreviousTopic(topic).getId());
     }
 
     List temp_messages = forumManager.getTopicByIdWithMessagesAndAttachments(topic.getId())
         .getMessages();
     if (temp_messages == null || temp_messages.size() < 1)
     {
+      decoTopic.setTotalNoMessages(0);
+      decoTopic.setUnreadNoMessages(0);
       return decoTopic;
+    }
+    
+    List msgIdList = new ArrayList();
+    for (Iterator msgIter = temp_messages.iterator(); msgIter.hasNext();) {
+    	Message msg = (Message) msgIter.next();
+    	if(msg != null && !msg.getDraft().booleanValue() && !msg.getDeleted()) {
+    		msgIdList.add(msg.getId());
+    	}
+    }
+    
+    // retrieve read status for all of the messages in this topic
+    Map messageReadStatusMap = forumManager.getReadStatusForMessagesWithId(msgIdList, getUserId());
+    
+    // set # read/unread msgs on topic level
+    if (!topic.getModerated().booleanValue() || uiPermissionsManager.isModeratePostings(topic, selectedForum.getForum())) {
+    	int totalMsgs = 0;
+    	int totalUnread = 0;
+    	for (Iterator msgIter = msgIdList.iterator(); msgIter.hasNext();) {
+    		Long msgId = (Long) msgIter.next();
+    		Boolean readStatus = (Boolean)messageReadStatusMap.get(msgId);
+    		if (readStatus != null) {
+    			totalMsgs++;
+    			if (!readStatus.booleanValue()) {
+    				totalUnread++;
+    			}
+    		}
+    	}
+
+    	decoTopic.setTotalNoMessages(totalMsgs);
+    	decoTopic.setUnreadNoMessages(totalUnread);
+
+    } else {  // topic is moderated
+    	decoTopic.setTotalNoMessages(forumManager.getTotalViewableMessagesWhenMod(topic));
+    	decoTopic.setUnreadNoMessages(forumManager.getNumUnreadViewableMessagesWhenMod(topic));
     }
 
     Iterator iter = temp_messages.iterator();
@@ -2197,8 +2272,13 @@ public class DiscussionForumTool
               messageManager);
           if(isRead || (isNewResponse && decoMsg.getIsOwn()))
           {
-          	decoMsg.setRead(messageManager.isMessageReadForUser(topic.getId(),
-              message.getId()));
+        	Boolean readStatus = (Boolean) messageReadStatusMap.get(message.getId());
+        	if (readStatus != null) {
+        		decoMsg.setRead(readStatus.booleanValue());
+        	} else {
+        		decoMsg.setRead(messageManager.isMessageReadForUser(topic.getId(),
+        				message.getId()));
+        	}
           	boolean isOwn = decoMsg.getMessage().getCreatedBy().equals(getUserId());
           	decoMsg.setRevise(decoTopicGetIsReviseAny 
           			|| (decoTopicGetIsReviseOwn && isOwn));
@@ -2532,7 +2612,7 @@ public class DiscussionForumTool
     this.attachments.clear();
 
     // refresh page with unread status     
-    selectedTopic = getDecoratedTopic(forumManager.getTopicById(selectedTopic.getTopic().getId()));
+    selectedTopic = getDecoratedTopic(selectedTopic.getTopic());
     
     return ALL_MESSAGES;
   }
@@ -2769,16 +2849,16 @@ public class DiscussionForumTool
 	      return gotoMain();
 	    }
 	    // Message message=forumManager.getMessageById(new Long(messageId));
-	    Message message = messageManager.getMessageByIdWithAttachments(new Long(
-	        messageId));
 	    messageManager.markMessageReadForUser(new Long(topicId),
 	        new Long(messageId), true);
+	    Message message = messageManager.getMessageByIdWithAttachments(new Long(
+		        messageId));
 	    if (message == null)
 	    {
 	      setErrorMessage(getResourceBundleString(MESSAGE_WITH_ID) + messageId + getResourceBundleString(NOT_FOUND_WITH_QUOTE));
 	      return gotoMain();
 	    }
-	    message = messageManager.getMessageByIdWithAttachments(message.getId());
+
 	    selectedMessage = new DiscussionMessageBean(message, messageManager);
 	    
 	    return processDfMsgReplyMsg();
@@ -2855,7 +2935,7 @@ public class DiscussionForumTool
 	      setErrorMessage(getResourceBundleString(MESSAGE_WITH_ID) + messageId + getResourceBundleString(NOT_FOUND_WITH_QUOTE));
 	      return gotoMain();
 	    }
-	    message = messageManager.getMessageByIdWithAttachments(message.getId());
+
 	    selectedMessage = new DiscussionMessageBean(message, messageManager);
 	  return processDfMsgGrd();
   }
@@ -3032,14 +3112,16 @@ public class DiscussionForumTool
 
   public String processDfReplyMsgPost()
   {
-    List tempList = forumManager.getMessagesByTopicId(selectedTopic.getTopic().getId());
+	DiscussionTopic topicWithMsgs = (DiscussionTopic) forumManager.getTopicByIdWithMessages(selectedTopic.getTopic().getId());
+    List tempList = topicWithMsgs.getMessages();
     if(tempList != null)
     {
     	boolean existed = false;
+    	Long selMsgId = selectedMessage.getMessage().getId();
     	for(int i=0; i<tempList.size(); i++)
     	{
     		Message tempMsg = (Message)tempList.get(i);
-    		if(tempMsg.getId().equals(selectedMessage.getMessage().getId()))
+    		if(tempMsg.getId().equals(selMsgId))
     		{
     			existed = true;
     			break;
@@ -3061,10 +3143,9 @@ public class DiscussionForumTool
 
     dMsg.setInReplyTo(selectedMessage.getMessage());
     forumManager.saveMessage(dMsg);
-    setSelectedForumForCurrentTopic((DiscussionTopic) forumManager
-        .getTopicByIdWithMessages(selectedTopic.getTopic().getId()));
-    selectedTopic.setTopic((DiscussionTopic) forumManager
-        .getTopicByIdWithMessages(selectedTopic.getTopic().getId()));
+    
+    setSelectedForumForCurrentTopic(topicWithMsgs);
+    selectedTopic.setTopic(topicWithMsgs);
     selectedTopic.getTopic().setBaseForum(selectedForum.getForum());
     //selectedTopic.addMessage(new DiscussionMessageBean(dMsg, messageManager));
     selectedTopic.insertMessage(new DiscussionMessageBean(dMsg, messageManager));
@@ -3614,14 +3695,13 @@ public class DiscussionForumTool
 			  displayPendingMsgQueue = false;
 		  }
 		  else
-		  {
-			  if (refreshPendingMsgs)
-			  {
-			  	refreshPendingMessages();
-			  }
-			  
+		  {		  
 			  displayPendingMsgQueue = true;
 		  }
+	  }
+	  
+	  if (refreshPendingMsgs && displayPendingMsgQueue.booleanValue()) {
+		  refreshPendingMessages();
 	  }
 	  return displayPendingMsgQueue.booleanValue();
   }
