@@ -261,7 +261,7 @@
         <mf:forumHideDivision title="#{msgs.cdfm_readby} (#{ForumTool.selectedMessage.message.readbyNum} #{msgs.cdfm_users})" id="cntrl_perm" hideByDefault="true" rendered="#{(ForumTool.selectedTopic.isViewReadbyOwn && ForumTool.selectedMessage.isOwn) || ForumTool.selectedTopic.isViewReadbyAny }" >
 	  <h:dataTable id="perm" value="ForumTool.permissions" var="permission" cellpadding="0" cellspacing="0">
 	    <h:column>
-	        <h:outputText value="{#ForumTool.selectedMessage.message.readbyNames}" />
+	        <h:outputText value="#{ForumTool.selectedMessage.message.readbyNames}" />
 	    </h:column>
 	  </h:dataTable>
 	</mf:forumHideDivision>
