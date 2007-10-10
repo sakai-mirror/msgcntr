@@ -6,6 +6,8 @@
   <f:loadBundle basename="org.sakaiproject.api.app.messagecenter.bundle.Messages" var="msgs"/>
   <sakai:view_container title="#{msgs.cdfm_container_title}">
     <sakai:view_content>
+       		<script type="text/javascript" src="/library/js/jquery.js"></script>
+       		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
       <h:form >
 
         <sakai:tool_bar_message value="#{msgs.cdfm_tool_bar_message}" /> 

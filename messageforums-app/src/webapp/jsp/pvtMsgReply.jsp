@@ -8,6 +8,8 @@
 <f:view>
   <sakai:view title="#{msgs.pvt_reply}">
     <h:form id="pvtMsgReply">
+           		<script type="text/javascript" src="/library/js/jquery.js"></script>
+       		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
   			<div class="breadCrumb">
 			  <h3>
 				<h:panelGroup rendered="#{PrivateMessagesTool.messagesandForums}" >
