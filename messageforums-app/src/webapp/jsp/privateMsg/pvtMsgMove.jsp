@@ -8,6 +8,8 @@
 	<sakai:view title="#{msgs.pvt_move} #{msgs.pvt_rcvd_msgs}">
 <!--jsp/privateMsg/pvtMsgMove.jsp-->	
 		<h:form id="pvtMsgMove">
+		<script type="text/javascript" src="/library/js/jquery.js"></script>
+                <sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 		  <sakai:tool_bar_message value="#{msgs.pvt_msgs_label} #{msgs.pvt_move_msg_to}" /> 
 			<h:messages styleClass="alertMessage" id="errorMessages" /> 
 
