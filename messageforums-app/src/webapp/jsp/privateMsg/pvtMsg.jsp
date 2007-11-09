@@ -16,11 +16,7 @@
 	  Application app = context.getApplication();
 	  ValueBinding binding = app.createValueBinding("#{PrivateMessagesTool}");
 	  PrivateMessagesTool pmt = (PrivateMessagesTool) binding.getValue(context);
-	  pmt.initializePrivateMessageArea();
-	  pmt.processPvtMsgTopic();
-	  PrivateTopicDecoratedBean selectedTopic = pmt.getSelectedTopic();
-	  selectedTopic.setHasNextTopic(true);
-	  selectedTopic.setHasPreviousTopic(false);
+	  pmt.initializeFromSynoptic();
     }
 %>
 
@@ -102,7 +98,7 @@
           </h:commandLink>
 		  			<f:verbatim></h4></f:verbatim>
 		  </h:column>			
-		  <h:column rendered="#{PrivateMessagesTool.msgNavMode != 'Sent'}">
+		  <h:column rendered="#{PrivateMessagesTool.selectedTopic.topic.title != 'Sent'}">
 		    <f:facet name="header">
 		       <h:commandLink value="#{msgs.pvt_authby}"
 		                      title="#{msgs.sort_author}">
@@ -118,7 +114,7 @@
 		     <h:outputText value="#{rcvdItems.msg.author}" rendered="#{rcvdItems.hasRead}"/>
 		     <h:outputText styleClass="unreadMsg" value="#{rcvdItems.msg.author}" rendered="#{!rcvdItems.hasRead}"/>
 		  </h:column>
-		  <h:column rendered="#{PrivateMessagesTool.msgNavMode == 'Sent'}">
+		  <h:column rendered="#{PrivateMessagesTool.selectedTopic.topic.title == 'Sent'}">
 		    <f:facet name="header">
    		     <h:commandLink value="#{msgs.pvt_to}"
 		                      title="#{msgs.sort_to}">
@@ -202,14 +198,14 @@
             <f:param value="#{rcvdItems.msg.id}" name="current_msg_detail"/>
           </h:commandLink>
 		  </h:column>			
-		  <h:column rendered="#{PrivateMessagesTool.msgNavMode != 'Sent'}">
+		  <h:column rendered="#{PrivateMessagesTool.selectedTopic.topic.title != 'Sent'}">
 		    <f:facet name="header">
 		       <h:outputText value="#{msgs.pvt_authby}"/>
 		    </f:facet>		     		    
 		     <h:outputText value="#{rcvdItems.msg.author}" rendered="#{rcvdItems.hasRead}"/>
 		     <h:outputText styleClass="unreadMsg" value="#{rcvdItems.msg.author}" rendered="#{!rcvdItems.hasRead}"/>
 		  </h:column>
-		  <h:column rendered="#{PrivateMessagesTool.msgNavMode == 'Sent'}">
+		  <h:column rendered="#{PrivateMessagesTool.selectedTopic.topic.title == 'Sent'}">
 		    <f:facet name="header">
 		       <h:outputText value="#{msgs.pvt_to}"/>
 		    </f:facet>		     		    
