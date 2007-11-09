@@ -1040,6 +1040,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
     LOG.debug("processActionHome()");
     msgNavMode = "privateMessages";
     multiDeleteSuccess = false;
+    if (searchPvtMsgs != null)
+    	searchPvtMsgs.clear();
     return  MAIN_PG;
   }  
   public String processActionPrivateMessages()
@@ -1047,6 +1049,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
     LOG.debug("processActionPrivateMessages()");                    
     msgNavMode = "privateMessages";            
     multiDeleteSuccess = false;
+    if (searchPvtMsgs != null) 
+    	searchPvtMsgs.clear();
     return  MESSAGE_HOME_PG;
   }        
   public String processDisplayForum()
@@ -1836,6 +1840,11 @@ public void processChangeSelectView(ValueChangeEvent eve)
       //set prev/next message
       setPrevNextMessageDetails();
       
+      if (searchPvtMsgs != null)
+      {
+    	  searchPvtMsgs.clear();
+    	  return DISPLAY_MESSAGES_PG;
+      }
     }
     return null;
   }
@@ -1868,7 +1877,14 @@ public void processChangeSelectView(ValueChangeEvent eve)
       setPrevNextTopicDetails(msgNavMode);
       //set prev/next message
       setPrevNextMessageDetails();
+      
+      if (searchPvtMsgs != null)
+      {
+    	  searchPvtMsgs.clear();
+    	  return DISPLAY_MESSAGES_PG;
+      }
     }
+
     return null;
   }
 /////////////////////////////////////     DISPLAY NEXT/PREVIOUS TOPIC     //////////////////////////////////
@@ -3509,7 +3525,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
     }
 
 
-    public String getAuthorString() {
+    public String getAuthorString() 
+    {
        String authorString = getUserId();
        
        try
@@ -3525,12 +3542,17 @@ public void processChangeSelectView(ValueChangeEvent eve)
        return authorString;
     }
     
-    public String getPlacementId() {
+    public String getPlacementId() 
+    {
        return Validator.escapeJavascript("Main" + ToolManager.getCurrentPlacement().getId());
     }
 
+    public boolean isSearchPvtMsgsEmpty()
+    {
+    	return searchPvtMsgs == null || searchPvtMsgs.isEmpty();
+    }
 
-	public void setMsgNavMode(String msgNavMode) {
+    public void setMsgNavMode(String msgNavMode) {
 		this.msgNavMode = msgNavMode;
 	}	
 	
