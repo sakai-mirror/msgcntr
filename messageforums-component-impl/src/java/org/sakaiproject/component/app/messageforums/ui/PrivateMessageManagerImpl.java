@@ -413,9 +413,10 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     /** need to evict forum b/c area saves fk on forum (which places two objects w/same id in session */
     //getHibernateTemplate().evict(forum);
     
-    if (isInstructor()){
+    if (isInstructor() || isEmailPermit()){
       savePrivateMessageArea(area);
     }
+    
   }
 
   public void saveForumSettings(PrivateForum forum)
@@ -1070,7 +1071,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       //   a non-instructor (! site.upd)
       //   instructor but not the author
       String sendToString = message.getRecipientsAsText();
-      if (sendToString.indexOf("(") > 0 && (! isInstructor() || (message.getAuthor() != getAuthorString())) ) {
+      if (sendToString.indexOf("(") > 0 && (! isInstructor() || !isEmailPermit()|| (message.getAuthor() != getAuthorString())) ) {
     	  sendToString = sendToString.substring(0, sendToString.indexOf("("));
       }
       
@@ -1423,6 +1424,24 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     else
       return false;
   }
+  
+  public boolean isEmailPermit() {
+	  LOG.debug("isEmailPermit()");
+	  return isEmailPermit(UserDirectoryService.getCurrentUser());
+  }
+  
+  private boolean isEmailPermit(User user)
+  {
+    if (LOG.isDebugEnabled())
+    {
+      LOG.debug("isEmailPermit(User " + user + ")");
+    }
+    if (user != null)
+      return SecurityService.unlock(user, "msg.emailout", getContextSiteId());
+    else
+      return false;
+  }
+  
 
   /**
    * @return siteId

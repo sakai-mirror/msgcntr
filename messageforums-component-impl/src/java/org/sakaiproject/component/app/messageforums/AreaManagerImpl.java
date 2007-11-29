@@ -138,6 +138,7 @@ public class AreaManagerImpl extends HibernateDaoSupport implements AreaManager 
             area.setHidden(Boolean.TRUE);
             area.setLocked(Boolean.FALSE);
             area.setModerated(Boolean.FALSE);
+            area.setSendEmailOut(Boolean.TRUE);
             saveArea(area);
         }
 
@@ -153,9 +154,30 @@ public class AreaManagerImpl extends HibernateDaoSupport implements AreaManager 
             area.setHidden(Boolean.TRUE);
             area.setLocked(Boolean.FALSE);
             area.setModerated(Boolean.FALSE);
+            area.setSendEmailOut(Boolean.FALSE);
             saveArea(area);
         }
         return area;
+    }
+    
+    public Area getDiscussionArea(String contextId) {
+    	if (contextId == null) {
+    		return getDiscusionArea();
+    	}
+    	Area area = this.getAreaByContextIdAndTypeId(contextId, typeManager.getDiscussionForumType());
+    	
+    	if (area == null) {
+    		area = createArea(typeManager.getDiscussionForumType(), contextId);
+    		area.setName(getResourceBundleString(FORUMS_TITLE));
+            area.setEnabled(Boolean.TRUE);
+            area.setHidden(Boolean.TRUE);
+            area.setLocked(Boolean.FALSE);
+            area.setModerated(Boolean.FALSE);
+            area.setSendEmailOut(Boolean.TRUE);
+            saveArea(area);
+    	}
+    	
+    	return area;
     }
 
     public boolean isPrivateAreaEnabled() {
