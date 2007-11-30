@@ -67,7 +67,6 @@ import org.sakaiproject.content.api.FilePickerHelper;
 import org.sakaiproject.content.cover.ContentHostingService;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
-import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
@@ -2550,8 +2549,6 @@ public void processChangeSelectView(ValueChangeEvent eve)
     
     //reset contents
     resetComposeContents();
-    
-    EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_FORWARD, getEventMessage(rrepMsg), false));
     
     return DISPLAY_MESSAGES_PG;
 
