@@ -206,7 +206,7 @@ public class PrivateMessagesTool
   private List pvtTopics=new ArrayList();
   private List decoratedPvtMsgs;
   //huxt
-  private String msgNavMode="privateMessages" ;//============
+  private String msgNavMode="privateMessages" ;
   private PrivateMessageDecoratedBean detailMsg ;
   private boolean viewChanged = false;
   
@@ -275,7 +275,6 @@ public class PrivateMessagesTool
   
   //////////////////////
   
-  //=====================need to be modified to support internationalization - by huxt
   /** The configuration mode, received, sent,delete, case etc ... */
   public static final String STATE_PVTMSG_MODE = "pvtmsg.mode";
   
@@ -1483,10 +1482,21 @@ public void processChangeSelectView(ValueChangeEvent eve)
 	    }
 	    
 	    this.setForwardBody(replyallText.toString());
+	  
+
+	    
+	    String msgautherString=getDetailMsg().getAuthor();
+	    String msgCClistString=getDetailMsg().getRecipientsAsText();
+	    //remove the auther in Cc string 
+	    if(msgCClistString.length()>=msgautherString.length()){
+	    String msgCClistStringwithoutAuthor=msgCClistString.substring(msgautherString.length()+1-1, msgCClistString.length());
+	    getDetailMsg().setRecipientsAsText(msgCClistStringwithoutAuthor);
+	  //  getDetailMsg().setSendToStringDecorated(sendToStringDecorated)
+	    }
 	    //from message detail screen
 	    this.setDetailMsg(getDetailMsg()) ;
 	  
-
+	    
 	    return MESSAGE_ReplyAll_PG;//MESSAGE_FORWARD_PG;
 	  }
 	
@@ -1601,7 +1611,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     
     PrivateMessage pMsg= constructMessage() ;
     
-    if(!getBooleanEmailOut())
+    if((SET_AS_YES).equals(getComposeSendAsPvtMsg()))
     {
       prtMsgManager.sendPrivateMessage(pMsg, getRecipients(), false); 
     }
@@ -1744,6 +1754,22 @@ public void processChangeSelectView(ValueChangeEvent eve)
 
       if (! "".equals(sendToString)) {
     	  sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
+      }
+      
+      
+      //remove the author from the Cc String
+      String msgautherString=getAuthorString();//etDetailMsg().getAuthor();
+      String msgCClistString=sendToString;//getDetailMsg().getRecipientsAsText();
+      //remove the auther in Cc string 
+      if(msgCClistString.length()>=msgautherString.length()){
+    	  
+    	  String firstUserofmsgCClistString=msgCClistString.substring(0,msgautherString.length());//, msgCClistString.length());
+      
+    	  if(firstUserofmsgCClistString.equals(msgautherString)){
+    	  String msgCClistStringwithoutAuthor=msgCClistString.substring(msgautherString.length()+1-1, msgCClistString.length());
+    	  sendToString=msgCClistStringwithoutAuthor;
+    	  }
+      
       }
       
       if ("".equals(sendToHiddenString)) {
@@ -2370,7 +2396,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     
     if (selectedComposeToList.size() == 1) {
         MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
-        if(membershipItem != null)              //selectedComposeToList
+        if((membershipItem != null)&&(!membershipItem.getName().equals(getAuthorString())))              //selectedComposeToList
         {
       		  sendToString +=membershipItem.getName()+"; " ;
         }          
@@ -2381,7 +2407,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
     		                         //selectedComposeToList
     	    		
-    		if(membershipItem != null)
+    		if((membershipItem != null)&&(!membershipItem.getName().equals(getAuthorString())))
     		{
     			if (membershipItem.isViewable()) {
     				sendToString +=membershipItem.getName()+"; " ;
@@ -2404,30 +2430,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
   	//  sendToString+=msgauther;
     }
   	  
-  	  if(!"".equals(sendReplyAllstring2))
-  	  {
-  	//  sendToString+=";";
-  	//  sendToString+=sendReplyAllstring2;
-  	  
-  	  
-  	  
-  	  }
-  		  
-    //}
-
-  	  
-  	 if( "".equals(sendToString))
-     {
-//       setErrorMessage(getResourceBundleString(SELECT_MSG_RECIPIENT_replyall));//SELECT_MSG_RECIPIENT_replyall  SELECT_MSG_RECIPIENT
-//       return null ;
-     }
-    
-    //=======
-  	 
-  	//public void setRecipients(List recipients) {
-      //  this.recipients = recipients;
-   // }
-  	 //======
+  	
     
     
     if ("".equals(sendToHiddenString)) {
@@ -2438,7 +2441,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     	
     	sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
     	//rrepMsg.setRecipientsAsText(sendToString +sendReplyAllstring1+ " (" + sendToHiddenString + ")");
-    	//rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
+    	rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
     }    
     
     //Add attachments
@@ -2478,7 +2481,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     
     String sendToStringreplyall="";
     
-    while (iter.hasNext())
+    while (iter.hasNext())//tmpRecipList
     {
     	PrivateMessageRecipient tmpPMR = (PrivateMessageRecipient)iter.next();
     	User replyrecipientaddtmp=null;
@@ -2492,14 +2495,39 @@ public void processChangeSelectView(ValueChangeEvent eve)
     	
 		//replyalllist.add(replyrecipientaddtmp);
     	
+		if(replyrecipientaddtmp!=authoruser)//!replyrecipientaddtmp.equals(authoruser)
+		{
     	returnSet.add(replyrecipientaddtmp);
     	
     	sendToStringreplyall+=replyrecipientaddtmp.getDisplayName()+"; " ;
+    	
+		}
     	//rrepMsg.setRecipients(recipients);
     	
     	//selectedComposeToList.add(membershipItem.getId());
     	
     }
+    
+    //begin
+    /*
+    public String getAuthorString() 
+    {
+       String authorString = getUserId();
+       
+       try
+       {
+         authorString = UserDirectoryService.getUser(getUserId()).getSortName();
+
+       }
+       catch(Exception e)
+       {
+         e.printStackTrace();
+       }
+       
+       return authorString;
+    }
+    */
+    //end
     
     
     // when clienter  want to add more recepitents
@@ -2510,7 +2538,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
     	{
     		MembershipItem membershipItemtmp = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(iemb));
     		tmpusr =membershipItemtmp.getUser();
-    		if(tmpusr!=null)
+    		
+    		if((tmpusr!=null)&&(tmpusr!=authoruser))//!(tmpusr.equals(authoruser))
     		{
     			returnSet.add(tmpusr);
     			
@@ -2530,13 +2559,14 @@ public void processChangeSelectView(ValueChangeEvent eve)
     	
     }
     //replyalllist.add(authoruser);
+ //2007-12-19
     returnSet.add(authoruser);
   
    // MembershipItem itemTmp = (MembershipItem) courseMemberMap.get(currentMessage.getAuthor());//UUID);//msgauther);//selectedComposeToList.get(i));
    // MembershipItem itemTmp2 = (MembershipItem) courseMemberMap.get(currentMessage.getCreatedBy());
 
     
-    if(!getBooleanEmailOut())
+    if((SET_AS_YES).equals(getComposeSendAsPvtMsg()))
     {
     	
       prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, false);//getRecipients()  replyalllist
