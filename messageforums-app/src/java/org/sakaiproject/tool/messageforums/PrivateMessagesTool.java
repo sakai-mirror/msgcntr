@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -295,6 +296,9 @@ public class PrivateMessagesTool
   public static final String SORT_ATTACHMENT_ASC = "attachment_asc";
   public static final String SORT_ATTACHMENT_DESC = "attachment_desc";
   
+  private boolean selectedComposedlistequalCurrentuser=false;
+  
+  
   /** sort member */
   private String sortType = SORT_DATE_DESC;
   
@@ -302,6 +306,47 @@ public class PrivateMessagesTool
   {    
   }
 
+  private String getLanguage(String navName)
+  {
+	  String Tmp= new String();
+	  Locale loc = null;
+	  //getLocale( String userId )
+	  ResourceLoader rl = new ResourceLoader();
+	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
+	 
+	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
+	 
+	  String local_received=getResourceBundleString("pvt_received");
+	  String local_sent = getResourceBundleString("pvt_sent");
+	  String local_deleted= getResourceBundleString("pvt_deleted");
+	  
+	  String current_NAV= getResourceBundleString("pvt_message_nav");
+	  
+	  topicsbyLocalization.add(local_received);
+  	  topicsbyLocalization.add(local_sent);
+      topicsbyLocalization.add(local_deleted);
+	  
+	  String localLanguage=loc.getLanguage();
+	  
+	  if(navName.equals("Received")||navName.equals("Sent")||navName.equals("Deleted"))
+		  {
+		  Tmp = "en";
+			  }
+	  else if(navName.equals("Recibidos")||navName.equals("Enviados")||navName.equals("Borrados"))
+	  {
+		  
+		  Tmp ="es";
+		  
+	  }
+	  
+	  
+	  else//english language
+	  {		  
+		  Tmp="en";		  
+	  }
+    	
+	  return Tmp;	  
+  }
   
   /**
    * @return
@@ -348,6 +393,20 @@ public class PrivateMessagesTool
   public void initializePrivateMessageArea()
   {           
     /** get area per request */
+	  
+	  /** The type string for this "application": should not change over time as it may be stored in various parts of persistent entities. */
+		String APPLICATION_ID = "sakai:resourceloader";
+
+		/** Preferences key for user's regional language locale */
+		String LOCALE_KEY = "locale";
+
+  
+	  Locale loc = null;
+	  //getLocale( String userId )
+	  ResourceLoader rl = new ResourceLoader();
+	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
+	  
+	
     area = prtMsgManager.getPrivateMessageArea();
     
     
@@ -415,10 +474,39 @@ public class PrivateMessagesTool
       
       
       /** only load topics/counts if area is enabled */
-      if (getPvtAreaEnabled()){        
-        for (Iterator iterator = pvtTopics.iterator(); iterator.hasNext();)
+      
+     
+    	  Locale loc = null;
+    	
+    	  ResourceLoader rl = new ResourceLoader();
+    	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
+    	  
+    	  
+    	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
+    	  
+    	  String local_received=getResourceBundleString("pvt_received");
+    	  String local_sent = getResourceBundleString("pvt_sent");
+    	  String local_deleted= getResourceBundleString("pvt_deleted");
+    	  
+    	  String current_NAV= getResourceBundleString("pvt_message_nav");
+    	  
+    	  topicsbyLocalization.add(local_received);
+	  	  topicsbyLocalization.add(local_sent);
+	      topicsbyLocalization.add(local_deleted);
+    	  
+    	  String localLanguage=loc.getLanguage();
+	    	
+    	  
+      if (getPvtAreaEnabled()){  
+    	  
+    	int countForFolderNum = 0;// only three folder 
+    	Iterator iterator = pvtTopics.iterator(); 
+        for (int indexlittlethanTHREE=0;indexlittlethanTHREE<3;indexlittlethanTHREE++)//Iterator iterator = pvtTopics.iterator(); iterator.hasNext();)//only three times
         {
           PrivateTopic topic = (PrivateTopic) iterator.next();
+          String CurrentTopicTitle= topic.getTitle();//folder name
+          String CurrentTopicUUID= topic.getUuid();
+           
           if (topic != null)
           {
           	
@@ -430,18 +518,36 @@ public class PrivateMessagesTool
             }       
           	
             PrivateTopicDecoratedBean decoTopic= new PrivateTopicDecoratedBean(topic) ;
-            //decoTopic.setTotalNoMessages(prtMsgManager.getTotalNoMessages(topic)) ;
-            //decoTopic.setUnreadNoMessages(prtMsgManager.getUnreadNoMessages(SessionManager.getCurrentSessionUserId(), topic)) ;
-          
-            String typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());          
-          
-            decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid));
-            decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid));
+           
+            String typeUuid="";  // folder uuid
+            if(getLanguage(CurrentTopicTitle).toString().equals(getLanguage(current_NAV).toString()))
+            {
+             typeUuid = getPrivateMessageTypeFromContext(topicsbyLocalization.get(countForFolderNum).toString());// topic.getTitle());
+            
+            
+            }
+            else
+            {
+            	
+             typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());//topicsbyLocalization.get(countForFolderNum).toString());// topic.getTitle());
+                  
+            	
+            	
+            	
+            }
+            countForFolderNum++;
+            
+          ////need change here:==by huxt
+            decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid));//"prtMsgManager.findMessageCount(typeUuid)"= 40	
+
+            decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid));//"prtMsgManager.findUnreadMessageCount(typeUuid)"= 1	
+
+
           
             decoratedForum.addTopic(decoTopic);
-          }          
-        }
-      }
+          }    //if (topic != null)      
+        }//for  Iterator iterator
+      }//if  getPvtAreaEnabled()
     return decoratedForum ;
   }
 
@@ -452,6 +558,22 @@ public class PrivateMessagesTool
   	    solution -- only call during render_response phase
   	    8/29/07 JLR - if coming from the synoptic tool, we need to process
   	*/
+
+	  /** The type string for this "application": should not change over time as it may be stored in various parts of persistent entities. */
+		String APPLICATION_ID = "sakai:resourceloader";
+
+		/** Preferences key for user's regional language locale */
+		String LOCALE_KEY = "locale";
+
+    
+  
+	  Locale loc = null;
+	  //getLocale( String userId )
+	  ResourceLoader rl = new ResourceLoader();
+	  loc=rl.getLocale();//===country = "US"  language="en"
+	
+	  
+
   	if (!FacesContext.getCurrentInstance().getRenderResponse() && !viewChanged &&
   			getExternalParameterByKey(EXTERNAL_WHICH_TOPIC) == null) { 
   		return decoratedPvtMsgs;
@@ -1148,7 +1270,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
   {
 	  
 	  
-	  //===========huxt
+	  
 	    /** reset sort type */
 	    sortType = SORT_DATE_DESC;    
 	    
@@ -1420,6 +1542,18 @@ public void processChangeSelectView(ValueChangeEvent eve)
 	    return MESSAGE_FORWARD_PG;
 	  }
 	
+  
+//how many letters k in string a  a= "fdh,jlg,jds,lgjd"  k=","
+private   int   getNum(char letter,   String   a)
+{  
+	int   j=0;  
+	for(int   i=0;   i<a.length();   i++){  
+		if(a.charAt(i)==(letter)){  //s.charAt(j) == 'x'
+		j++;  
+		}  
+	}  
+	return   j;  
+}   
 /////////////modified by hu2@iupui.edu  begin
   //function: add Reply All Tools
 
@@ -1484,10 +1618,75 @@ public void processChangeSelectView(ValueChangeEvent eve)
 	    }
 	    
 	    this.setForwardBody(replyallText.toString());
-	    //from message detail screen
+	   	    
+	    String msgautherString=getDetailMsg().getAuthor();
+	    String msgCClistString=getDetailMsg().getRecipientsAsText();
+	    
+	    //remove the auther in Cc string 	    
+	    if(msgCClistString.length()>=msgautherString.length())
+	    {
+	    String msgCClistStringwithoutAuthor = msgCClistString;	   
+	    
+	    List ccauther = new ArrayList();
+	    String currentUserasAuther = getUserName();
+	    char letter=';';
+	    int  n=getNum(letter,msgCClistStringwithoutAuthor);
+	    
+	    int numberofAuther=0;
+	    
+	    if(n==0)
+	    {numberofAuther=1;}
+	    else if(n>=1)	    	
+	    { numberofAuther=n+1;}//add the end ";"
+	    String[] ccSS = new String[numberofAuther];
+	    ccSS=msgCClistStringwithoutAuthor.split("; ");
+	  
+	    String tmpCC=new String();
+	    
+			if((numberofAuther>0)&&(numberofAuther<=msgCClistStringwithoutAuthor.length()))
+					      {
+					    
+						    for(int indexCC =0;indexCC<numberofAuther;indexCC++)	    //last for ";"	
+						    {
+						    	
+						    	
+						    	if(!ccSS[indexCC].equals(currentUserasAuther)&&(!ccSS[indexCC].equals(msgautherString)))//not equal current auther and not equal old auther
+						    	{						    		
+						    		tmpCC=tmpCC+ccSS[indexCC];
+						    		tmpCC=tmpCC+";";
+						    		
+						    	}
+						    	
+						    	
+						    }
+						    String tmp1=new String(ccSS[numberofAuther-1]);
+						    String tmp2=new String(currentUserasAuther);
+						    boolean b = ccSS[numberofAuther-1].equals(currentUserasAuther);
+						    boolean a = tmp1.equals(tmp2);
+						    
+						    if(!tmp1.equals(tmp2))//last letter have no: ";"
+						    {
+						  
+						    }
+						    else if(tmp1.equals(tmp2)){
+						    	if(tmpCC.length()>1){
+						    	}
+						    }
+						    if(tmpCC.length()>1)
+						    {
+							    	tmpCC=tmpCC.substring(0,tmpCC.length()-1);//remove the ";"
+							}
+						 
+						    getDetailMsg().setSendToStringDecorated(tmpCC);
+						    getDetailMsg().getMsg().setRecipientsAsText(tmpCC);
+						 
+						  }
+						    
+	    
+	    }
+	    
 	    this.setDetailMsg(getDetailMsg()) ;
 	  
-
 	    return MESSAGE_ReplyAll_PG;//MESSAGE_FORWARD_PG;
 	  }
 	
@@ -2307,17 +2506,18 @@ public void processChangeSelectView(ValueChangeEvent eve)
   
   
   
-  //Process PvtMsgReplyALL modified by huxt begin
+
   
-//////////////////////reply all by huxt begin.....Forward SEND  /////////////////
+/*
+ * Raply to all
+ * 
+ * */
   public String processPvtMsgReplyAllSend() {
     LOG.debug("processPvtMsgReply All Send()");
   
     PrivateMessage currentMessage = getDetailMsg().getMsg() ;
   
-    String msgauther=currentMessage.getAuthor();//string   "Test"  
-   
-     
+    String msgauther=currentMessage.getAuthor();//string   "Test"      
     
     //Select Forward Recipients
     if(!hasValue(getForwardSubject()))
@@ -2343,12 +2543,9 @@ public void processChangeSelectView(ValueChangeEvent eve)
     
     
     rrepMsg.setBody(replyAllbody);//getForwardBody()) ;// ad some blank;
-    
     rrepMsg.setLabel(getSelectedLabel());
-    
     rrepMsg.setInReplyTo(currentMessage) ;
-    
-    //this.getRecipients().add(drMsg.getCreatedBy());
+      
     
     //Add the recipientList as String for display in Sent folder
     // Since some users may be hidden, if some of these are recipients
@@ -2363,85 +2560,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     
     sendReplyAllstring1=getDetailMsg().getRecipientsAsText();
     
-   
-   // MembershipItem itemtmp = (MembershipItem) courseMemberMap.get(currentMessage.getAuthor());//getCreatedby()//UUID);//msgauther);//selectedComposeToList.get(i));
-   
-   // MembershipItem itemtmp2 = (MembershipItem) courseMemberMap.get(currentMessage.getCreatedBy());
-   
-    
-    if (selectedComposeToList.size() == 1) {
-        MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
-        if(membershipItem != null)              //selectedComposeToList
-        {
-      		  sendToString +=membershipItem.getName()+"; " ;
-        }          
-    }
-    else {
-    	for (int i = 0; i < selectedComposeToList.size(); i++)
-    	{
-    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
-    		                         //selectedComposeToList
-    	    		
-    		if(membershipItem != null)
-    		{
-    			if (membershipItem.isViewable()) {
-    				sendToString +=membershipItem.getName()+"; " ;
-    			}
-   		       	else {
-   	        		sendToHiddenString += membershipItem.getName() + "; ";
-   	        	}
-   	        }          
-    	}
-    }
-    
-    
-
-    //if (! "".equals(sendToString)) {
-    if(!"".equals(sendToString))
-    {
-  	  sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
-  	//  sendToString+=sendReplyAllstring1;
-  	//  sendToString+=";";
-  	//  sendToString+=msgauther;
-    }
-  	  
-  	  if(!"".equals(sendReplyAllstring2))
-  	  {
-  	//  sendToString+=";";
-  	//  sendToString+=sendReplyAllstring2;
-  	  
-  	  
-  	  
-  	  }
-  		  
-    //}
-
-  	  
-  	 if( "".equals(sendToString))
-     {
-//       setErrorMessage(getResourceBundleString(SELECT_MSG_RECIPIENT_replyall));//SELECT_MSG_RECIPIENT_replyall  SELECT_MSG_RECIPIENT
-//       return null ;
-     }
-    
-    //=======
-  	 
-  	//public void setRecipients(List recipients) {
-      //  this.recipients = recipients;
-   // }
-  	 //======
-    
-    
-    if ("".equals(sendToHiddenString)) {
-    	
-        rrepMsg.setRecipientsAsText(sendToString);
-    }
-    else {
-    	
-    	sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
-    	//rrepMsg.setRecipientsAsText(sendToString +sendReplyAllstring1+ " (" + sendToHiddenString + ")");
-    	//rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
-    }    
-    
+         
     //Add attachments
     for(int i=0; i<allAttachments.size(); i++)
     {
@@ -2449,36 +2568,34 @@ public void processChangeSelectView(ValueChangeEvent eve)
     }            
     
     
-    //add reply all user
-    //this.getRecipients().add(getDetailMsg().getMsg().getCreatedBy());// getCurrentMessage().getCreatedBy());
-    //for()
     Set returnSetreplyall = new HashSet();
-    
     Set returnSetreplyall2 = new HashSet();
 
-   
-    
     returnSetreplyall=getRecipients();
-    //====huxt
-    
+//1
     List returnSetreplyall22=null;
     returnSetreplyall22=currentMessage.getRecipients();//
-    
-    User authoruser=null;
+    User autheruser=null;
 	try {
-		authoruser = UserDirectoryService.getUser(currentMessage.getCreatedBy());
+		autheruser = UserDirectoryService.getUser(currentMessage.getCreatedBy());
+	} catch (UserNotDefinedException e) {
+		e.printStackTrace();
+	}
+	
+	User currentuser=null;
+	try {
+		currentuser = UserDirectoryService.getUser(getUserId());
 	} catch (UserNotDefinedException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-	}//getUserId());//.getSortName();
-    
+	}
+	
     List tmpRecipList = currentMessage.getRecipients();
     List replyalllist=new ArrayList();
     Set returnSet = new HashSet();
-    Iterator iter = tmpRecipList.iterator();
-    
     String sendToStringreplyall="";
-    
+       
+    Iterator iter = tmpRecipList.iterator();
     while (iter.hasNext())
     {
     	PrivateMessageRecipient tmpPMR = (PrivateMessageRecipient)iter.next();
@@ -2489,20 +2606,19 @@ public void processChangeSelectView(ValueChangeEvent eve)
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//    	rrepMsg.getRecipients().add(replyrecipientaddtmp);
-    	
-		//replyalllist.add(replyrecipientaddtmp);
-    	
+  	
+	
+		
+		if((!(replyrecipientaddtmp.getDisplayName()).equals(getUserName()) ) )//&&(!(replyrecipientaddtmp.getDisplayName()).equals(msgauther)))
+       {
     	returnSet.add(replyrecipientaddtmp);
-    	
     	sendToStringreplyall+=replyrecipientaddtmp.getDisplayName()+"; " ;
-    	//rrepMsg.setRecipients(recipients);
     	
-    	//selectedComposeToList.add(membershipItem.getId());
-    	
+		}
+		
     }
     
-    
+    //(2)
     // when clienter  want to add more recepitents
     User tmpusr=null;
     if(selectedComposeToList.size() > 0)
@@ -2511,41 +2627,46 @@ public void processChangeSelectView(ValueChangeEvent eve)
     	{
     		MembershipItem membershipItemtmp = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(iemb));
     		tmpusr =membershipItemtmp.getUser();
-    		if(tmpusr!=null)
+    		boolean iscontained=containedInList(tmpusr,tmpRecipList);
+    		if((tmpusr!=null)&&(!iscontained))//&&(!(tmpusr.getDisplayName()).equals(getUserName()) )) //&&(!(tmpusr.getDisplayName()).equals(msgauther)))
     		{
     			returnSet.add(tmpusr);
-    			
     			sendToStringreplyall+=tmpusr.getDisplayName()+"; " ;
+    			
     		}
+    		
+    		    		
+    		if((tmpusr!=null)&&((tmpusr.getDisplayName()).equals(getUserName())))
+            {
+            	this.selectedComposedlistequalCurrentuser=true;
+            }
     		
     		
     	}
 		
 	}
-
+  
+    if((selectedComposedlistequalCurrentuser==true)&&(currentuser!=autheruser))
+    {
+    	returnSet.add(currentuser);
+    
+    }
+    
+    
     if(!"".equals(sendToStringreplyall))
     {
     	sendToStringreplyall=sendToStringreplyall.substring(0, sendToStringreplyall.length()-2); //remove last comma and space    
-    	//rrepMsg.setRecipientsAsText(sendToString +sendReplyAllstring1+ " (" + sendToHiddenString + ")");
     	rrepMsg.setRecipientsAsText(sendToStringreplyall);// + " (" + sendToHiddenString + ")");
     	
     }
-    //replyalllist.add(authoruser);
-    returnSet.add(authoruser);
-  
-   // MembershipItem itemTmp = (MembershipItem) courseMemberMap.get(currentMessage.getAuthor());//UUID);//msgauther);//selectedComposeToList.get(i));
-   // MembershipItem itemTmp2 = (MembershipItem) courseMemberMap.get(currentMessage.getCreatedBy());
-
-    
+      
     if(!getBooleanEmailOut())
     {
     	
       prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, false);//getRecipients()  replyalllist
-     // prtMsgManager.sendPrivateMessage(rrepMsg, returnSetreplyall, false);
     }
     else{
       prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, true);//getRecipients()  replyalllist
-      //prtMsgManager.sendPrivateMessage(rrepMsg, returnSetreplyall, true);
     }
     
     //reset contents
@@ -2554,6 +2675,45 @@ public void processChangeSelectView(ValueChangeEvent eve)
     return DISPLAY_MESSAGES_PG;
 
   }
+  
+  
+ private boolean containedInList(User user,List list){
+	 
+	boolean isContain=false;
+	 if (list==null)
+	 {
+		 return false;
+	 }
+	 
+	 Iterator iter = list.iterator();
+	 	
+	 List tmplist=new ArrayList();
+	   
+	 
+	   User tmpuser=null;
+	   while(iter.hasNext()){
+
+			 PrivateMessageRecipient tmpPMR = (PrivateMessageRecipient)iter.next();
+		 	User replyrecipientaddtmp=null;
+				try {
+					replyrecipientaddtmp = UserDirectoryService.getUser(tmpPMR.getUserId());
+				} catch (UserNotDefinedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		   
+		 
+		   
+		   if((replyrecipientaddtmp!=null)&&(replyrecipientaddtmp==user)){
+			   //tmplist.add(tmpPMR);
+			   isContain=true;
+			   
+		   }
+	   }
+	   return isContain;
+	  	   
+  }
+		
   //process PvtMsgReplyAll  modified by huxt end
   /**
    * process from Compose screen
@@ -3880,8 +4040,39 @@ public void processChangeSelectView(ValueChangeEvent eve)
   }
       
   private String getPrivateMessageTypeFromContext(String navMode){
+	 
+      Locale loc = null;
+    	  //getLocale( String userId )
+     ResourceLoader rl = new ResourceLoader();
+     loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
+
+	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
+	 
+
+	  String local_received=getResourceBundleString("pvt_received");
+	  String local_sent = getResourceBundleString("pvt_sent");
+	  String local_deleted= getResourceBundleString("pvt_deleted");
+	
+	  
+	  String current_NAV= getResourceBundleString("pvt_message_nav");
+	  
+	  topicsbyLocalization.add(local_received);
+  	  topicsbyLocalization.add(local_sent);
+      topicsbyLocalization.add(local_deleted);
+	  
+		  
+	  
+	 
     
-    if (PVTMSG_MODE_RECEIVED.equalsIgnoreCase(navMode)){
+      String stringCurrentTopicTitle=new String();
+      stringCurrentTopicTitle=navMode;//most important
+      
+      String current_NAV2= getResourceBundleString("pvt_message_nav");
+      String typeUuid="";  // folder uuid
+   
+    
+    //need to add more dictionary to support more language
+    if (((String) topicsbyLocalization.get(0)).equalsIgnoreCase(navMode)||"Recibidos".equalsIgnoreCase(navMode)||"Received".equalsIgnoreCase(navMode)){
       return typeManager.getReceivedPrivateMessageType();
     }
     else if (PVTMSG_MODE_SENT.equalsIgnoreCase(navMode)){
