@@ -398,7 +398,7 @@ public class DiscussionForumTool
   public List getForums()
   {
     LOG.debug("getForums()");
-
+    
     if (forums == null || forums.size() < 1)
     {
       try 
@@ -2364,7 +2364,7 @@ public class DiscussionForumTool
     }
   }
 
-  private void reset()
+  public void reset()
   {
     this.forums = null;
     this.selectedForum = null;

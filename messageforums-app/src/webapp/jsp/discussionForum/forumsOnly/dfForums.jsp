@@ -3,10 +3,31 @@
 <%@ taglib uri="http://sakaiproject.org/jsf/sakai" prefix="sakai" %>
 <%@ taglib uri="http://sakaiproject.org/jsf/messageforums" prefix="mf" %>
 
+<%@ page import="java.util.*, javax.faces.context.*,javax.faces.application.*,
+                 javax.faces.el.*,org.sakaiproject.tool.messageforums.*,
+				 org.sakaiproject.tool.cover.SessionManager,
+				 org.sakaiproject.tool.api.Session"%>
+
 <%
 // hack in attempt to fix navigation quirk
 org.sakaiproject.tool.cover.SessionManager.getCurrentToolSession().
 	removeAttribute(org.sakaiproject.jsf.util.JsfTool.LAST_VIEW_VISITED);
+// To reset the Forums page after import from site
+Session currentsession = SessionManager.getCurrentSession();
+if (currentsession.getAttribute("sakai.forums.refresh") != null &&
+((Boolean)currentsession.getAttribute("sakai.forums.refresh")).booleanValue())
+{
+	FacesContext context = FacesContext.getCurrentInstance();
+
+	Application app = context.getApplication();
+	ValueBinding bindingBean =
+		app.createValueBinding("#{ForumTool}");
+	DiscussionForumTool dft =
+		(DiscussionForumTool) bindingBean.getValue(context);
+  	dft.reset();
+
+	currentsession.removeAttribute("sakai.forums.refresh");
+}
 %>
 
 <jsp:useBean id="msgs" class="org.sakaiproject.util.ResourceLoader" scope="session">

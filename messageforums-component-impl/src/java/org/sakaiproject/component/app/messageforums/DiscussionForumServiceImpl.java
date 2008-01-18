@@ -66,6 +66,8 @@ import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.Group;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.cover.SiteService;
+import org.sakaiproject.tool.api.Session;
+import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.util.Validator;
 import org.w3c.dom.DOMException;
@@ -113,7 +115,9 @@ public class DiscussionForumServiceImpl  implements DiscussionForumService, Enti
 	private MessageForumsTypeManager typeManager;
 	private DiscussionForumManager dfManager;
 	private PermissionLevelManager permissionManager;
-
+	
+	public static final String ATTR_FORUM_REFRESH = "sakai.forums.refresh";
+	
 	private static final Log LOG = LogFactory.getLog(DiscussionForumService.class);
 
 	public void init() throws Exception
@@ -545,7 +549,7 @@ public class DiscussionForumServiceImpl  implements DiscussionForumService, Enti
 						}
 					}	
 				}
-			}			
+			}
 		}
 
 		catch (Exception e) {
@@ -884,7 +888,7 @@ public class DiscussionForumServiceImpl  implements DiscussionForumService, Enti
 							}
 						}
 					}
-				}
+				}	
 			}
 			catch (Exception e)
 			{     
@@ -1174,6 +1178,15 @@ public class DiscussionForumServiceImpl  implements DiscussionForumService, Enti
 		return permissionManager;
 	}
 	
+	protected void scheduleForumsRefresh()
+	{
+		Session session = SessionManager.getCurrentSession();
+		if (session.getAttribute(ATTR_FORUM_REFRESH) == null)
+		{
+			session.setAttribute(ATTR_FORUM_REFRESH, Boolean.TRUE);
+		}
+	}
+	
 	public void transferCopyEntities(String fromContext, String toContext, List ids, boolean cleanup)
 	{	
 		try
@@ -1200,6 +1213,7 @@ public class DiscussionForumServiceImpl  implements DiscussionForumService, Enti
 				}
 			}
 			transferCopyEntities(fromContext, toContext, ids);
+			scheduleForumsRefresh();		
 		}
 		catch(Exception e)
 		{
