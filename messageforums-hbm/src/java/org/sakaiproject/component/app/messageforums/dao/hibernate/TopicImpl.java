@@ -153,6 +153,11 @@ public abstract class TopicImpl extends MutableEntityImpl implements Topic {
     }
 
     public BaseForum getBaseForum() {
+    	if (openForum != null)
+    		return openForum;
+    	else if (privateForum != null)
+    		return privateForum;
+    	
         return baseForum;
     }
 
