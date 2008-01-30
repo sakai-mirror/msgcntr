@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -79,6 +80,7 @@ import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.util.Validator;
+import org.sakaiproject.util.ResourceLoader;
 
 public class PrivateMessagesTool
 {
@@ -169,6 +171,10 @@ public class PrivateMessagesTool
   
   public static final String THREADED_VIEW = "threaded";
   
+  //huxt
+	public static final String EXTERNAL_TOPIC_ID = "pvtMsgTopicId";
+	public static final String EXTERNAL_WHICH_TOPIC = "selectedTopic";
+
   PrivateForumDecoratedBean decoratedForum;
   
   private Area area;
@@ -244,6 +250,130 @@ public class PrivateMessagesTool
   {    
   }
 
+  private String getLanguage(String navName)
+  {
+	  String Tmp= new String();
+	  Locale loc = null;
+	  //getLocale( String userId )
+	  ResourceLoader rl = new ResourceLoader();
+	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
+	 
+	  //=====huxt end language + country
+	/*  "localeString"= "en_US, en_GB, ja_JP, ko_KR, nl_NL, zh_CN, es_ES, fr_CA, fr, ca_ES, sv_SE, ar, ru_RU"	
+			count= 83	
+			hash= 0	
+			offset= 0	
+			value= char[83]  (id=23149)	 */
+	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
+	  // 
+	 /* public static final int en_US = 0;
+
+	  public static final int en_GB = 1;
+
+	  public static final int ja_JP = 2;
+
+	  public static final int ko_KR = 3;
+
+	  public static final int nl_NL = 4;
+
+	  public static final int zh_CN = 5;
+
+	  public static final int es_ES = 6;
+	  
+	  public static final int fr_CA = 7;
+
+	  public static final int ca_ES = 8;
+
+	  public static final int sv_SE = 9;
+
+	  public static final int  ru_RU = 10;*/
+
+		/*  getResourceBundleString(MISSING_SUBJECT)
+		pvt_message_nav=Mensajes
+		pvt_received=Recibidos
+		pvt_sent=Enviados
+		pvt_deleted=Borrados
+		pvt_drafts=Preliminar
+		
+		getResourceBundleString("pvt_received");
+		getResourceBundleString("pvt_sent");
+		getResourceBundleString("pvt_deleted");
+					
+		 */
+	  String local_received=getResourceBundleString("pvt_received");
+	  String local_sent = getResourceBundleString("pvt_sent");
+	  String local_deleted= getResourceBundleString("pvt_deleted");
+	  
+	  String current_NAV= getResourceBundleString("pvt_message_nav");
+	  
+	  topicsbyLocalization.add(local_received);
+  	  topicsbyLocalization.add(local_sent);
+      topicsbyLocalization.add(local_deleted);
+	  
+	  String localLanguage=loc.getLanguage();
+	  
+	  if(navName.equals("Received")||navName.equals("Sent")||navName.equals("Deleted"))
+		  {
+		  Tmp = "en";
+			  }
+	  else if(navName.equals("Recibidos")||navName.equals("Enviados")||navName.equals("Borrados"))
+	  {
+		  
+		  Tmp ="es";
+		  
+	  }
+	  
+	  
+	  else//english language
+	  {
+		  
+		  Tmp="en";
+		  
+	  }
+    	/*  if(localLanguage.equals("en"))
+    	  {
+    	  //case 'en':
+    		  topicsbyLocalization.add("Received");
+    		  topicsbyLocalization.add("Sent");
+    		  topicsbyLocalization.add("Deleted");
+    		//  break;
+    	  }
+		  else if(localLanguage.equals("es"))
+		  {
+		  topicsbyLocalization.add("Recibidos");
+		  topicsbyLocalization.add("Enviados");
+		  topicsbyLocalization.add("Borrados");
+		  //break;
+		  }
+		  else if(localLanguage.equals("zh"))
+		  {//case 'zh':
+		  topicsbyLocalization.add("Received");
+		  topicsbyLocalization.add("Sent");
+		  topicsbyLocalization.add("Deleted");
+		  //break;
+		  }
+	  
+		  else if(localLanguage.equals("ja"))
+		  {//case 'ja':
+		  topicsbyLocalization.add("Received");
+		  topicsbyLocalization.add("Sent");
+		  topicsbyLocalization.add("Deleted");
+		  //break;
+		  }
+	
+		  else
+		  {// default: //english
+		  topicsbyLocalization.add("Received");
+	  	  topicsbyLocalization.add("Sent");
+	      topicsbyLocalization.add("Deleted");
+	      }
+	  
+	  */
+	  return Tmp;
+	  
+	  
+	  
+  }
   
   /**
    * @return
@@ -290,6 +420,34 @@ public class PrivateMessagesTool
   public void initializePrivateMessageArea()
   {           
     /** get area per request */
+//===huxt bgein
+	  
+	  /** The type string for this "application": should not change over time as it may be stored in various parts of persistent entities. */
+		String APPLICATION_ID = "sakai:resourceloader";
+
+		/** Preferences key for user's regional language locale */
+		String LOCALE_KEY = "locale";
+
+  //String userId = getCurrentUser();
+  
+  //huxt-begin
+  //added by huxt for test localization
+	  Locale loc = null;
+	  //getLocale( String userId )
+	  ResourceLoader rl = new ResourceLoader();
+	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
+	  
+	  //"loc"= Locale  (id=22635)	
+		/*country= "ES"	
+			hashcode= -1	
+			hashCodeValue= 829102	
+			language= "es"	
+			variant= ""	*/
+
+	//  Preferences prefs = PreferencesService.getPreferences(userId);
+	//	ResourceProperties locProps = prefs.getProperties(APPLICATION_ID);
+	//	String localeString = locProps.getProperty(LOCALE_KEY);
+	  //=====huxt end
     area = prtMsgManager.getPrivateMessageArea();
     
     if (! area.getEnabled() && isMessages()) {
@@ -335,10 +493,131 @@ public class PrivateMessagesTool
       PrivateForumDecoratedBean decoratedForum = new PrivateForumDecoratedBean(getForum()) ;
       
       /** only load topics/counts if area is enabled */
-      if (getPvtAreaEnabled()){        
-        for (Iterator iterator = pvtTopics.iterator(); iterator.hasNext();)
+      
+      //===modified to support Internationalization
+      
+
+      //huxt-begin
+      //added by huxt for test localization
+    	  Locale loc = null;
+    	  //getLocale( String userId )
+    	  ResourceLoader rl = new ResourceLoader();
+    	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
+    	  
+    	  //"loc"= Locale  (id=22635)	
+    		/*country= "ES"	
+    			hashcode= -1	
+    			hashCodeValue= 829102	
+    			language= "es"	
+    			variant= ""	*/
+
+    	//  Preferences prefs = PreferencesService.getPreferences(userId);
+    	//	ResourceProperties locProps = prefs.getProperties(APPLICATION_ID);
+    	//	String localeString = locProps.getProperty(LOCALE_KEY);
+    	  //=====huxt end language + country
+    	/*  "localeString"= "en_US, en_GB, ja_JP, ko_KR, nl_NL, zh_CN, es_ES, fr_CA, fr, ca_ES, sv_SE, ar, ru_RU"	
+    			count= 83	
+    			hash= 0	
+    			offset= 0	
+    			value= char[83]  (id=23149)	 */
+    	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
+    	  // 
+    	 /* public static final int en_US = 0;
+
+    	  public static final int en_GB = 1;
+
+    	  public static final int ja_JP = 2;
+
+    	  public static final int ko_KR = 3;
+
+    	  public static final int nl_NL = 4;
+
+    	  public static final int zh_CN = 5;
+
+    	  public static final int es_ES = 6;
+    	  
+    	  public static final int fr_CA = 7;
+
+    	  public static final int ca_ES = 8;
+
+    	  public static final int sv_SE = 9;
+
+    	  public static final int  ru_RU = 10;*/
+
+			/*  getResourceBundleString(MISSING_SUBJECT)
+			pvt_message_nav=Mensajes
+			pvt_received=Recibidos
+			pvt_sent=Enviados
+			pvt_deleted=Borrados
+			pvt_drafts=Preliminar
+			
+			getResourceBundleString("pvt_received");
+			getResourceBundleString("pvt_sent");
+			getResourceBundleString("pvt_deleted");
+						
+			 */
+    	  String local_received=getResourceBundleString("pvt_received");
+    	  String local_sent = getResourceBundleString("pvt_sent");
+    	  String local_deleted= getResourceBundleString("pvt_deleted");
+    	  
+    	  String current_NAV= getResourceBundleString("pvt_message_nav");
+    	  
+    	  topicsbyLocalization.add(local_received);
+	  	  topicsbyLocalization.add(local_sent);
+	      topicsbyLocalization.add(local_deleted);
+    	  
+    	  String localLanguage=loc.getLanguage();
+	    	/*  if(localLanguage.equals("en"))
+	    	  {
+	    	  //case 'en':
+	    		  topicsbyLocalization.add("Received");
+	    		  topicsbyLocalization.add("Sent");
+	    		  topicsbyLocalization.add("Deleted");
+	    		//  break;
+	    	  }
+    		  else if(localLanguage.equals("es"))
+    		  {
+    		  topicsbyLocalization.add("Recibidos");
+    		  topicsbyLocalization.add("Enviados");
+    		  topicsbyLocalization.add("Borrados");
+    		  //break;
+    		  }
+    		  else if(localLanguage.equals("zh"))
+    		  {//case 'zh':
+    		  topicsbyLocalization.add("Received");
+    		  topicsbyLocalization.add("Sent");
+    		  topicsbyLocalization.add("Deleted");
+    		  //break;
+    		  }
+    	  
+    		  else if(localLanguage.equals("ja"))
+    		  {//case 'ja':
+    		  topicsbyLocalization.add("Received");
+    		  topicsbyLocalization.add("Sent");
+    		  topicsbyLocalization.add("Deleted");
+    		  //break;
+    		  }
+    	
+    		  else
+    		  {// default: //english
+    		  topicsbyLocalization.add("Received");
+    	  	  topicsbyLocalization.add("Sent");
+		      topicsbyLocalization.add("Deleted");
+    	      }
+    	  
+    	  */
+    	  //========huxt end
+    	  
+      if (getPvtAreaEnabled()){  
+    	  
+    	int countForFolderNum = 0;// only three folder 
+    	Iterator iterator = pvtTopics.iterator(); 
+        for (int indexlittlethanTHREE=0;indexlittlethanTHREE<3;indexlittlethanTHREE++)//Iterator iterator = pvtTopics.iterator(); iterator.hasNext();)//only three times
         {
           PrivateTopic topic = (PrivateTopic) iterator.next();
+          String CurrentTopicTitle= topic.getTitle();//folder name
+          String CurrentTopicUUID= topic.getUuid();
+          
           if (topic != null)
           {
           	
@@ -353,15 +632,36 @@ public class PrivateMessagesTool
             //decoTopic.setTotalNoMessages(prtMsgManager.getTotalNoMessages(topic)) ;
             //decoTopic.setUnreadNoMessages(prtMsgManager.getUnreadNoMessages(SessionManager.getCurrentSessionUserId(), topic)) ;
           
-            String typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());          
-          
-            decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid));
-            decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid));
+            //String typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());    //"topic.getTitle()"= "Received"	
+      // private String getLanguage(String navName)
+            String typeUuid="";  // folder uuid
+            if(getLanguage(CurrentTopicTitle).toString().equals(getLanguage(current_NAV).toString()))
+            {
+             typeUuid = getPrivateMessageTypeFromContext(topicsbyLocalization.get(countForFolderNum).toString());// topic.getTitle());
+            
+            
+            }
+            else
+            {
+            	
+             typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());//topicsbyLocalization.get(countForFolderNum).toString());// topic.getTitle());
+                  
+            	
+            	
+            	
+            }
+            countForFolderNum++;
+            
+          ////need change here:==by huxt
+            decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid));//"prtMsgManager.findMessageCount(typeUuid)"= 40	
+
+            decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid));//"prtMsgManager.findUnreadMessageCount(typeUuid)"= 1	
+
           
             decoratedForum.addTopic(decoTopic);
-          }          
-        }
-      }
+          }    //if (topic != null)      
+        }//for  Iterator iterator
+      }//if  getPvtAreaEnabled()
     return decoratedForum ;
   }
 
@@ -371,7 +671,25 @@ public class PrivateMessagesTool
   	    avoid apply_request_values and render_response from calling this method on postback
   	    solution -- only call durig render_response phase
   	*/
-  	if (!FacesContext.getCurrentInstance().getRenderResponse() && !viewChanged){
+//--huxt begin
+	  /** The type string for this "application": should not change over time as it may be stored in various parts of persistent entities. */
+		String APPLICATION_ID = "sakai:resourceloader";
+
+		/** Preferences key for user's regional language locale */
+		String LOCALE_KEY = "locale";
+
+  //String userId = getCurrentUser();
+  
+  //huxt-begin
+  //added by huxt for test localization
+	  Locale loc = null;
+	  //getLocale( String userId )
+	  ResourceLoader rl = new ResourceLoader();
+	  loc=rl.getLocale();//===country = "US"  language="en"
+	
+	  
+  	if (!FacesContext.getCurrentInstance().getRenderResponse() && !viewChanged &&
+  			getExternalParameterByKey(EXTERNAL_WHICH_TOPIC) == null) { 
   		return decoratedPvtMsgs;
   	}
   	
@@ -382,6 +700,8 @@ public class PrivateMessagesTool
     }
   	  	  	
   	decoratedPvtMsgs=new ArrayList() ;
+   	
+    String current_NAV= getResourceBundleString("pvt_message_nav");
 
   	String typeUuid = getPrivateMessageTypeFromContext(msgNavMode);
 
@@ -989,14 +1309,14 @@ public class PrivateMessagesTool
     /** reset sort type */
     sortType = SORT_DATE_DESC;    
     
-    //get external parameter
-    //selectedTopicTitle = getExternalParameterByKey("pvtMsgTopicTitle") ;
-    selectedTopicTitle = forumManager.getTopicByUuid(getExternalParameterByKey("pvtMsgTopicId")).getTitle();
-    setSelectedTopicId(getExternalParameterByKey("pvtMsgTopicId")) ;
+    setSelectedTopicId(getExternalParameterByKey(EXTERNAL_TOPIC_ID));
+   	selectedTopic = new PrivateTopicDecoratedBean(forumManager.getTopicByUuid(getExternalParameterByKey(EXTERNAL_TOPIC_ID)));
+   	selectedTopicTitle = forumManager.getTopicByUuid(getExternalParameterByKey(EXTERNAL_TOPIC_ID)).getTitle();
+   	//"selectedTopicTitle"= "Recibidos"	
     msgNavMode=getSelectedTopicTitle();
 
     //set prev/next topic details
-    setPrevNextTopicDetails(msgNavMode);
+    setPrevNextTopicDetails(msgNavMode);// "Recibidos"	
     
     return DISPLAY_MESSAGES_PG;
   }
@@ -1559,6 +1879,8 @@ public class PrivateMessagesTool
     for (int i = 0; i < pvtTopics.size(); i++)
     {
       Topic el = (Topic)pvtTopics.get(i);
+      
+      
       if(el.getTitle().equals(msgNavMode))
       {
         setSelectedTopic(new PrivateTopicDecoratedBean(el)) ;
@@ -3014,22 +3336,123 @@ public class PrivateMessagesTool
   }
       
   private String getPrivateMessageTypeFromContext(String navMode){
+	 
+      //added by huxt for test localization
+      Locale loc = null;
+    	  //getLocale( String userId )
+     ResourceLoader rl = new ResourceLoader();
+     loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
     
-    if (PVTMSG_MODE_RECEIVED.equalsIgnoreCase(navMode)){
+	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
+	  // 
+	 /* public static final int en_US = 0;
+
+	  public static final int en_GB = 1;
+
+	  public static final int ja_JP = 2;
+
+	  public static final int ko_KR = 3;
+
+	  public static final int nl_NL = 4;
+
+	  public static final int zh_CN = 5;
+
+	  public static final int es_ES = 6;
+	  
+	  public static final int fr_CA = 7;
+
+	  public static final int ca_ES = 8;
+
+	  public static final int sv_SE = 9;
+
+	  public static final int  ru_RU = 10;*/
+
+	  String local_received=getResourceBundleString("pvt_received");
+	  String local_sent = getResourceBundleString("pvt_sent");
+	  String local_deleted= getResourceBundleString("pvt_deleted");
+	  
+	//  <h:outputText value=" #{msgs.pvt_message_nav}" />
+	  
+	  String current_NAV= getResourceBundleString("pvt_message_nav");
+	  
+	  topicsbyLocalization.add(local_received);
+  	  topicsbyLocalization.add(local_sent);
+      topicsbyLocalization.add(local_deleted);
+	  
+	 // String localLanguage=loc.getLanguage();
+      /*
+	  String localLanguage=loc.getLanguage();
+    	  if(localLanguage.equals("en"))
+    	  {
+    	  //case 'en':
+    		  topicsbyLocalization.add("Received");
+    		  topicsbyLocalization.add("Sent");
+    		  topicsbyLocalization.add("Deleted");
+    		//  break;
+    	  }
+		  else if(localLanguage.equals("es"))
+		  {
+		  topicsbyLocalization.add("Recibidos");
+		  topicsbyLocalization.add("Enviados");
+		  topicsbyLocalization.add("Borrados");
+		  //break;
+		  }
+		  else if(localLanguage.equals("zh"))
+		  {//case 'zh':
+		  topicsbyLocalization.add("Received");
+		  topicsbyLocalization.add("Sent");
+		  topicsbyLocalization.add("Deleted");
+		  //break;
+		  }
+	  
+		  else if(localLanguage.equals("ja"))
+		  {//case 'ja':
+		  topicsbyLocalization.add("Received");
+		  topicsbyLocalization.add("Sent");
+		  topicsbyLocalization.add("Deleted");
+		  //break;
+		  }
+	
+		  else
+		  {// default: //english
+		  topicsbyLocalization.add("Received");
+	  	  topicsbyLocalization.add("Sent");
+	      topicsbyLocalization.add("Deleted");
+	      }
+	  
+	  */
+	  
+	  
+	 
+    
+      String stringCurrentTopicTitle=new String();
+      stringCurrentTopicTitle=navMode;//most important
+      
+      String current_NAV2= getResourceBundleString("pvt_message_nav");
+      String typeUuid="";  // folder uuid
+   
+    
+    //need to add more dictionary to support more language
+    if (((String) topicsbyLocalization.get(0)).equalsIgnoreCase(navMode)||"Recibidos".equalsIgnoreCase(navMode)||"Received".equalsIgnoreCase(navMode)){
       return typeManager.getReceivedPrivateMessageType();
     }
-    else if (PVTMSG_MODE_SENT.equalsIgnoreCase(navMode)){
+    else if (((String) topicsbyLocalization.get(1)).equalsIgnoreCase(navMode)||"Enviados".equalsIgnoreCase(navMode)||"Sent".equalsIgnoreCase(navMode)){
       return typeManager.getSentPrivateMessageType();
     }
-    else if (PVTMSG_MODE_DELETE.equalsIgnoreCase(navMode)){
+    else if (((String) topicsbyLocalization.get(2)).equalsIgnoreCase(navMode)||"Borrados".equalsIgnoreCase(navMode)||"Deleted".equalsIgnoreCase(navMode)){
       return typeManager.getDeletedPrivateMessageType(); 
     }
-    else if (PVTMSG_MODE_DRAFT.equalsIgnoreCase(navMode)){
-      return typeManager.getDraftPrivateMessageType();
-    }
+    //else if (PVTMSG_MODE_DRAFT.equalsIgnoreCase(navMode)){
+   //   return typeManager.getDraftPrivateMessageType();
+   // }
     else{
       return typeManager.getCustomTopicType(navMode);
     }    
+    
+    
+    
+    
+    
   }
 
   //////// GETTER AND SETTER  ///////////////////  
