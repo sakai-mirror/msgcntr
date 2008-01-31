@@ -2019,7 +2019,8 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 	{
 		LOG.debug("getDiscussionForumsWithTopics()");
 		if (userId == null) {
-			 throw new IllegalArgumentException("Null Argument for userId in getReadStatusForMessagesWithId");
+			LOG.debug("empty map returns b/c no userId passed to getReadStatusForMessagesWithId");
+			return new HashMap(); 
 		}
 		
 		Map msgIdStatusMap = new HashMap();
