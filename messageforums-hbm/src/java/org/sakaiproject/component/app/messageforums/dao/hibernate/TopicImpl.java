@@ -153,12 +153,16 @@ public abstract class TopicImpl extends MutableEntityImpl implements Topic {
     }
 
     public BaseForum getBaseForum() {
-    	if (openForum != null)
-    		return openForum;
-    	else if (privateForum != null)
-    		return privateForum;
     	
-        return baseForum;
+    	//some places in the tool logic set this explicitly
+    	if (baseForum != null)
+    		return baseForum;
+    	else if (openForum != null)
+    		return (BaseForum)openForum;
+    	else if (privateForum != null)
+    		return (BaseForum)privateForum;
+
+    	return baseForum;
     }
 
     public void setBaseForum(BaseForum forum) {
