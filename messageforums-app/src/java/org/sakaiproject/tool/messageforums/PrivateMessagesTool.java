@@ -113,6 +113,7 @@ public class PrivateMessagesTool
   private static final String CREATE_DIFF_FOLDER_NAME = "pvt_create_diff_folder_name";
   private static final String FOLDER_NAME_BLANK = "pvt_folder_name_blank";
   private static final String ENTER_FOLDER_NAME = "pvt_enter_new_folder_name";
+  private static final String ENTER_SHORTER_NAME = "pvt_enter_shorter_folder_name";
   private static final String CONFIRM_FOLDER_DELETE = "pvt_delete_folder_confirm";
   private static final String CANNOT_DEL_REVISE_FOLDER = "pvt_no_delete_revise_folder";
   private static final String PROVIDE_VALID_EMAIL = "pvt_provide_email_addr";
@@ -3203,28 +3204,30 @@ public void processChangeSelectView(ValueChangeEvent eve)
   {
     LOG.debug("processPvtMsgFldCreate()");
     
-    String createFolder=getAddFolder() ;
+    String createFolder=getAddFolder() ;   
     if(createFolder == null || createFolder.trim().length() == 0)
     {
-      setErrorMessage(getResourceBundleString(ENTER_FOLDER_NAME));
-      return null ;
-    } else {
-      if(PVTMSG_MODE_RECEIVED.equals(createFolder) || PVTMSG_MODE_SENT.equals(createFolder)|| 
-          PVTMSG_MODE_DELETE.equals(createFolder) || PVTMSG_MODE_DRAFT.equals(createFolder))
-      {
-        setErrorMessage(getResourceBundleString(CREATE_DIFF_FOLDER_NAME));
-      } else 
-      {
+    	setErrorMessage(getResourceBundleString(ENTER_FOLDER_NAME));
+      	return null ;
+    } else if(PVTMSG_MODE_RECEIVED.equals(createFolder) || PVTMSG_MODE_SENT.equals(createFolder)|| 
+    			PVTMSG_MODE_DELETE.equals(createFolder) || PVTMSG_MODE_DRAFT.equals(createFolder))
+    {
+    	setErrorMessage(CREATE_DIFF_FOLDER_NAME);
+    } else if(createFolder.length() > 100) 
+    {
+    	setErrorMessage(getResourceBundleString(ENTER_SHORTER_NAME));
+    	return null;      
+    } else 
+    {
         prtMsgManager.createTopicFolderInForum(forum, createFolder);
       //create a typeUUID in commons
-      String newTypeUuid= typeManager.getCustomTopicType(createFolder); 
-      }
+       String newTypeUuid= typeManager.getCustomTopicType(createFolder); 
+    }
       //since PrivateMessagesTool has a session scope, 
       //reset addFolder to blank for new form
       addFolder = "";
       return processPvtMsgReturnToMainOrHp();
-    }
-  }
+   }  
   
   private String selectedNewTopicTitle=selectedTopicTitle;  //default
   public String getSelectedNewTopicTitle()
@@ -3310,9 +3313,9 @@ public void processChangeSelectView(ValueChangeEvent eve)
     
     return ADD_FOLDER_IN_FOLDER_PG ;
   }
-  
+ 
   //create folder within Folder
-  //TODO - add parent fodler id for this 
+  //TODO - add parent fodler id for this  
   public String processPvtMsgFldInFldCreate() 
   {
     LOG.debug("processPvtMsgFldCreate()");
@@ -3339,7 +3342,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
       addFolder = "";
       return processPvtMsgReturnToMainOrHp();
     }
-  }
+  } 
   ///////////////////// MOVE    //////////////////////
   private String moveToTopic="";
   private String moveToNewTopic="";
