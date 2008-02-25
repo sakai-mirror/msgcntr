@@ -1273,14 +1273,9 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       throw new Error("markMessageAsReadForUser(message: " + message
           + ") has empty recipient list");
     }
-    
-    int recordIndex = -1;
-    for(int i  = 0; i < pvtMessage.getRecipients().size(); i++) {
-    	if(((PrivateMessageRecipientImpl) pvtMessage.getRecipients().get(i)).getUserId().equals(searchRecipient.getUserId())){
-    		recordIndex = i;
-    	}      
-    }
-    
+
+    int recordIndex = pvtMessage.getRecipients().indexOf(searchRecipient);
+
     if (recordIndex != -1)
     {
       ((PrivateMessageRecipientImpl) recipientList.get(recordIndex))
