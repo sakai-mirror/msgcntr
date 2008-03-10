@@ -430,4 +430,7 @@ public interface DiscussionForumManager
    * @return
    */
   public DiscussionForum getForumByIdWithTopicsAttachmentsAndMessages(Long forumId);
+
+  public String getContextForTopicById(Long topicId);
+
 }

@@ -2100,6 +2100,11 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     	
     	return eventMessagePrefix + getContextSiteId() + "/" + object.toString() + "/" + sessionManager.getCurrentSessionUserId();
     }
+
+    public String getContextForTopicById(Long topicId) {
+      // TODO Auto-generated method stub
+      return getTopicById(topicId).getOpenForum().getArea().getContextId();
+    }
     
     
 }
