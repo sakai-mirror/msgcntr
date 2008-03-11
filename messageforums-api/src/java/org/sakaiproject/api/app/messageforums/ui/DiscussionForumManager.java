@@ -431,6 +431,24 @@ public interface DiscussionForumManager
    */
   public DiscussionForum getForumByIdWithTopicsAttachmentsAndMessages(Long forumId);
 
+  /**
+   * Returns the context (siteId) for a given topic
+   * @param topicId
+   * @return context (siteId)
+   */
   public String getContextForTopicById(Long topicId);
-
+  
+  /**
+   * Returns the context (siteId) for a given forum
+   * @param forumId
+   * @return context (siteId)
+   */
+  public String getContextForForumById(Long forumId);
+  
+  /**
+   * Returns the context (siteId) for a given message
+   * @param messageId
+   * @return context (siteId)
+   */
+  public String getContextForMessageById(Long messageId);
 }

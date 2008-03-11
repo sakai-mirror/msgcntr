@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sakaiproject.site.api.SiteService;
-import org.sakaiproject.thread_local.api.ThreadLocalManager;
 import org.sakaiproject.tool.api.ToolSession;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.api.ActiveTool;
@@ -40,7 +39,6 @@ import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.tool.cover.ActiveToolManager;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.component.cover.ComponentManager;
-import org.sakaiproject.entitybroker.EntityBroker;
 import org.sakaiproject.entitybroker.EntityReference;
 import org.sakaiproject.entitybroker.access.HttpServletAccessProvider;
 import org.sakaiproject.entitybroker.access.HttpServletAccessProviderManager;
@@ -269,6 +267,7 @@ public class MessageForumsFilePickerServlet extends JsfTool  implements HttpServ
       super.init(config);
       
       try {
+        //load service level dependecies from the ComponentManager
         siteService = (SiteService) ComponentManager.get("org.sakaiproject.site.api.SiteService");
         accessProviderManager = (HttpServletAccessProviderManager) ComponentManager
           .get("org.sakaiproject.entitybroker.access.HttpServletAccessProviderManager");
@@ -281,6 +280,7 @@ public class MessageForumsFilePickerServlet extends JsfTool  implements HttpServ
           accessProviderManager.registerProvider("forum", this);
           accessProviderManager.registerProvider("forum_message", this);
         }
+        //mark initialization of dependecies as complete
         if (siteService != null && forumManager != null)
           initComplete = true;
       } catch (Exception e) {
@@ -290,6 +290,7 @@ public class MessageForumsFilePickerServlet extends JsfTool  implements HttpServ
     
     
     public void handleAccess(HttpServletRequest req, HttpServletResponse res, EntityReference ref) {
+        //don't bother if the user is not logged in
         if (req.getRemoteUser() == null) {
             try {
                 String url = req.getRequestURL().toString();
@@ -309,8 +310,16 @@ public class MessageForumsFilePickerServlet extends JsfTool  implements HttpServ
         }
       
         String[] parts = req.getPathInfo().split("/");
+        //ensure we have our dependencies and something reassembling proper input
         if (initComplete && parts.length > 2) {
-            String context = forumManager.getContextForTopicById(new Long(parts[2]));
+            String context = "";
+            if ("forum_topic".equals(parts[1]))
+              context = forumManager.getContextForTopicById(new Long(parts[2]));
+            else if ("forum".equals(parts[1]))
+              context = forumManager.getContextForForumById(new Long(parts[2]));
+            else if ("forum_message".equals(parts[1]))
+              context = forumManager.getContextForMessageById(new Long(parts[2]));
+
             String placementId = "";
             String target = "";
     
@@ -320,11 +329,11 @@ public class MessageForumsFilePickerServlet extends JsfTool  implements HttpServ
                 if (siteService.getSite(context).getToolForCommonId("sakai.forums") != null) {
                     placementId = siteService.getSite(context)
                                          .getToolForCommonId("sakai.forums").getId();
-              }
-              else {
-                  placementId = siteService.getSite(context)
+                }
+                else {
+                    placementId = siteService.getSite(context)
                                          .getToolForCommonId("sakai.messagecenter").getId();
-              }
+                }
             }
             catch (IdUnusedException iue) {
                 iue.printStackTrace();
@@ -335,7 +344,8 @@ public class MessageForumsFilePickerServlet extends JsfTool  implements HttpServ
             //into the the threadlocal manager here resulted in the closest thing... rendered
             //the page, but links were broken, might be doable with more time or fresh eyes
             //though.
-    
+
+            //direct the request to the proper 'direct' view with needed parameters
             if ("forum_topic".equals(parts[1])) {
                 req.setAttribute("topicId", parts[2]);
                 target = "/jsp/discussionForum/message/dfAllMessagesDirect.jsf?topicId="
@@ -343,18 +353,14 @@ public class MessageForumsFilePickerServlet extends JsfTool  implements HttpServ
             }
             else if ("forum".equals(parts[1])) {
                 target = "/jsp/discussionForum/forum/dfForumDirect.jsf?forumId="
-                     + parts[2] + "&placementId=" + placementId;
+                       + parts[2] + "&placementId=" + placementId;
             }
             else if ("forum_message".equals(parts[1])) {
-                target = "";
+                target = "/jsp/discussionForum/message/dfViewThreadDirect.jsf?messageId="
+                       + parts[2] + "&placementId=" + placementId + "&topicId="
+                       + forumManager.getMessageById(new Long(parts[2])).getTopic().getId();
             }
-    
-            // set the sakai request object wrappers to provide the native, not
-            // Sakai set up, URL information
-            // - this assures that the FacesServlet can dispatch to the proper view
-            // based on the path info
-            req.setAttribute(Tool.NATIVE_URL, Tool.NATIVE_URL);
-    
+
             // dispatch to the target
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(target);
             try {

@@ -71,7 +71,8 @@ AutoRegisterEntityProvider, PropertyProvideable{
     if (forum.getCreated() != null)
       props.put("date", forum.getCreated().toString());
     props.put("description", forum.getShortDescription());
-//    props.put("context", forum.getOpenForum().getArea().getContextId());
+    if (forum.getDraft() != null)
+      props.put("draft", forum.getDraft().toString());
     
     return props;
   }

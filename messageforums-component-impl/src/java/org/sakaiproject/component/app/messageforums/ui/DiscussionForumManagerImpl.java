@@ -2102,9 +2102,15 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
 
     public String getContextForTopicById(Long topicId) {
-      // TODO Auto-generated method stub
       return getTopicById(topicId).getOpenForum().getArea().getContextId();
     }
+
+    public String getContextForForumById(Long forumId) {
+      return getForumById(forumId).getArea().getContextId();
+    }
     
+    public String getContextForMessageById(Long messageId) {
+      return getMessageById(messageId).getTopic().getOpenForum().getArea().getContextId();
+    }
     
 }
