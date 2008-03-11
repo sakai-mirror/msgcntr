@@ -2112,5 +2112,9 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     public String getContextForMessageById(Long messageId) {
       return getMessageById(messageId).getTopic().getOpenForum().getArea().getContextId();
     }
+
+    public String ForumIdForMessage(Long messageId) {
+      return getMessageById(messageId).getTopic().getOpenForum().getId().toString();
+    }
     
 }

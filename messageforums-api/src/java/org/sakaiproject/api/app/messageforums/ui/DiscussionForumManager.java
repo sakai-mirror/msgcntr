@@ -451,4 +451,11 @@ public interface DiscussionForumManager
    * @return context (siteId)
    */
   public String getContextForMessageById(Long messageId);
+
+  /**
+   * Returns the id of the Forum containing a given Message
+   * @param messageId
+   * @return forumId
+   */
+  public String ForumIdForMessage(Long messageId);
 }

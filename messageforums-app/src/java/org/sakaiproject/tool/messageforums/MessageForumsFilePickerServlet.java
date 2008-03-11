@@ -358,7 +358,8 @@ public class MessageForumsFilePickerServlet extends JsfTool  implements HttpServ
             else if ("forum_message".equals(parts[1])) {
                 target = "/jsp/discussionForum/message/dfViewThreadDirect.jsf?messageId="
                        + parts[2] + "&placementId=" + placementId + "&topicId="
-                       + forumManager.getMessageById(new Long(parts[2])).getTopic().getId();
+                       + forumManager.getMessageById(new Long(parts[2])).getTopic().getId()
+                       + "&forumId=" + forumManager.ForumIdForMessage(new Long(parts[2]));
             }
 
             // dispatch to the target

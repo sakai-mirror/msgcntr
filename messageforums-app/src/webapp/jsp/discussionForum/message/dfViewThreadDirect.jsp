@@ -17,7 +17,9 @@
     try {
       target = "/portal/tool/" + request.getParameter("placementId")
              + "/discussionForum/message/dfViewThreadDirect.jsf?messageId="
-      	     + request.getParameter("messageId");
+      	     + request.getParameter("messageId")
+      	     + "&topicId=" + request.getParameter("topicId")
+      	     + "&forumId=" + request.getParameter("forumId");
       response.sendRedirect(target);
       return;
     }
@@ -26,12 +28,11 @@
     }
   }
 
-  target = "/jsp/discussionForum/message/dfAllMessages.jsf?topicId="
-  	       + request.getParameter("topicId")
-  	       + "&forumId="
-  	       + request.getParameter("forumId")
-  	       + "&messageId=" + request.getParameter("messageId");
-  
+  target = "/jsp/discussionForum/message/dfViewThread.jsf?messageId="
+         + request.getParameter("messageId")
+         + "&topicId=" + request.getParameter("topicId")
+         + "&forumId=" + request.getParameter("forumId");
+
   forumTool.processActionDisplayThread();
 
   // dispatch to the target
