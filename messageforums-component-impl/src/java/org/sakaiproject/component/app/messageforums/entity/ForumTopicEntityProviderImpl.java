@@ -8,6 +8,7 @@ import java.util.Map;
 import org.sakaiproject.api.app.messageforums.DiscussionForum;
 import org.sakaiproject.api.app.messageforums.Topic;
 import org.sakaiproject.api.app.messageforums.entity.ForumTopicEntityProvider;
+import org.sakaiproject.api.app.messageforums.entity.ForumMessageEntityProvider;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.entitybroker.entityprovider.CoreEntityProvider;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.AutoRegisterEntityProvider;
@@ -47,13 +48,15 @@ AutoRegisterEntityProvider, PropertyProvideable{
           siteId = searchValue[i];
         else if ("user".equalsIgnoreCase(name[i]) || "userId".equalsIgnoreCase(name[i]))
           userId = searchValue[i];
-        else if ("forum".equalsIgnoreCase(name[i]) || "forumId".equalsIgnoreCase(name[i]))
-          forumId = searchValue[i];
+        else if ("parentReference".equalsIgnoreCase(name[i])) {
+          String[] parts = searchValue[i].split("/");
+          forumId = parts[parts.length - 1];
+        }
       }
 
       //TODO: need a way to generate the url with out having siteId in search
       if (forumId != null) {
-        DiscussionForum forum = forumManager.getForumById(new Long(forumId));
+        DiscussionForum forum = forumManager.getForumByIdWithTopics(new Long(forumId));
         List<Topic> topics = forum.getTopics();
         for (int i = 0; i < topics.size(); i++) {
           rv.add("/" + ENTITY_PREFIX + "/" + topics.get(i).getId().toString());
@@ -86,6 +89,7 @@ AutoRegisterEntityProvider, PropertyProvideable{
     if (topic.getCreated() != null)
       props.put("date", topic.getCreated().toString());
     props.put("description", topic.getShortDescription());
+    props.put("child_provider", ForumMessageEntityProvider.ENTITY_PREFIX);
     
     return props;
   }

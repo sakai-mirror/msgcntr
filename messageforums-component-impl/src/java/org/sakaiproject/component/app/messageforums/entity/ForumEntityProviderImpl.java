@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.sakaiproject.api.app.messageforums.DiscussionForum;
 import org.sakaiproject.api.app.messageforums.entity.ForumEntityProvider;
+import org.sakaiproject.api.app.messageforums.entity.ForumTopicEntityProvider;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.entitybroker.entityprovider.CoreEntityProvider;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.AutoRegisterEntityProvider;
@@ -73,6 +74,7 @@ AutoRegisterEntityProvider, PropertyProvideable{
     props.put("description", forum.getShortDescription());
     if (forum.getDraft() != null)
       props.put("draft", forum.getDraft().toString());
+    props.put("child_provider", ForumTopicEntityProvider.ENTITY_PREFIX);
     
     return props;
   }

@@ -49,11 +49,15 @@ AutoRegisterEntityProvider, PropertyProvideable{
           userId = searchValue[i];
         else if ("topic".equalsIgnoreCase(name[i]) || "topicId".equalsIgnoreCase(name[i]))
           topicId = searchValue[i];
+        else if ("parentReference".equalsIgnoreCase(name[i])) {
+          String[] parts = searchValue[i].split("/");
+          topicId = parts[parts.length - 1];
+        }
       }
 
       //TODO: support search by something other then topic id...
       if (topicId != null) {
-        List <Message> messages = forumManager.getTopicById(new Long(topicId)).getMessages();
+        List <Message> messages = forumManager.getTopicByIdWithMessagesAndAttachments(new Long(topicId)).getMessages();
         for (int i = 0; i < messages.size(); i++) {
           if (messages.get(i).getDraft().booleanValue() == false
                   && messages.get(i).getDeleted().booleanValue() == false) {
