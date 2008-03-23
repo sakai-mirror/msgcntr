@@ -199,6 +199,14 @@ public interface DiscussionForumManager
    * @return
    */
   public boolean isInstructor();
+  
+  /**
+   * Tests if the user has instructor privileges to the site 
+   * @param userId
+   * @param siteId
+   * @return true, only if user has site.upd
+   */
+  public boolean isInstructor(String userId, String siteId);
 
   /**
    * @return

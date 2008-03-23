@@ -15,10 +15,10 @@ import org.sakaiproject.entitybroker.entityprovider.capabilities.AutoRegisterEnt
 import org.sakaiproject.entitybroker.entityprovider.capabilities.PropertyProvideable;
 
 public class ForumTopicEntityProviderImpl implements ForumTopicEntityProvider,
-AutoRegisterEntityProvider, PropertyProvideable{
+    AutoRegisterEntityProvider, PropertyProvideable {
 
   private DiscussionForumManager forumManager;
-  
+
   public String getEntityPrefix() {
     return ENTITY_PREFIX;
   }
@@ -34,9 +34,10 @@ AutoRegisterEntityProvider, PropertyProvideable{
     return (topic != null);
   }
 
-  public List<String> findEntityRefs(String[] prefixes, String[] name, String[] searchValue, boolean exactMatch) {
+  public List<String> findEntityRefs(String[] prefixes, String[] name, String[] searchValue,
+      boolean exactMatch) {
     List<String> rv = new ArrayList<String>();
-    
+
     String forumId = null;
     String userId = null;
     String siteId = null;
@@ -54,22 +55,28 @@ AutoRegisterEntityProvider, PropertyProvideable{
         }
       }
 
-      //TODO: need a way to generate the url with out having siteId in search
-      if (forumId != null) {
+      // TODO: need a way to generate the url with out having siteId in search
+      if (forumId != null && userId != null) {
         DiscussionForum forum = forumManager.getForumByIdWithTopics(new Long(forumId));
         List<Topic> topics = forum.getTopics();
         for (int i = 0; i < topics.size(); i++) {
-          rv.add("/" + ENTITY_PREFIX + "/" + topics.get(i).getId().toString());
+          // TODO: authz is way too basic, someone more hip to message center please improve...
+          //This should also allow people with read access to an item to link to it
+          if (forumManager.isInstructor(userId, siteId)
+              || userId.equals(topics.get(i).getCreatedBy()))
+            rv.add("/" + ENTITY_PREFIX + "/" + topics.get(i).getId().toString());
         }
       }
-      else if (siteId != null) {
-        List <DiscussionForum> forums = forumManager.getDiscussionForumsByContextId(siteId);
+      else if (siteId != null && userId != null) {
+        List<DiscussionForum> forums = forumManager.getDiscussionForumsByContextId(siteId);
         for (int i = 0; i < forums.size(); i++) {
-          if (forums.get(i).getDraft().booleanValue() == false) {
-            List<Topic> topics = forums.get(i).getTopics();
-            for (int j = 0; j < topics.size(); j++) {
+          List<Topic> topics = forums.get(i).getTopics();
+          for (int j = 0; j < topics.size(); j++) {
+            // TODO: authz is way too basic, someone more hip to message center please improve...
+            //This should also allow people with read access to an item to link to it
+            if (forumManager.isInstructor(userId, siteId)
+                || userId.equals(topics.get(i).getCreatedBy()))
               rv.add("/" + ENTITY_PREFIX + "/" + topics.get(j).getId().toString());
-            }
           }
         }
       }
@@ -80,9 +87,9 @@ AutoRegisterEntityProvider, PropertyProvideable{
 
   public Map<String, String> getProperties(String reference) {
     Map<String, String> props = new HashMap<String, String>();
-    System.out.println(reference + " ==> " + reference.substring(reference.lastIndexOf("/") + 1));
-    Topic topic = forumManager.getTopicById(new Long(reference.substring(reference.lastIndexOf("/") + 1)));
-    
+    Topic topic =
+      forumManager.getTopicById(new Long(reference.substring(reference.lastIndexOf("/") + 1)));
+
     props.put("author", topic.getCreatedBy());
     props.put("title", topic.getTitle());
     props.put("modifiedBy", topic.getModifiedBy());
@@ -90,18 +97,19 @@ AutoRegisterEntityProvider, PropertyProvideable{
       props.put("date", topic.getCreated().toString());
     props.put("description", topic.getShortDescription());
     props.put("child_provider", ForumMessageEntityProvider.ENTITY_PREFIX);
-    
+
     return props;
   }
 
   public String getPropertyValue(String reference, String name) {
-    //TODO: don't be so lazy, just get what we need...
+    // TODO: don't be so lazy, just get what we need...
     Map<String, String> props = getProperties(reference);
     return props.get(name);
   }
 
   public void setPropertyValue(String reference, String name, String value) {
-    //This does nothing for now... we could all the setting of many published assessment properties here though... if you're feeling jumpy feel free.
+    // This does nothing for now... we could all the setting of many published assessment properties
+    // here though... if you're feeling jumpy feel free.
   }
 
   public void setForumManager(DiscussionForumManager forumManager) {

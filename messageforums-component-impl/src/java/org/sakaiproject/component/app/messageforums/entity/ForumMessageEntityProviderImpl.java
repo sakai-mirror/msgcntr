@@ -14,10 +14,10 @@ import org.sakaiproject.entitybroker.entityprovider.capabilities.AutoRegisterEnt
 import org.sakaiproject.entitybroker.entityprovider.capabilities.PropertyProvideable;
 
 public class ForumMessageEntityProviderImpl implements ForumMessageEntityProvider,
-AutoRegisterEntityProvider, PropertyProvideable{
+    AutoRegisterEntityProvider, PropertyProvideable {
 
   private DiscussionForumManager forumManager;
-  
+
   public String getEntityPrefix() {
     return ENTITY_PREFIX;
   }
@@ -33,9 +33,10 @@ AutoRegisterEntityProvider, PropertyProvideable{
     return (topic != null);
   }
 
-  public List<String> findEntityRefs(String[] prefixes, String[] name, String[] searchValue, boolean exactMatch) {
+  public List<String> findEntityRefs(String[] prefixes, String[] name, String[] searchValue,
+      boolean exactMatch) {
     List<String> rv = new ArrayList<String>();
-    
+
     String userId = null;
     String siteId = null;
     String topicId = null;
@@ -55,12 +56,15 @@ AutoRegisterEntityProvider, PropertyProvideable{
         }
       }
 
-      //TODO: support search by something other then topic id...
+      // TODO: support search by something other then topic id...
       if (topicId != null) {
-        List <Message> messages = forumManager.getTopicByIdWithMessagesAndAttachments(new Long(topicId)).getMessages();
+        List<Message> messages =
+          forumManager.getTopicByIdWithMessagesAndAttachments(new Long(topicId)).getMessages();
         for (int i = 0; i < messages.size(); i++) {
-          if (messages.get(i).getDraft().booleanValue() == false
-                  && messages.get(i).getDeleted().booleanValue() == false) {
+          // TODO: authz is way too basic, someone more hip to message center please improve...
+          //This should also allow people with read access to an item to link to it
+          if (forumManager.isInstructor(userId, siteId)
+              || userId.equals(messages.get(i).getCreatedBy())) {
             rv.add("/" + ENTITY_PREFIX + "/" + messages.get(i).getId().toString());
           }
         }
@@ -72,9 +76,9 @@ AutoRegisterEntityProvider, PropertyProvideable{
 
   public Map<String, String> getProperties(String reference) {
     Map<String, String> props = new HashMap<String, String>();
-    System.out.println(reference + " ==> " + reference.substring(reference.lastIndexOf("/") + 1));
-    Message message = forumManager.getMessageById(new Long(reference.substring(reference.lastIndexOf("/") + 1)));
-    
+    Message message =
+      forumManager.getMessageById(new Long(reference.substring(reference.lastIndexOf("/") + 1)));
+
     props.put("author", message.getCreatedBy());
     props.put("title", message.getTitle());
     props.put("modifiedBy", message.getModifiedBy());
@@ -83,18 +87,19 @@ AutoRegisterEntityProvider, PropertyProvideable{
     props.put("label", message.getLabel());
     if (message.getDraft() != null)
       props.put("draft", message.getDraft().toString());
-    
+
     return props;
   }
 
   public String getPropertyValue(String reference, String name) {
-    //TODO: don't be so lazy, just get what we need...
+    // TODO: don't be so lazy, just get what we need...
     Map<String, String> props = getProperties(reference);
     return props.get(name);
   }
 
   public void setPropertyValue(String reference, String name, String value) {
-    //This does nothing for now... we could all the setting of many published assessment properties here though... if you're feeling jumpy feel free.
+    // This does nothing for now... we could all the setting of many published assessment properties
+    // here though... if you're feeling jumpy feel free.
   }
 
   public void setForumManager(DiscussionForumManager forumManager) {
