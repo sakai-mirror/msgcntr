@@ -1,5 +1,6 @@
 package org.sakaiproject.component.app.messageforums.entity;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,10 +83,10 @@ public class ForumMessageEntityProviderImpl implements ForumMessageEntityProvide
     props.put("title", message.getTitle());
     props.put("author", message.getCreatedBy());
     if (message.getCreated() != null)
-      props.put("date", message.getCreated().toString());
+      props.put("date", DateFormat.getInstance().format(message.getCreated()));
     if (message.getModifiedBy() != null) {
       props.put("modified_by", message.getModifiedBy());
-      props.put("modified_date", message.getModified().toString());
+      props.put("modified_date", DateFormat.getInstance().format(message.getModified()));
     }
     props.put("label", message.getLabel());
     if (message.getDraft() != null)

@@ -1,5 +1,6 @@
 package org.sakaiproject.component.app.messageforums.entity;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,9 +74,9 @@ public class ForumEntityProviderImpl implements ForumEntityProvider, AutoRegiste
     props.put("title", forum.getTitle());
     props.put("author", forum.getCreatedBy());
     if (forum.getCreated() != null)
-      props.put("date", forum.getCreated().toString());
+      props.put("date", DateFormat.getInstance().format(forum.getCreated()));
     if (forum.getModified() != null) {
-      props.put("modified_date", forum.getModified().toString());
+      props.put("modified_date", DateFormat.getInstance().format(forum.getModified()));
       props.put("modified_by", forum.getModifiedBy());
     }
     props.put("short_description", forum.getShortDescription());
