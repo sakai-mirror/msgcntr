@@ -79,15 +79,24 @@ public class ForumMessageEntityProviderImpl implements ForumMessageEntityProvide
     Message message =
       forumManager.getMessageById(new Long(reference.substring(reference.lastIndexOf("/") + 1)));
 
-    props.put("author", message.getCreatedBy());
     props.put("title", message.getTitle());
-    props.put("modifiedBy", message.getModifiedBy());
+    props.put("author", message.getCreatedBy());
     if (message.getCreated() != null)
       props.put("date", message.getCreated().toString());
+    if (message.getModifiedBy() != null) {
+      props.put("modified_by", message.getModifiedBy());
+      props.put("modified_date", message.getModified().toString());
+    }
     props.put("label", message.getLabel());
     if (message.getDraft() != null)
       props.put("draft", message.getDraft().toString());
-
+    if (message.getApproved() != null)
+      props.put("approved", message.getApproved().toString());
+    if (message.getGradeAssignmentName() != null)
+      props.put("assignment_name", message.getGradeAssignmentName());
+    if (message.getGradeComment() != null)
+      props.put("grade_comment", message.getGradeComment());
+    
     return props;
   }
 

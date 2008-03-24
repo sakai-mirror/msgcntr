@@ -90,12 +90,18 @@ public class ForumTopicEntityProviderImpl implements ForumTopicEntityProvider,
     Topic topic =
       forumManager.getTopicById(new Long(reference.substring(reference.lastIndexOf("/") + 1)));
 
-    props.put("author", topic.getCreatedBy());
     props.put("title", topic.getTitle());
-    props.put("modifiedBy", topic.getModifiedBy());
+    props.put("author", topic.getCreatedBy());
     if (topic.getCreated() != null)
       props.put("date", topic.getCreated().toString());
-    props.put("description", topic.getShortDescription());
+    if (topic.getModified() != null) {
+      props.put("modified_by", topic.getModifiedBy());
+      props.put("modified_date", topic.getModified().toString());
+    }
+    props.put("short_description", topic.getShortDescription());
+    props.put("description", topic.getExtendedDescription());
+    if (topic.getModerated() != null)
+      props.put("moderated", topic.getModerated().toString());
     props.put("child_provider", ForumMessageEntityProvider.ENTITY_PREFIX);
 
     return props;

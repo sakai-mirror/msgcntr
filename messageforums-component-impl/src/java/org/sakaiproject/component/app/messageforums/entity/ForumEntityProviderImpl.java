@@ -70,16 +70,22 @@ public class ForumEntityProviderImpl implements ForumEntityProvider, AutoRegiste
     DiscussionForum forum =
       forumManager.getForumById(new Long(reference.substring(reference.lastIndexOf("/") + 1)));
 
-    props.put("author", forum.getCreatedBy());
     props.put("title", forum.getTitle());
-    props.put("modifiedBy", forum.getModifiedBy());
+    props.put("author", forum.getCreatedBy());
     if (forum.getCreated() != null)
       props.put("date", forum.getCreated().toString());
-    props.put("description", forum.getShortDescription());
+    if (forum.getModified() != null) {
+      props.put("modified_date", forum.getModified().toString());
+      props.put("modified_by", forum.getModifiedBy());
+    }
+    props.put("short_description", forum.getShortDescription());
+    props.put("description", forum.getExtendedDescription());
     if (forum.getDraft() != null)
       props.put("draft", forum.getDraft().toString());
+    if (forum.getModerated() != null)
+      props.put("moderated", forum.getModerated().toString());
     props.put("child_provider", ForumTopicEntityProvider.ENTITY_PREFIX);
-
+    props.put("assignment_name", forum.getDefaultAssignName());
     return props;
   }
 
