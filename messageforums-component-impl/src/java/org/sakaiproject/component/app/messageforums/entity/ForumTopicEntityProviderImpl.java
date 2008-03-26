@@ -76,7 +76,7 @@ public class ForumTopicEntityProviderImpl implements ForumTopicEntityProvider,
             // TODO: authz is way too basic, someone more hip to message center please improve...
             //This should also allow people with read access to an item to link to it
             if (forumManager.isInstructor(userId, siteId)
-                || userId.equals(topics.get(i).getCreatedBy()))
+                || userId.equals(topics.get(j).getCreatedBy()))
               rv.add("/" + ENTITY_PREFIX + "/" + topics.get(j).getId().toString());
           }
         }
