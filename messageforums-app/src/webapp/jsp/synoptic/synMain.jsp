@@ -63,15 +63,12 @@
 						escape="false" title="#{msgs.syn_goto_messages}" rendered="#{eachSite.unreadPrivateAmt > 0}"/>
 					<h:outputText value="  " rendered="#{eachSite.unreadPrivateAmt > 0}" />
 
-		 			<h:commandLink action="synMain"
-						actionListener="#{mfSynopticBean.processReadAll}"
-						rendered="#{eachSite.unreadPrivateAmt > 0}"
-						styleClass="active">
-							<h:graphicImage url="/../library/image/silk/email_edit.png" title="#{msgs.syn_mark_as_read}"
-								onmouseover="ImageRollOver(this, '/..//library/image/silk/email_open.png');"
-								onmouseout="ImageRollOver(this, '/../library/image/silk/email_edit.png');"
-								rendered="#{eachSite.unreadPrivateAmt > 0}" />
-							<f:param name="contextId" value="#{eachSite.siteId}" />
+		 			<h:commandLink action="synMain" actionListener="#{mfSynopticBean.processReadAll}" rendered="#{eachSite.unreadPrivateAmt > 0}" styleClass="active">
+						<h:graphicImage url="/../library/image/silk/email_edit.png" title="#{msgs.syn_mark_as_read}"
+									onmouseover="ImageRollOver(this, '/..//library/image/silk/email_open.png');"
+									onmouseout="ImageRollOver(this, '/../library/image/silk/email_edit.png');"
+									rendered="#{eachSite.unreadPrivateAmt > 0}" />
+						<f:param name="contextId" value="#{eachSite.siteId}" />
 					</h:commandLink>
 				
 					<h:outputText value="#{msgs.syn_no_messages}" rendered="#{eachSite.unreadPrivateAmt == 0}" />			

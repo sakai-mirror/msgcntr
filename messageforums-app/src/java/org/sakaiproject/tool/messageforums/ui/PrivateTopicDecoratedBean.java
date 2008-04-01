@@ -31,6 +31,7 @@ import org.sakaiproject.api.app.messageforums.Topic;
 public class PrivateTopicDecoratedBean
 {
   private Topic topic;
+  private String intTitle;
   private int totalNoMessages;
   private int unreadNoMessages;
   private List messages;
@@ -41,16 +42,20 @@ public class PrivateTopicDecoratedBean
   private String previousTopicId;
   private String previousTopicTitle;
   private String nextTopicTitle;
-  
-  public PrivateTopicDecoratedBean(Topic topic)
+
+  public PrivateTopicDecoratedBean(Topic topic, String intTitle)
   {
-   this.topic= topic;    
+   this.topic= topic;
+   this.intTitle = intTitle;
   }
   public Topic getTopic()
   {
     return topic;
   }
-  
+
+  public String getIntTitle(){
+	  return this.intTitle;
+  }
 
   /**
    * @return

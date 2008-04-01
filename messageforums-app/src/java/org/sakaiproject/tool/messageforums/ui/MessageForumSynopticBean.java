@@ -1424,6 +1424,7 @@ public class MessageForumSynopticBean {
 	 * @param ActionEvent e
 	 */
 	public void processReadAll(ActionEvent e) {
+
 		//need modified to support internationalization
 		final String typeUuid = typeManager.getReceivedPrivateMessageType();
 
@@ -1614,7 +1615,7 @@ public class MessageForumSynopticBean {
 				if (mcTool != null) {
 					pvtTopicMessageUrl = ServerConfigurationService.getPortalUrl() + "/directtool/"
 		    					+ mcTool.getId() + "/sakai.messageforums.helper.helper/privateMsg/pvtMsg?pvtMsgTopicId=" 
-		    					+ receivedTopicUuid + "&contextId=" + contextId + "&selectedTopic=Received";
+		    					+ receivedTopicUuid + "&contextId=" + contextId + "&selectedTopic=pvt_received";
 	    			return pvtTopicMessageUrl;
 	    		}
 	    	}

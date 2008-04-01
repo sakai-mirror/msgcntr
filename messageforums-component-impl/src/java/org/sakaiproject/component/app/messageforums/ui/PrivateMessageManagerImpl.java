@@ -221,21 +221,27 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     {      
       /** initialize collections */
       //getHibernateTemplate().initialize(area.getPrivateForumsSet());
-            
-      pf = forumManager.createPrivateForum(getResourceBundleString(MESSAGES_TITLE));
-      
+
+//      pf = forumManager.createPrivateForum(getResourceBundleString(MESSAGES_TITLE));
+
+      pf = forumManager.createPrivateForum(Topic.MESSAGES);
       //area.addPrivateForum(pf);
       //pf.setArea(area);
       //areaManager.saveArea(area);
-      
-      PrivateTopic receivedTopic = forumManager.createPrivateForumTopic(getResourceBundleString(PVT_RECEIVED), true,false,
-          userId, pf.getId());     
+
+/*      PrivateTopic receivedTopic = forumManager.createPrivateForumTopic(getResourceBundleString(PVT_RECEIVED), true,false,
+          userId, pf.getId());
 
       PrivateTopic sentTopic = forumManager.createPrivateForumTopic(getResourceBundleString(PVT_SENT), true,false,
           userId, pf.getId());      
 
       PrivateTopic deletedTopic = forumManager.createPrivateForumTopic(getResourceBundleString(PVT_DELETED), true,false,
-          userId, pf.getId());      
+          userId, pf.getId());
+*/
+
+      PrivateTopic receivedTopic = forumManager.createPrivateForumTopic(Topic.RECEIVED, true,false,userId, pf.getId());
+      PrivateTopic sentTopic = forumManager.createPrivateForumTopic(Topic.SENT, true,false,userId, pf.getId());
+      PrivateTopic deletedTopic = forumManager.createPrivateForumTopic(Topic.DELETED, true,false,userId, pf.getId());
 
       //PrivateTopic draftTopic = forumManager.createPrivateForumTopic("Drafts", true,false,
       //    userId, pf.getId());
@@ -264,8 +270,8 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     			PrivateTopic currentTopic = (PrivateTopic) pvtTopics.get(i);
     			if(currentTopic != null)
     			{
-    				if(!currentTopic.getTitle().equals("Received") && !currentTopic.getTitle().equals("Sent") && !currentTopic.getTitle().equals("Deleted") 
-    						&& !currentTopic.getTitle().equals("Drafts") && area.getContextId().equals(currentTopic.getContextId()))
+    				if(!currentTopic.getTitle().equals(Topic.RECEIVED) && !currentTopic.getTitle().equals(Topic.SENT) && !currentTopic.getTitle().equals(Topic.DELETED)
+    						&& !currentTopic.getTitle().equals(Topic.DRAFT) && area.getContextId().equals(currentTopic.getContextId()))
     				{
     					currentTopic.setPrivateForum(pf);
     		      forumManager.savePrivateForumTopic(currentTopic);
@@ -317,6 +323,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
    */
   public void savePrivateMessage(Message message)
   {
+
     messageManager.saveMessage(message);
   }
 
@@ -1017,6 +1024,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   public void sendPrivateMessage(PrivateMessage message, Set recipients, boolean asEmail)
   {
 
+
     if (LOG.isDebugEnabled())
     {
       LOG.debug("sendPrivateMessage(message: " + message + ", recipients: "
@@ -1139,7 +1147,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       String bodyString = body.toString();
       
       /** determines if default in sakai.properties is set, if not will make a reasonable default */
-      String defaultEmail = "postmaster@" + ServerConfigurationService.getServerName();
+      String defaultEmail = "notifications@" + ServerConfigurationService.getServerName();
       String systemEmail = ServerConfigurationService.getString("msgcntr.notification.from.address", defaultEmail);
       
       /** determine if current user is equal to recipient */
@@ -1439,7 +1447,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   }  
      
   //Helper class
-  public String getTopicTypeUuid(String topicTitle)
+/*  public String getTopicTypeUuid(String topicTitle)
   {
     String topicTypeUuid;
 
@@ -1462,8 +1470,29 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     else
     {
       topicTypeUuid=typeManager.getCustomTopicType(topicTitle);
-    }
+    }2007-07-23 10:03:43,792 http-8080-Processor23_org.sakaiproject.component.app.messag
 return topicTypeUuid;
+  }
+*/
+  public String getTopicTypeUuid(String topicTitle){
+	  
+
+    String topicTypeUuid;
+
+    if(Topic.RECEIVED.equals(topicTitle)){
+      topicTypeUuid=typeManager.getReceivedPrivateMessageType();
+    }else if(Topic.SENT.equals(topicTitle)){
+      topicTypeUuid=typeManager.getSentPrivateMessageType();
+    }else if(Topic.DELETED.equals(topicTitle)){
+      topicTypeUuid=typeManager.getDeletedPrivateMessageType();
+    }else if(Topic.DRAFT.equals(topicTitle)){
+      topicTypeUuid=typeManager.getDraftPrivateMessageType();
+    }else{
+      topicTypeUuid=typeManager.getCustomTopicType(topicTitle);
+    }
+    
+    
+	return topicTypeUuid;
   }
   
   public Area getAreaByContextIdAndTypeId(final String typeId) {

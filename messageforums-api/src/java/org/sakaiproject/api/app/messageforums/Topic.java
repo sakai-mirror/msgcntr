@@ -25,6 +25,11 @@ import java.util.Set;
  
 public interface Topic extends MutableEntity {
 
+  public static final String RECEIVED = "pvt_received";
+  public static final String SENT = "pvt_sent";
+  public static final String DELETED = "pvt_deleted";
+  public static final String DRAFT = "pvt_drafts";
+  public static final String MESSAGES = "pvt_message_nav";
     public List getAttachments();
 
     public void setAttachments(List attachments);

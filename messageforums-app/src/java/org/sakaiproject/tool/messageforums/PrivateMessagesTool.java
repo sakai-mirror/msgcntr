@@ -14,7 +14,7 @@
  * Unless required by applicable law or agreed to in writing, software 
  * distributed under the License is distributed on an "AS IS" BASIS, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and 
+ * See the License for the processPvtMsgSendspecific language governing permissions and 
  * limitations under the License.
  *
  **********************************************************************************/
@@ -100,9 +100,9 @@ public class PrivateMessagesTool
   private static final String MESSAGECENTER_PRIVACY_TEXT = "messagecenter.privacy.text";
 
   private static final String MESSAGECENTER_BUNDLE = "org.sakaiproject.api.app.messagecenter.bundle.Messages";
- 
-  private static final ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
-  
+
+  private static ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
+
   /**
    * List individual private messages details
    */
@@ -184,12 +184,12 @@ public class PrivateMessagesTool
   
   //need to modified to support internationalization by huxt
   /** portlet configuration parameter values**/
-  public static final String PVTMSG_MODE_RECEIVED = "Received";
-  public static final String PVTMSG_MODE_SENT = "Sent";
-  public static final String PVTMSG_MODE_DELETE = "Deleted";
-  public static final String PVTMSG_MODE_DRAFT = "Drafts";
-  public static final String PVTMSG_MODE_CASE = "Personal Folders";
-  
+  public static final String PVTMSG_MODE_RECEIVED = Topic.RECEIVED;
+  public static final String PVTMSG_MODE_SENT = Topic.SENT;
+  public static final String PVTMSG_MODE_DELETE = Topic.DELETED;
+  public static final String PVTMSG_MODE_DRAFT = Topic.DRAFT;
+  public static final String PVTMSG_MODE_CASE = Topic.MESSAGES;
+
   public static final String RECIPIANTS_ENTIRE_CLASS= "All Participants";
   public static final String RECIPIANTS_ALL_INSTRUCTORS= "All Instructors";
   
@@ -210,6 +210,7 @@ public class PrivateMessagesTool
   private List decoratedPvtMsgs;
   //huxt
   private String msgNavMode="privateMessages" ;//============
+  private String msgNavModeTitle;
   private PrivateMessageDecoratedBean detailMsg ;
   private boolean viewChanged = false;
   
@@ -308,47 +309,7 @@ public class PrivateMessagesTool
   {    
   }
 
-  private String getLanguage(String navName)
-  {
-	  String Tmp= new String();
-	  Locale loc = null;
-	  //getLocale( String userId )
-	  ResourceLoader rl = new ResourceLoader();
-	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-	 
-	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
-	 
-	  String local_received=getResourceBundleString("pvt_received");
-	  String local_sent = getResourceBundleString("pvt_sent");
-	  String local_deleted= getResourceBundleString("pvt_deleted");
-	  
-	  String current_NAV= getResourceBundleString("pvt_message_nav");
-	  
-	  topicsbyLocalization.add(local_received);
-  	  topicsbyLocalization.add(local_sent);
-      topicsbyLocalization.add(local_deleted);
-	  
-	  String localLanguage=loc.getLanguage();
-	  
-	  if(navName.equals("Received")||navName.equals("Sent")||navName.equals("Deleted"))
-		  {
-		  Tmp = "en";
-			  }
-	  else if(navName.equals("Recibidos")||navName.equals("Enviados")||navName.equals("Borrados"))
-	  {
-		  
-		  Tmp ="es";
-		  
-	  }
-	  
-	  
-	  else//english language
-	  {		  
-		  Tmp="en";		  
-	  }
-    	
-	  return Tmp;	  
-  }
+
   
   /**
    * @return
@@ -393,7 +354,8 @@ public class PrivateMessagesTool
   }
 
   public void initializePrivateMessageArea()
-  {           
+  { 
+
     /** get area per request */
 //===huxt bgein
 	  
@@ -476,36 +438,12 @@ public class PrivateMessagesTool
       PrivateForumDecoratedBean decoratedForum = new PrivateForumDecoratedBean(getForum()) ;
       
       
-      /** only load topics/counts if area is enabled */
-      
-     
-    	  Locale loc = null;
-    	
-    	  ResourceLoader rl = new ResourceLoader();
-    	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-    	  
-    	  
-    	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
-    	  
-    	  String local_received=getResourceBundleString("pvt_received");
-    	  String local_sent = getResourceBundleString("pvt_sent");
-    	  String local_deleted= getResourceBundleString("pvt_deleted");
-    	  
-    	  String current_NAV= getResourceBundleString("pvt_message_nav");
-    	  
-    	  topicsbyLocalization.add(local_received);
-	  	  topicsbyLocalization.add(local_sent);
-	      topicsbyLocalization.add(local_deleted);
-    	  
-    	  String localLanguage=loc.getLanguage();
-	    	
-    	  
+
       if (getPvtAreaEnabled()){  
     	  
     	int countForFolderNum = 0;// only three folder 
-    	Iterator iterator = pvtTopics.iterator(); 
-        for (int indexlittlethanTHREE=0;indexlittlethanTHREE<3;indexlittlethanTHREE++)//Iterator iterator = pvtTopics.iterator(); iterator.hasNext();)//only three times
-        {
+		for (Iterator iterator = pvtTopics.iterator(); iterator.hasNext();)//only three times        
+		{
           PrivateTopic topic = (PrivateTopic) iterator.next();
           String CurrentTopicTitle= topic.getTitle();//folder name
           String CurrentTopicUUID= topic.getUuid();
@@ -519,33 +457,24 @@ public class PrivateMessagesTool
             	  && topic.getContextId() != null && !topic.getContextId().equals(prtMsgManager.getContextId())){
                continue;
             }       
-          	
-            PrivateTopicDecoratedBean decoTopic= new PrivateTopicDecoratedBean(topic) ;
-           
-            String typeUuid="";  // folder uuid
-            if(getLanguage(CurrentTopicTitle).toString().equals(getLanguage(current_NAV).toString()))
-            {
-             typeUuid = getPrivateMessageTypeFromContext(topicsbyLocalization.get(countForFolderNum).toString());// topic.getTitle());
-            
-            
-            }
-            else
-            {
-            	
-             typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());//topicsbyLocalization.get(countForFolderNum).toString());// topic.getTitle());
-                  
-            	
-            	
-            	
-            }
-            countForFolderNum++;
-            
-          ////need change here:==by huxt
-            decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid));//"prtMsgManager.findMessageCount(typeUuid)"= 40	
 
-            decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid));//"prtMsgManager.findUnreadMessageCount(typeUuid)"= 1	
+ 
+			PrivateTopicDecoratedBean decoTopic;
+			String topicTitle = rb.getString(topic.getTitle());	
+ 
+ 
+			if (topicTitle.indexOf("[missing key")!=-1)
+				//Las carpetas creadas por cada usuario, tienen un nombre que no depende del idioma y, por tanto, el ResourceLoader no encontrará el mensaje correspondiente
+				decoTopic = new PrivateTopicDecoratedBean(topic,topic.getTitle());
+			else
+				//Se trata de una de las carpetas "estándar": pvt_received, pvt_sent, pvt_deleted, pvt_draft y pvt_msg_navigate (ver Topic.java)
+             	decoTopic= new PrivateTopicDecoratedBean(topic, rb.getString(topic.getTitle())) ;
+			
+			String typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());
+  
+			decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid));
+			decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid));
 
-          
             decoratedForum.addTopic(decoTopic);
           }    //if (topic != null)      
         }//for  Iterator iterator
@@ -555,26 +484,6 @@ public class PrivateMessagesTool
 
   public List getDecoratedPvtMsgs()
   {
-  	/** 
-  	    avoid apply_request_values and render_response from calling this method on postback
-  	    solution -- only call during render_response phase
-  	    8/29/07 JLR - if coming from the synoptic tool, we need to process
-  	*/
-
-	  /** The type string for this "application": should not change over time as it may be stored in various parts of persistent entities. */
-		String APPLICATION_ID = "sakai:resourceloader";
-
-		/** Preferences key for user's regional language locale */
-		String LOCALE_KEY = "locale";
-
-    
-  
-	  Locale loc = null;
-	  //getLocale( String userId )
-	  ResourceLoader rl = new ResourceLoader();
-	  loc=rl.getLocale();//===country = "US"  language="en"
-	
-	  
   	if (!FacesContext.getCurrentInstance().getRenderResponse() && !viewChanged &&
   			getExternalParameterByKey(EXTERNAL_WHICH_TOPIC) == null) { 
   		return decoratedPvtMsgs;
@@ -585,21 +494,20 @@ public class PrivateMessagesTool
     	this.rearrageTopicMsgsThreaded(false);
     	return decoratedPvtMsgs;
     }
+
   	
-  	// coming from synoptic view, need to change the msgNavMode
-	if (msgNavMode == null)
-	{//=======Recibidios by huxt
-		msgNavMode = (getExternalParameterByKey(EXTERNAL_WHICH_TOPIC) == null) ? //"selectedTopic"
-						forumManager.getTopicByUuid(getExternalParameterByKey(EXTERNAL_TOPIC_ID)).getTitle() ://"pvtMsgTopicid"
-						getExternalParameterByKey(EXTERNAL_WHICH_TOPIC);
+  	// if coming from synoptic view, EXTERNAL_WHICH_TOPIC is not null, otherwise it does
+	String mode = getExternalParameterByKey(EXTERNAL_WHICH_TOPIC);
+	if (mode!=null){
+		setMsgNavMode(mode);
+		setSelectedTopicTitle(mode);
+		setSelectedTopicId(getExternalParameterByKey("pvtMsgTopicId")) ;
 	}
-	
-  	decoratedPvtMsgs=new ArrayList();
-  	String typeUuid;
-  	
-   	typeUuid = getPrivateMessageTypeFromContext(msgNavMode);//=======Recibidios by huxt
-   	
-    String current_NAV= getResourceBundleString("pvt_message_nav");
+	String topicId=getExternalParameterByKey("pvtMsgTopicId") ;
+
+	decoratedPvtMsgs=new ArrayList();
+  	String typeUuid = getPrivateMessageTypeFromContext(msgNavMode);//=======Recibidios by huxt
+
 
   	/** support for sorting */
   	/* if the view was changed to "All Messages", we want to retain the previous
@@ -747,7 +655,34 @@ public class PrivateMessagesTool
   {
     return msgNavMode ;
   }
+  private void setMsgNavMode(String navMode){
+	  msgNavMode = navMode;
+	  setMsgNavModeTitle(navMode);
+  }
  
+  private void setMsgNavModeTitle(String navMode){
+	  if (navMode.equals("privateMessages"))
+		msgNavModeTitle = rb.getString(Topic.MESSAGES);
+	  else if (rb.getString(navMode).indexOf("[missing key:")!=-1)
+		msgNavModeTitle = navMode;
+	  else
+	  	msgNavModeTitle = rb.getString(navMode);
+  }
+
+  private String getMsgTopicTitle(String topic){
+	  if (topic.equals("privateMessages"))
+		return rb.getString(Topic.MESSAGES);
+	  else if (rb.getString(topic).indexOf("[missing key:")!=-1)
+		return topic;
+	  else
+	  	return rb.getString(topic);
+    }
+
+  public String getMsgNavModeTitle(){
+	  setMsgNavModeTitle(msgNavMode);
+	  return msgNavModeTitle;
+  }
+
   public PrivateMessageDecoratedBean getDetailMsg()
   {
     return detailMsg ;
@@ -837,6 +772,11 @@ public class PrivateMessagesTool
     this.selectedLabel = selectedLabel;
   }
   
+	public String getSelectedLabelTitle(){
+		return rb.getString(selectedLabel);
+	}
+
+
   public boolean getBooleanEmailOut() {
 	  return booleanEmailOut;
   }
@@ -1217,6 +1157,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
    * @return - pvtMsg
    */
   private String selectedTopicTitle="";
+  private String selectedTopicIntTitle = "";
   private String selectedTopicId="";
   public String getSelectedTopicTitle()
   {
@@ -1225,7 +1166,17 @@ public void processChangeSelectView(ValueChangeEvent eve)
   public void setSelectedTopicTitle(String selectedTopicTitle) 
   {
     this.selectedTopicTitle=selectedTopicTitle;
+    setSelectedTopicIntTitle(selectedTopicTitle);
   }
+  public String getSelectedTopicIntTitle()
+  {
+    return selectedTopicIntTitle ;
+  }
+  private void setSelectedTopicIntTitle(String selectedTopicTitle) 
+  {
+    this.selectedTopicIntTitle=rb.getString(selectedTopicTitle);
+  }
+
   public String getSelectedTopicId()
   {
     return selectedTopicId;
@@ -1238,7 +1189,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
   public String processActionHome()
   {
     LOG.debug("processActionHome()");
-    msgNavMode = "privateMessages";
+    setMsgNavMode("privateMessages");
     multiDeleteSuccess = false;
     if (searchPvtMsgs != null)
     	searchPvtMsgs.clear();
@@ -1247,7 +1198,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
   public String processActionPrivateMessages()
   {
     LOG.debug("processActionPrivateMessages()");                    
-    msgNavMode = "privateMessages";            
+    setMsgNavMode("privateMessages");            
     multiDeleteSuccess = false;
     if (searchPvtMsgs != null) 
     	searchPvtMsgs.clear();
@@ -1271,16 +1222,12 @@ public void processChangeSelectView(ValueChangeEvent eve)
   
   public void initializeFromSynoptic()
   {
-	  
-	  
-	  
 	    /** reset sort type */
 	    sortType = SORT_DATE_DESC;    
 	    
 	    setSelectedTopicId(getExternalParameterByKey(EXTERNAL_TOPIC_ID));
-	   	selectedTopic = new PrivateTopicDecoratedBean(forumManager.getTopicByUuid(getExternalParameterByKey(EXTERNAL_TOPIC_ID)));
-	    selectedTopicTitle = getExternalParameterByKey(EXTERNAL_WHICH_TOPIC);
-
+	    setSelectedTopicTitle(getExternalParameterByKey(EXTERNAL_WHICH_TOPIC));
+		selectedTopic = new PrivateTopicDecoratedBean(forumManager.getTopicByUuid(getExternalParameterByKey(EXTERNAL_TOPIC_ID)),selectedTopicTitle);
 	    //set prev/next topic details
 	    PrivateForum pf = forumManager.getPrivateForumByOwnerAreaNullWithAllTopics(getUserId());
 	    
@@ -1305,14 +1252,14 @@ public void processChangeSelectView(ValueChangeEvent eve)
     LOG.debug("processPvtMsgTopic()");
     
     /** reset sort type */
-    sortType = SORT_DATE_DESC;    
-    
-    setSelectedTopicId(getExternalParameterByKey(EXTERNAL_TOPIC_ID));
-   	selectedTopic = new PrivateTopicDecoratedBean(forumManager.getTopicByUuid(getExternalParameterByKey(EXTERNAL_TOPIC_ID)));
-   	selectedTopicTitle = forumManager.getTopicByUuid(getExternalParameterByKey(EXTERNAL_TOPIC_ID)).getTitle();
-   	//"selectedTopicTitle"= "Recibidos"	
-    msgNavMode=getSelectedTopicTitle();
-    
+    sortType = SORT_DATE_DESC;
+
+    //get external parameter
+    //selectedTopicTitle = getExternalParameterByKey("pvtMsgTopicTitle") ;
+    setSelectedTopicTitle(forumManager.getTopicByUuid(getExternalParameterByKey("pvtMsgTopicId")).getTitle());
+    setSelectedTopicId(getExternalParameterByKey("pvtMsgTopicId")) ;
+    setMsgNavMode(getSelectedTopicTitle());
+
     //set prev/next topic details
     setPrevNextTopicDetails(msgNavMode);// "Recibidos"	
     
@@ -1489,8 +1436,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     	// format the created date according to the setting in the bundle
 	    SimpleDateFormat formatter = new SimpleDateFormat(getResourceBundleString("date_format"));
 		formatter.setTimeZone(TimeService.getLocalTimeZone());
-		String formattedCreateDate = formatter.format(pm.getCreated());
-		
+		String formattedCreateDate = formatter.format(pm.getCreated());		
 		StringBuilder forwardedText = new StringBuilder();
 	    
 	    // populate replyToBody with the forwarded text
@@ -1741,8 +1687,8 @@ private   int   getNum(char letter,   String   a)
   
   //RESET form variable - required as the bean is in session and some attributes are used as helper for navigation
   public void resetFormVariable() {
-    
-    this.msgNavMode="" ;
+
+    setMsgNavMode("");
     this.deleteConfirm=false;
     selectAll=false;
     attachments.clear();
@@ -1835,7 +1781,7 @@ private   int   getNum(char letter,   String   a)
     }
     else if(selectedTopic != null)
     {
-    	msgNavMode=getSelectedTopicTitle();
+    	setMsgNavMode(getSelectedTopicTitle());
     	setPrevNextTopicDetails(msgNavMode);
 
     	return DISPLAY_MESSAGES_PG;
@@ -2146,14 +2092,17 @@ private   int   getNum(char letter,   String   a)
    */
   public void setPrevNextTopicDetails(String msgNavMode)
   {
+
     for (int i = 0; i < pvtTopics.size(); i++)
     {
       Topic el = (Topic)pvtTopics.get(i);
       
-      
       if(el.getTitle().equals(msgNavMode))
       {
-        setSelectedTopic(new PrivateTopicDecoratedBean(el)) ;
+        setSelectedTopic(new PrivateTopicDecoratedBean(el, rb.getString(el.getTitle())));
+  	selectedTopicTitle= msgNavMode;
+	selectedTopicIntTitle = getMsgTopicTitle(msgNavMode);
+
         if(i ==0)
         {
           getSelectedTopic().setHasPreviousTopic(false);
@@ -2215,8 +2164,8 @@ private   int   getNum(char letter,   String   a)
     String prevTopicTitle = getExternalParameterByKey("previousTopicTitle");
     if(hasValue(prevTopicTitle))
     {
-      msgNavMode=prevTopicTitle;
-      
+      setMsgNavMode(prevTopicTitle);
+
       decoratedPvtMsgs=new ArrayList() ;
       
       String typeUuid = getPrivateMessageTypeFromContext(msgNavMode);        
@@ -2254,7 +2203,7 @@ private   int   getNum(char letter,   String   a)
     String nextTitle = getExternalParameterByKey("nextTopicTitle");
     if(hasValue(nextTitle))
     {
-      msgNavMode=nextTitle;
+      setMsgNavMode(nextTitle);
       decoratedPvtMsgs=new ArrayList() ;
       
       String typeUuid = getPrivateMessageTypeFromContext(msgNavMode);        
@@ -4060,58 +4009,17 @@ private   int   getNum(char letter,   String   a)
   }
       
   private String getPrivateMessageTypeFromContext(String navMode){
-	 
-      Locale loc = null;
-    	  //getLocale( String userId )
-     ResourceLoader rl = new ResourceLoader();
-     loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-    
-	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
-	 
-
-	  String local_received=getResourceBundleString("pvt_received");
-	  String local_sent = getResourceBundleString("pvt_sent");
-	  String local_deleted= getResourceBundleString("pvt_deleted");
-	
-	  
-	  String current_NAV= getResourceBundleString("pvt_message_nav");
-	  
-	  topicsbyLocalization.add(local_received);
-  	  topicsbyLocalization.add(local_sent);
-      topicsbyLocalization.add(local_deleted);
-	  
-		  
-	  
-	 
-    
-      String stringCurrentTopicTitle=new String();
-      stringCurrentTopicTitle=navMode;//most important
-      
-      String current_NAV2= getResourceBundleString("pvt_message_nav");
-      String typeUuid="";  // folder uuid
-   
-    
-    //need to add more dictionary to support more language
-    if (((String) topicsbyLocalization.get(0)).equalsIgnoreCase(navMode)||"Recibidos".equalsIgnoreCase(navMode)||"Received".equalsIgnoreCase(navMode)){
-      return typeManager.getReceivedPrivateMessageType();
-    }
-    else if (((String) topicsbyLocalization.get(1)).equalsIgnoreCase(navMode)||"Enviados".equalsIgnoreCase(navMode)||"Sent".equalsIgnoreCase(navMode)){
-      return typeManager.getSentPrivateMessageType();
-    }
-    else if (((String) topicsbyLocalization.get(2)).equalsIgnoreCase(navMode)||"Borrados".equalsIgnoreCase(navMode)||"Deleted".equalsIgnoreCase(navMode)){
-      return typeManager.getDeletedPrivateMessageType(); 
-    }
-    //else if (PVTMSG_MODE_DRAFT.equalsIgnoreCase(navMode)){
-   //   return typeManager.getDraftPrivateMessageType();
-   // }
-    else{
-      return typeManager.getCustomTopicType(navMode);
-    }    
-    
-    
-    
-    
-    
+	  if (PVTMSG_MODE_RECEIVED.equalsIgnoreCase(navMode)){
+        return typeManager.getReceivedPrivateMessageType();
+      }else if (PVTMSG_MODE_SENT.equalsIgnoreCase(navMode)){
+        return typeManager.getSentPrivateMessageType();
+      }else if (PVTMSG_MODE_DELETE.equalsIgnoreCase(navMode)){
+		return typeManager.getDeletedPrivateMessageType();
+      }else if (PVTMSG_MODE_DRAFT.equalsIgnoreCase(navMode)){
+       return typeManager.getDraftPrivateMessageType();
+      }else{
+		  return typeManager.getCustomTopicType(navMode);
+	  }
   }
 
   //////// GETTER AND SETTER  ///////////////////  
@@ -4278,10 +4186,6 @@ private   int   getNum(char letter,   String   a)
     	return searchPvtMsgs == null || searchPvtMsgs.isEmpty();
     }
 
-    public void setMsgNavMode(String msgNavMode) {
-		this.msgNavMode = msgNavMode;
-	}	
-	
 	/**
 	 * @return
 	 */

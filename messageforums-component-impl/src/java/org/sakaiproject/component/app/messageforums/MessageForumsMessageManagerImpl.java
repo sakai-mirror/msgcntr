@@ -614,6 +614,8 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
     }
 
     public void saveMessage(Message message, boolean logEvent) {
+
+
         boolean isNew = message.getId() == null;
         
         if (!(message instanceof PrivateMessage)){                  

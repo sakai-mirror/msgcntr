@@ -12,7 +12,7 @@
     ExternalContext exContext = context.getExternalContext();
     Map paramMap = exContext.getRequestParameterMap();
     
-     if (  ("Received".equals((String) paramMap.get("selectedTopic")))|| ("Recibidos".equals((String) paramMap.get("selectedTopic")))  ) {
+     if  ("pvt_received".equals((String) paramMap.get("selectedTopic"))){
 	  Application app = context.getApplication();
 	  ValueBinding binding = app.createValueBinding("#{PrivateMessagesTool}");
 	  PrivateMessagesTool pmt = (PrivateMessagesTool) binding.getValue(context);
@@ -36,7 +36,7 @@
        			<sakai:tool_bar_item value="#{msgs.pvt_compose}" action="#{PrivateMessagesTool.processPvtMsgCompose}" />
  			</sakai:tool_bar>
 
-			<%--<sakai:tool_bar_message value="#{msgs.pvt_pvtmsg}- #{PrivateMessagesTool.msgNavMode}" /> --%>
+			<%--<sakai:tool_bar_message value="#{msgs.pvt_pvtmsg}- #{PrivateMessagesTool.msgNavModeTitle}" /> --%>
 			<%@include file="topNav.jsp" %>
  
  			<h:messages styleClass="alertMessage" id="errorMessages" /> 

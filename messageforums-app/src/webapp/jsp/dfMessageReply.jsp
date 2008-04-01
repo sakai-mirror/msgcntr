@@ -47,8 +47,8 @@
 		    <h:inputHidden id="msgHidden" value="#{ForumTool.selectedMessage.message.body}" />
 		    <h:inputHidden id="titleHidden" value="#{ForumTool.selectedMessage.message.title}" />
 		    <div>
-		    	<input type="button" value="Insert Original Text" onClick="InsertHTML();" />
-		   	</div>
+		    <h:commandButton value="#{msgs.insert_original_text}" onclick="InsertHTML();" /> 
+		   </div>
 		   	
             <sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
             <script language="javascript" type="text/javascript">
