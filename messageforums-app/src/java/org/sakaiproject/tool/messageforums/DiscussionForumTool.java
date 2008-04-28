@@ -1029,6 +1029,11 @@ public class DiscussionForumTool
       return null;
     }
     
+    StringBuffer alertMsg = new StringBuffer();
+    forum.setExtendedDescription(FormattedText.processFormattedText(forum.getExtendedDescription(), alertMsg));
+    forum.setTitle(FormattedText.processFormattedText(forum.getTitle(), alertMsg));
+    forum.setShortDescription(FormattedText.processFormattedText(forum.getShortDescription(), alertMsg));
+    
     saveForumSelectedAssignment(forum);
     saveForumAttach(forum);  
     setObjectPermissions(forum);
@@ -1298,6 +1303,11 @@ public class DiscussionForumTool
       DiscussionTopic topic = selectedTopic.getTopic();
       if (selectedForum != null)
       {
+    	StringBuffer alertMsg = new StringBuffer();
+    	topic.setTitle(FormattedText.processFormattedText(topic.getTitle(), alertMsg));
+    	topic.setShortDescription(FormattedText.processFormattedText(topic.getShortDescription(), alertMsg));
+    	topic.setExtendedDescription(FormattedText.processFormattedText(topic.getExtendedDescription(), alertMsg));
+    	
         topic.setBaseForum(selectedForum.getForum());
         saveTopicSelectedAssignment(topic);
         saveTopicAttach(topic);
