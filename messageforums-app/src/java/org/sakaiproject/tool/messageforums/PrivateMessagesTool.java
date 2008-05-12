@@ -519,32 +519,12 @@ public class PrivateMessagesTool
       
       /** only load topics/counts if area is enabled */
       
-      //===modified to support Internationalization
-      
+       	  Locale loc = null;
 
-      //huxt-begin
-      //added by huxt for test localization
-    	  Locale loc = null;
     	  //getLocale( String userId )
     	  ResourceLoader rl = new ResourceLoader();
     	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-    	  
-    	  //"loc"= Locale  (id=22635)	
-    		/*country= "ES"	
-    			hashcode= -1	
-    			hashCodeValue= 829102	
-    			language= "es"	
-    			variant= ""	*/
 
-    	//  Preferences prefs = PreferencesService.getPreferences(userId);
-    	//	ResourceProperties locProps = prefs.getProperties(APPLICATION_ID);
-    	//	String localeString = locProps.getProperty(LOCALE_KEY);
-    	  //=====huxt end language + country
-    	/*  "localeString"= "en_US, en_GB, ja_JP, ko_KR, nl_NL, zh_CN, es_ES, fr_CA, fr, ca_ES, sv_SE, ar, ru_RU"	
-    			count= 83	
-    			hash= 0	
-    			offset= 0	
-    			value= char[83]  (id=23149)	 */
     	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
     	  // 
     	 /* public static final int en_US = 0;
@@ -662,30 +642,53 @@ public class PrivateMessagesTool
             String typeUuid="";  // folder uuid
             if(getLanguage(CurrentTopicTitle).toString().equals(getLanguage(current_NAV).toString()))
             {
-             typeUuid = getPrivateMessageTypeFromContext(topicsbyLocalization.get(countForFolderNum).toString());// topic.getTitle());
+             typeUuid = getPrivateMessageTypeFromContext(topicsbyLocalization.get(countForFolderNum).toString());
             
             
             }
             else
             {
             	
-             typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());//topicsbyLocalization.get(countForFolderNum).toString());// topic.getTitle());
-                  
-            	
-            	
-            	
+             typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());
+                              	
             }
             countForFolderNum++;
             
-          ////need change here:==by huxt
-            decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid));//"prtMsgManager.findMessageCount(typeUuid)"= 40	
+            decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid));
 
-            decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid));//"prtMsgManager.findUnreadMessageCount(typeUuid)"= 1	
+            decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid));
 
           
             decoratedForum.addTopic(decoTopic);
-          }    //if (topic != null)      
-        }//for  Iterator iterator
+          }       
+        }
+        
+        while(iterator.hasNext())//add more folder 
+        {
+               PrivateTopic topic = (PrivateTopic) iterator.next();
+               if (topic != null)
+               {
+
+               
+               /** filter topics by context and type*/                                                    
+                 if (topic.getTypeUuid() != null
+                 && topic.getTypeUuid().equals(typeManager.getUserDefinedPrivateTopicType())
+                   && topic.getContextId() != null && !topic.getContextId().equals(prtMsgManager.getContextId())){
+                    continue;
+                 }       
+               
+                 PrivateTopicDecoratedBean decoTopic= new PrivateTopicDecoratedBean(topic) ;
+                
+                 String typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());          
+               
+                 decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid));
+                 decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid));
+               
+                 decoratedForum.addTopic(decoTopic);
+               }          
+        
+        }
+
       }//if  getPvtAreaEnabled()
     return decoratedForum ;
   }
@@ -704,14 +707,11 @@ public class PrivateMessagesTool
 		/** Preferences key for user's regional language locale */
 		String LOCALE_KEY = "locale";
 
-  //String userId = getCurrentUser();
-  
-  //huxt-begin
-  //added by huxt for test localization
-	  Locale loc = null;
+		Locale loc = null;
+
 	  //getLocale( String userId )
-	  ResourceLoader rl = new ResourceLoader();
-	  loc=rl.getLocale();//===country = "US"  language="en"
+		ResourceLoader rl = new ResourceLoader();
+		loc=rl.getLocale();//===country = "US"  language="en"
 	
 	  
   	if (!FacesContext.getCurrentInstance().getRenderResponse() && !viewChanged &&
@@ -3808,9 +3808,9 @@ public void processChangeSelectView(ValueChangeEvent eve)
     else if (((String) topicsbyLocalization.get(2)).equalsIgnoreCase(navMode)||"Borrados".equalsIgnoreCase(navMode)||"Deleted".equalsIgnoreCase(navMode)){
       return typeManager.getDeletedPrivateMessageType(); 
     }
-    //else if (PVTMSG_MODE_DRAFT.equalsIgnoreCase(navMode)){
-   //   return typeManager.getDraftPrivateMessageType();
-   // }
+    else if (PVTMSG_MODE_DRAFT.equalsIgnoreCase(navMode)){
+      return typeManager.getDraftPrivateMessageType();
+    }
     else{
       return typeManager.getCustomTopicType(navMode);
     }    
