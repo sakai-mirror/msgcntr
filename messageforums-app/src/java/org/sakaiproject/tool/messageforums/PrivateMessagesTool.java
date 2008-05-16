@@ -1689,16 +1689,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
   // created separate method as to be used with processPvtMsgSend() and processPvtMsgSaveDraft()
   public PrivateMessage constructMessage()
   {
-    PrivateMessage aMsg;
-    // in case of compose this is a new message 
-    if (this.getDetailMsg() == null )
-    {
-      aMsg = messageManager.createPrivateMessage() ;
-    }
-    //if reply to a message then message is existing
-    else {
-      aMsg = (PrivateMessage)this.getDetailMsg().getMsg();       
-    }
+    PrivateMessage aMsg = messageManager.createPrivateMessage();
+    
     if (aMsg != null)
     {
       aMsg.setTitle(getComposeSubject());
