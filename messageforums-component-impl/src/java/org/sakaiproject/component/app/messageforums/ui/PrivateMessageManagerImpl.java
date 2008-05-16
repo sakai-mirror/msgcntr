@@ -59,6 +59,7 @@ import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.component.app.messageforums.TestUtil;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateMessageImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateMessageRecipientImpl;
+import org.sakaiproject.component.app.messageforums.exception.MessageCenterDataIntegrityException;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.email.api.EmailService;
@@ -1132,42 +1133,11 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       Boolean isRecipientCurrentUser = 
         (currentUserAsString.equals(userId) ? Boolean.TRUE : Boolean.FALSE);      
       
-      if (!asEmail && forwardingEnabled){
-      	  if(pf != null)
-      	  {
-      	  	emailService.send(systemEmail, pf.getAutoForwardEmail(), message.getTitle(), 
-              bodyString, u.getEmail(), null, additionalHeaders);
-      	  }
-      	  else if(oldPf != null)
-      	  {
-      	  	emailService.send(systemEmail, oldPf.getAutoForwardEmail(), message.getTitle(), 
-                bodyString, u.getEmail(), null, additionalHeaders);      	  	
-      	  }
-          
-          // use forwarded address if set
-          
-          PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
-              userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
-              isRecipientCurrentUser);
-          recipientList.add(receiver);                    
-      }      
-      else if (asEmail){
-    	  
-    	 PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
-                  userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
-                  isRecipientCurrentUser);
-    	 recipientList.add(receiver);
-    	  
-         emailService.send(systemEmail, u.getEmail(), message.getTitle(), 
-            bodyString, u.getEmail(), null, additionalHeaders);
-      }      
-      else{        
-        PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
-            userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
-            isRecipientCurrentUser);
-        recipientList.add(receiver);
-      }
-    }
+      
+      PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(userId, typeManager.getReceivedPrivateMessageType(), getContextId(), isRecipientCurrentUser);
+      recipientList.add(receiver);
+      
+
 
     /** add sender as a saved recipient */
     PrivateMessageRecipientImpl sender = new PrivateMessageRecipientImpl(
@@ -1178,7 +1148,40 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
 
     message.setRecipients(recipientList);
 
-    savePrivateMessage(message);
+    try {
+    	verifyNoOverwrite(message);
+    	savePrivateMessage(message);
+
+    	if (!asEmail && forwardingEnabled){
+    		if(pf != null)
+    		{
+    			emailService.send(systemEmail, pf.getAutoForwardEmail(), message.getTitle(), 
+    					bodyString, u.getEmail(), null, additionalHeaders);
+    		}
+    		else if(oldPf != null)
+    		{
+    			emailService.send(systemEmail, oldPf.getAutoForwardEmail(), message.getTitle(), 
+    					bodyString, u.getEmail(), null, additionalHeaders);      	  	
+    		}
+
+    		// use forwarded address if set
+    	}      
+    	else if (asEmail){ 
+    		emailService.send(systemEmail, u.getEmail(), message.getTitle(), 
+    				bodyString, u.getEmail(), null, additionalHeaders);
+    	}      
+    	else{        
+    		//nothing
+    	}
+    }
+    catch (MessageCenterDataIntegrityException mcdie) {
+    	if (LOG.isDebugEnabled())
+    	{
+    		LOG.debug("Catching and rethrowing MessageCenterDataIntegrityException");
+    	}
+    	throw new MessageCenterDataIntegrityException(mcdie);
+    }
+    }
 
     /** enable if users are stored in message forums user table
      Iterator i = recipients.iterator();
@@ -1190,6 +1193,20 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
      }
      **/
 
+  }
+  
+  /**
+   * {@link org.sakaiproject.component.app.messageforums.ui.PrivateMessageDataChecker}
+   * @param message
+   * @throws MessageCenterDataIntegrityException
+   */
+  private void verifyNoOverwrite(PrivateMessage message) throws MessageCenterDataIntegrityException
+  {
+	  if (LOG.isDebugEnabled())
+	  {
+		  LOG.debug("verifyNoOverwrite()");
+	  }
+	  PrivateMessageDataChecker.checkMessage(message);
   }
 
   /**
