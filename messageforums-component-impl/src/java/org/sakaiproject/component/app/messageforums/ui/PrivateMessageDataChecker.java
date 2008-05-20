@@ -77,9 +77,9 @@ public class PrivateMessageDataChecker {
 					PrivateMessage loopMsg = msgs.get(0);
 					if (loopMsg.getId().equals(message.getId())) {
 						//just making sure the id is the same
-						if (!loopMsg.getTitle().equals(message.getTitle()) || 
-							!loopMsg.getBody().equals(message.getBody()) ||
-							!loopMsg.getAuthor().equals(message.getAuthor())) {
+						if ((loopMsg.getTitle() != null && !loopMsg.getTitle().equals(message.getTitle())) || 
+							(loopMsg.getBody() != null && !loopMsg.getBody().equals(message.getBody())) ||
+							(loopMsg.getAuthor() != null && !loopMsg.getAuthor().equals(message.getAuthor()))) {
 							//throw an exception
 							String msg ="Message with id: " + String.valueOf(message.getId()) + " was about to be overwritten - failing transaction to prevent data loss";
 							
