@@ -1268,6 +1268,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
           detailMsg.setDepth(thisDmb.getDepth());
           detailMsg.setHasNext(thisDmb.getHasNext());
           detailMsg.setHasPre(thisDmb.getHasPre());
+          //ONC
+          detailMsg.setMsgIsCorrupted(messageManager.messageIsCorrupted(new Long(msgId)));
           break;
         }
       }
@@ -1843,6 +1845,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
       getDetailMsg().setDepth(thisDmb.getDepth()) ;
       getDetailMsg().setHasNext(thisDmb.getHasNext());
       getDetailMsg().setHasPre(thisDmb.getHasPre()) ;
+      //ONC
+      getDetailMsg().setMsgIsCorrupted(messageManager.messageIsCorrupted(thisDmb.getMsg().getId()));
 
     }    
     return null;
@@ -1895,6 +1899,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
       getDetailMsg().setDepth(thisDmb.getDepth()) ;
       getDetailMsg().setHasNext(thisDmb.getHasNext());
       getDetailMsg().setHasPre(thisDmb.getHasPre()) ;
+      //ONC
+      getDetailMsg().setMsgIsCorrupted(messageManager.messageIsCorrupted(thisDmb.getMsg().getId()));
     }
     
     return null;
@@ -2084,6 +2090,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
       {
         dbean.addPvtMessage(new PrivateMessageDecoratedBean(msg)) ;
         detailMsg = dbean;
+        //ONC
+        detailMsg.setMsgIsCorrupted(messageManager.messageIsCorrupted(new Long(msgId)));
       }
     }
     else

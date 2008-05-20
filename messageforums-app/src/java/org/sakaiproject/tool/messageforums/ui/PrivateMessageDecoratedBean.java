@@ -52,6 +52,9 @@ public class PrivateMessageDecoratedBean
   //This string is for display of recipients in Received folder- comman separated list of users
   private String sendToStringDecorated=""; 
   
+  // ONC
+  private boolean msgIsCorrupted;
+  
   public PrivateMessage getMsg()
   {
     return msg;
@@ -176,6 +179,26 @@ public class PrivateMessageDecoratedBean
   public String getAuthor() {
 	  return msg.getAuthor();
   }
+  
+  //ONC
+  /**
+   * true if this message has been flagged as "corrupted" and the UI should not
+   * allow any replies to or forwards of the message
+   */
+  public boolean isMsgIsCorrupted()
+  {
+	  return msgIsCorrupted;
+  }
+  
+  /**
+   * true if this message has been flagged as "corrupted" and the UI should not
+   * allow any replies to or forwards of the message
+   */
+  public void setMsgIsCorrupted(boolean msgIsCorrupted)
+  {
+	  this.msgIsCorrupted = msgIsCorrupted;
+  }
+  // end ONC
 }
 
 

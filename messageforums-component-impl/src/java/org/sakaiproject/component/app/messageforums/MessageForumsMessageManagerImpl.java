@@ -52,8 +52,10 @@ import org.sakaiproject.component.app.messageforums.dao.hibernate.MessageImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateMessageImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.UnreadStatusImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.Util;
+import org.sakaiproject.component.app.messageforums.exception.CorruptedMessageException;
 import org.sakaiproject.component.app.messageforums.exception.LockedException;
 import org.sakaiproject.content.cover.ContentHostingService;
+import org.sakaiproject.db.cover.SqlService;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.id.api.IdManager;
@@ -612,6 +614,18 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
               LOG.info("saveMessage executed [messageId: " + (isNew ? "new" : message.getId().toString()) + "] but forum is locked -- save aborted");
               throw new LockedException("Message could not be saved [messageId: " + (isNew ? "new" : message.getId().toString()) + "]");
           }
+        } 
+
+        // ONC - check for reply to corrupted message
+        if (message instanceof PrivateMessage) {
+        	// check that this message is not in reply to a corrupted message
+        	if (message.getInReplyTo() != null) {
+        		if (messageIsCorrupted(message.getInReplyTo().getId())) {
+        			throw new CorruptedMessageException(getCurrentUser() + 
+        					" attempted to reply to corrupted message: " + message.getInReplyTo());
+        		}
+        	}
+
         }
         
         message.setModified(new Date());
@@ -1141,5 +1155,21 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
           }
         }
         return Util.setToList(resultSet); 
+	}
+
+	public boolean messageIsCorrupted(Long id) {
+		if (id == null) {
+			throw new IllegalArgumentException("Null id passed to msgIsCorrupted");
+		}
+
+		boolean msgIsCorrupted = false;
+
+		String query = "SELECT ID FROM MFR_CORRUPT_MSG_T WHERE ID = " + id;
+		List matches = SqlService.dbRead(query);
+		if (matches != null) {
+			msgIsCorrupted = !matches.isEmpty();
+		}
+
+		return msgIsCorrupted;
 	}
 }

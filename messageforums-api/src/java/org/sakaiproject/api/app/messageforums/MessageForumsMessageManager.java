@@ -132,4 +132,12 @@ public interface MessageForumsMessageManager {
 	 * @return
 	 */
 	public List getPendingMsgsInTopic(final Long topicId);
+	
+	/**
+	 * 
+	 * @param id
+	 * @return true if the message with the given id is contained in our table
+	 * of "corrupted" messages that should NOT be replied to
+	 */
+	public boolean messageIsCorrupted(Long id);
 }

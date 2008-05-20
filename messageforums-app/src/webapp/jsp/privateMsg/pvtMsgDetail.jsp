@@ -45,6 +45,10 @@
 								</h:commandLink>
         </h:panelGroup>
       </h:panelGrid>
+      
+      <!-- ONC - warning message because of corrupt msg -->
+<h:outputText styleClass="alertMessage" value="#{msgs.pvtMsgCorrupt}" rendered="#{PrivateMessagesTool.detailMsg.msgIsCorrupted && !PrivateMessagesTool.deleteConfirm}" />
+
       <sakai:button_bar rendered="#{!PrivateMessagesTool.deleteConfirm}" >
 
                    <table style="width: 100%;">
@@ -52,10 +56,10 @@
 				<tr>
 				<td text-align="left">
 
-  <sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgReply}" value="#{msgs.pvt_repmsg}" accesskey="r"/>
+  <sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgReply}" value="#{msgs.pvt_repmsg}" accesskey="r" disabled="#{PrivateMessagesTool.detailMsg.msgIsCorrupted}" />
           
           <%--SAK-10505 add forward --%>
-            <sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgReplyAll}" value="#{msgs.pvt_repmsg_ALL}" accesskey="r" /><sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgForward}" value="#{msgs.pvt_forwardmsg}" accesskey="r"/>
+            <sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgReplyAll}" value="#{msgs.pvt_repmsg_ALL}" accesskey="r"  disabled="#{PrivateMessagesTool.detailMsg.msgIsCorrupted}"/><sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgForward}" value="#{msgs.pvt_forwardmsg}" accesskey="r" disabled="#{PrivateMessagesTool.detailMsg.msgIsCorrupted}"/>
           
 				</td>
 
@@ -157,9 +161,9 @@
 				
 				<tr>
 				<td text-align="left">
-  <sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgReply}" value="#{msgs.pvt_repmsg}" accesskey="r"/>
+  <sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgReply}" value="#{msgs.pvt_repmsg}" accesskey="r" disabled="#{PrivateMessagesTool.detailMsg.msgIsCorrupted}"/>
           <%--SAKAI-10505 add forward--%>
-          <sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgReplyAll}" value="#{msgs.pvt_repmsg_ALL}" accesskey="r" /><sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgForward}" value="#{msgs.pvt_forwardmsg}" accesskey="r"/>
+          <sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgReplyAll}" value="#{msgs.pvt_repmsg_ALL}" accesskey="r"  disabled="#{PrivateMessagesTool.detailMsg.msgIsCorrupted}"/><sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgForward}" value="#{msgs.pvt_forwardmsg}" accesskey="r" disabled="#{PrivateMessagesTool.detailMsg.msgIsCorrupted}"/>
           
 
 				</td>
