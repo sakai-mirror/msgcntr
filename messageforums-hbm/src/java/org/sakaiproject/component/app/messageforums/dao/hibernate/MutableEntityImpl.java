@@ -25,6 +25,9 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.api.app.messageforums.MutableEntity;
+import org.sakaiproject.tool.api.Placement;
+import org.sakaiproject.tool.cover.SessionManager;
+import org.sakaiproject.tool.cover.ToolManager;
 
 public class MutableEntityImpl implements MutableEntity {
  
@@ -51,7 +54,17 @@ public class MutableEntityImpl implements MutableEntity {
     }
 
     public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+        Placement placement = ToolManager.getCurrentPlacement();
+        String siteId = placement.getContext();
+    	String roleswap = (String)SessionManager.getCurrentSession().getAttribute("roleswap/site/" + siteId);
+    	if (roleswap!=null)
+    	{
+    		this.createdBy = "";
+    	}
+    	else
+    	{
+    		this.createdBy = createdBy;
+    	}
     }
 
     public Long getId() {
