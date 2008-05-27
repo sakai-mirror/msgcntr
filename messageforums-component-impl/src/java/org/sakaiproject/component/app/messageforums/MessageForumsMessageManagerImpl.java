@@ -617,7 +617,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         } 
 
         // ONC - check for reply to corrupted message
-        if (message instanceof PrivateMessage) {
+        if (isNew && message instanceof PrivateMessage) {
         	// check that this message is not in reply to a corrupted message
         	if (message.getInReplyTo() != null) {
         		if (messageIsCorrupted(message.getInReplyTo().getId())) {
