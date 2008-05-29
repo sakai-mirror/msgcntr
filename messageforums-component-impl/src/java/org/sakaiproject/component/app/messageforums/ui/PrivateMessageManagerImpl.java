@@ -20,7 +20,9 @@
  **********************************************************************************/
 package org.sakaiproject.component.app.messageforums.ui;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -34,6 +36,8 @@ import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.api.app.messageforums.Area;
@@ -65,6 +69,7 @@ import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.email.api.EmailService;
 import org.sakaiproject.entity.api.ResourceProperties;
+import org.sakaiproject.entitybroker.EntityBroker;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.authz.cover.SecurityService;
@@ -102,6 +107,8 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   private SessionManager sessionManager;  
   private EmailService emailService;
   private ContentHostingService contentHostingService;
+  private EntityBroker entityBroker;
+
   
   
   // SAK-11130:  modified to support sakai localization 	 SAK-11130
@@ -135,6 +142,10 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   public void setContentHostingService(ContentHostingService contentHostingService) {
 		this.contentHostingService = contentHostingService;
 	}
+
+  public void setEntityBroker(EntityBroker entityBroker) {
+	  this.entityBroker = entityBroker;
+  }
 
   public boolean getPrivateAreaEnabled()
   {
@@ -1196,6 +1207,32 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     message.setRecipients(recipientList);
 
     savePrivateMessage(message, false);
+    
+    if (entityBroker.entityExists("/feed-entity")) {
+  	  String url = entityBroker.getEntityURL("/feed-entity/");
+  	  HttpClient httpClient= new HttpClient();
+  	  PostMethod postMethod = new PostMethod(url);
+  	  postMethod.addParameter("markup", message.getAuthor() + " sent you a message: " + message.getTitle());
+
+  	  // use a date which is related to the current users locale
+  	  DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+  	  postMethod.addParameter("publishTimeAsString", df.format(new Date()));
+  	  postMethod.addParameter("context", getContextId());
+  	  postMethod.addParameter("author", "sakai.messages");
+  	  postMethod.addParameter("surrogateKey", "");
+
+  	  for (Iterator recIter = message.getRecipients().iterator(); recIter.hasNext();) {
+  		  PrivateMessageRecipient recip = (PrivateMessageRecipient)recIter.next();
+  		  postMethod.addParameter("recipients", recip.getUserId());
+  	  }
+
+  	  try {
+  		  httpClient.executeMethod(postMethod);
+  	  } catch (IOException ioe) {
+  		  LOG.warn("Unable to post new message to feed");
+  	  }
+
+    }
   }
 
   /**
