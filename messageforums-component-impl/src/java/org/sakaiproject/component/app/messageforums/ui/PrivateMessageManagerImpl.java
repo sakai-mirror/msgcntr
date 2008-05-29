@@ -1212,10 +1212,10 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   	  String url = entityBroker.getEntityURL("/feed-entity/");
   	  HttpClient httpClient= new HttpClient();
   	  PostMethod postMethod = new PostMethod(url);
-  	  postMethod.addParameter("markup", message.getAuthor() + " sent you a message: " + message.getTitle());
+  	  postMethod.addParameter("markup", message.getAuthor() + " sent you a message: <strong>" + message.getTitle() + "</strong>");
 
   	  // use a date which is related to the current users locale
-  	  DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+  	  DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
   	  postMethod.addParameter("publishTimeAsString", df.format(new Date()));
   	  postMethod.addParameter("context", getContextId());
   	  postMethod.addParameter("author", "sakai.messages");
