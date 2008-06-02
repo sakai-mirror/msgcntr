@@ -21,6 +21,8 @@
 package org.sakaiproject.api.app.messageforums.ui;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -468,4 +470,24 @@ public interface DiscussionForumManager
    * @return forumId
    */
   public String ForumIdForMessage(Long messageId);
+
+  /**
+   * 
+   * @param topicId
+   * @param checkReadPermission - user must have read permission for topic
+   * @param checkModeratePermission - user must have moderate permission for topic
+   * @return a set of userIds for the site members who have "read" and/or "moderate" permission
+   * for the given topic. Uses the role and group permission settings for the topic
+   * to determine permission
+   */
+  public Set<String> getUsersAllowedForTopic(Long topicId, boolean checkReadPermission, boolean checkModeratePermission);
+  
+  /**
+   * if feed exists, will add an event with the given feedText and recipients that will
+   * appear after the publishDate
+   * @param feedText
+   * @param publishDate
+   * @param recipients
+   */
+  public void addForumEventToFeed(String feedText, Date publishDate, Collection<String> recipients);
 }

@@ -1211,7 +1211,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   	  String url = entityBroker.getEntityURL("/feed-entity/");
   	  HttpClient httpClient= new HttpClient();
   	  PostMethod postMethod = new PostMethod(url);
-  	  postMethod.addParameter("markup", currentUser.getDisplayName() + areaManager.getResourceBundleString("pvt_msg_feed_msg_send", new Object[] {message.getAuthor(),message.getTitle()}));
+  	  postMethod.addParameter("markup",  areaManager.getResourceBundleString("pvt_msg_feed_msg_send", new Object[] {currentUser.getDisplayName(), message.getTitle()}));
   	  
 
   	  // use a date which is related to the current users locale

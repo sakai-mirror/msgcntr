@@ -90,6 +90,7 @@ import org.sakaiproject.tool.messageforums.ui.DiscussionMessageBean;
 import org.sakaiproject.tool.messageforums.ui.DiscussionTopicBean;
 import org.sakaiproject.tool.messageforums.ui.PermissionBean;
 import org.sakaiproject.user.api.User;
+import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.util.FormattedText;
 import org.sakaiproject.util.ResourceLoader;
@@ -2699,6 +2700,10 @@ public class DiscussionForumTool
     	return gotoMain();
     }
     forumManager.saveMessage(dMsg);
+    
+    // add this post as an event to the feed
+    addMessagePostingEventToFeed(dMsg);
+    
     DiscussionTopic dSelectedTopic = (DiscussionTopic) forumManager.getTopicWithAttachmentsById(selectedTopic.getTopic().getId());
     setSelectedForumForCurrentTopic(dSelectedTopic);
     selectedTopic.setTopic(dSelectedTopic);
@@ -2721,6 +2726,31 @@ public class DiscussionForumTool
     selectedTopic = getDecoratedTopic(selectedTopic.getTopic());
     
     return ALL_MESSAGES;
+  }
+  
+  private void addMessagePostingEventToFeed(Message newMessage) {
+	    // add this post as an event to the feed
+	    Set<String> usersAbleToReadMessage;
+		String msgPostedBy;
+		try {
+			// get current user's name
+			msgPostedBy = UserDirectoryService.getUser(newMessage.getCreatedBy()).getDisplayName();
+		} catch (UserNotDefinedException unde) {
+			// user not found, so use author
+			msgPostedBy = newMessage.getAuthor();
+		}
+		
+		String feedText;
+		// if this message has not been approved, we may only let moderators view it
+		if (newMessage.getApproved() == null || !newMessage.getApproved()) {
+			usersAbleToReadMessage = forumManager.getUsersAllowedForTopic(newMessage.getTopic().getId(), true, true);
+			feedText = areaManager.getResourceBundleString("feed_forums_msg_posted_moderated", new Object[] {msgPostedBy, newMessage.getTitle(), newMessage.getTopic().getTitle()});
+		} else {
+			usersAbleToReadMessage = forumManager.getUsersAllowedForTopic(newMessage.getTopic().getId(), true, false);
+			feedText = areaManager.getResourceBundleString("feed_forums_msg_posted", new Object[] {msgPostedBy, newMessage.getTitle(), newMessage.getTopic().getTitle()});
+		}
+		
+		forumManager.addForumEventToFeed(feedText, new Date(), usersAbleToReadMessage);
   }
 
   public String processDfMsgSaveDraft()
@@ -3283,6 +3313,9 @@ public class DiscussionForumTool
     dMsg.setInReplyTo(selectedMessage.getMessage());
     forumManager.saveMessage(dMsg);
     
+    // add this post as an event to the feed
+    addMessagePostingEventToFeed(dMsg);
+    
     setSelectedForumForCurrentTopic(topicWithMsgs);
     selectedTopic.setTopic(topicWithMsgs);
     selectedTopic.getTopic().setBaseForum(selectedForum.getForum());
@@ -3690,6 +3723,10 @@ public class DiscussionForumTool
     Message dMsg = constructMessage();
 
     forumManager.saveMessage(dMsg);
+    
+    // add this event to the feed
+    addMessagePostingEventToFeed(dMsg);
+    
     setSelectedForumForCurrentTopic((DiscussionTopic) forumManager
         .getTopicByIdWithMessages(selectedTopic.getTopic().getId()));
     selectedTopic.setTopic((DiscussionTopic) forumManager
@@ -3982,6 +4019,12 @@ public class DiscussionForumTool
 		  {
 			  Message msg = decoMessage.getMessage();
 			  messageManager.markMessageApproval(msg.getId(), approved);
+			  
+			  if (approved) {
+				  // if approved, we want to add to the feed
+				  addMessagePostingEventToFeed(msg);
+			  }
+			  
 			  messageManager.markMessageReadForUser(msg.getTopic().getId(), msg.getId(), true);
 			  numSelected++;
 			  numPendingMessages--;
@@ -4051,6 +4094,16 @@ public class DiscussionForumTool
 	  if (msgId != null)
 	  {
 		  messageManager.markMessageApproval(msgId, true);
+
+		  if (selectedTopic != null) {
+			  // the topic is not initialized on the selectedMessage
+			  Message msg = messageManager.getMessageById(msgId);
+			  Topic topic = selectedTopic.getTopic();
+			  msg.setTopic(topic);
+			  // add this message to the feed
+			  addMessagePostingEventToFeed(msg);
+		  }
+
 		  selectedMessage = new DiscussionMessageBean(messageManager.getMessageByIdWithAttachments(msgId), messageManager);
 		  refreshSelectedMessageSettings(selectedMessage.getMessage());
 		  setSuccessMessage(getResourceBundleString("cdfm_approved_alert"));

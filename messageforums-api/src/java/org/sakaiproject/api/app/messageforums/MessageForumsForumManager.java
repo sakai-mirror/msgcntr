@@ -199,4 +199,12 @@ public interface MessageForumsForumManager {
 	 * @return
 	 */
 	public BaseForum getForumByIdWithTopicsAttachmentsAndMessages(final Long forumId);
+	
+	/**
+	 * 
+	 * @param topicId
+	 * @return the Topic with the given id with the DBMembershipItems initialized.
+	 * Does not initialize attachments or messages.
+	 */
+	public Topic getTopicByIdWithMemberships(final Long topicId);
 }

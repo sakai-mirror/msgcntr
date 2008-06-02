@@ -43,5 +43,6 @@
 	<classpathentry sourcepath="/SPRING_HOME" kind="var" path="M2_REPO/org/springframework/spring/2.0.6/spring-2.0.6.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/profile"/>
 	<classpathentry kind="src" path="/entity-broker"/>
+	<classpathentry kind="var" path="M2_REPO/commons-httpclient/commons-httpclient/3.0/commons-httpclient-3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

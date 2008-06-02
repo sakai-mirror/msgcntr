@@ -20,10 +20,14 @@
  **********************************************************************************/
 package org.sakaiproject.component.app.messageforums.ui;
 
+import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +60,10 @@ import org.sakaiproject.api.app.messageforums.PermissionManager;
 import org.sakaiproject.api.app.messageforums.Topic;
 import org.sakaiproject.api.app.messageforums.TopicControlPermission;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
+import org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
+import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.Role;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.authz.cover.AuthzGroupService;
@@ -68,13 +74,22 @@ import org.sakaiproject.component.app.messageforums.dao.hibernate.MessageForumsU
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.ContentResource;
+import org.sakaiproject.entitybroker.EntityBroker;
 import org.sakaiproject.event.cover.EventTrackingService;
+import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.site.api.Group;
+import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
+import org.sakaiproject.thread_local.cover.ThreadLocalManager;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
+import org.sakaiproject.user.api.UserNotDefinedException;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
 
 /**
  * @author <a href="mailto:rshastri@iupui.edu">Rashmi Shastri</a>
@@ -99,6 +114,8 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   private Map courseMemberMap = null;
   private boolean usingHelper = false; // just a flag until moved to database from helper
   private ContentHostingService contentHostingService;
+  private UIPermissionsManager permissionsManager;
+  private EntityBroker entityBroker;
   
   public static final int MAX_NUMBER_OF_SQL_PARAMETERS_IN_LIST = 1000;
 
@@ -106,6 +123,10 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   {
      LOG.info("init()");
     ;
+  }
+  
+  public void setEntityBroker(EntityBroker entityBroker) {
+	  this.entityBroker = entityBroker;
   }
   
   public void setContentHostingService(ContentHostingService contentHostingService) {
@@ -379,6 +400,36 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
       message.setTopic(getTopicById(message.getTopic().getId()));
     }
     messageManager.saveMessage(message, logEvent);
+    
+  }
+  
+  public void addForumEventToFeed(String feedText, Date publishDate, Collection<String> recipients) {
+	  // add this saving event to the feed for post recipients
+	  if (entityBroker.entityExists("/feed-entity") && recipients != null) {
+
+		  String url = entityBroker.getEntityURL("/feed-entity/");
+		  HttpClient httpClient= new HttpClient();
+		  PostMethod postMethod = new PostMethod(url);
+		  postMethod.addParameter("markup", feedText);
+
+		  // use a date which is related to the current users locale
+		  DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+		  postMethod.addParameter("publishTimeAsString", df.format(new Date()));
+		  postMethod.addParameter("context", ToolManager.getCurrentPlacement().getContext());
+		  postMethod.addParameter("author", "sakai.forums");
+		  postMethod.addParameter("surrogateKey", "");
+
+		  for (String recip : recipients) {
+			  postMethod.addParameter("recipients", recip);
+		  }
+
+		  try {
+			  httpClient.executeMethod(postMethod);
+		  } catch (IOException ioe) {
+			  LOG.warn("Unable to post new message to feed");
+		  }
+
+	  }
   }
 
   /*
@@ -2148,6 +2199,99 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
     public String ForumIdForMessage(Long messageId) {
       return getMessageById(messageId).getTopic().getOpenForum().getId().toString();
+    }
+    
+
+    public Set<String> getUsersAllowedForTopic(Long topicId, boolean checkReadPermission, boolean checkModeratePermission) {
+  	  if (topicId == null) {
+  		  throw new IllegalArgumentException("Null topicId passed to getUsersAllowedToReadTopic");
+  	  }
+  	  
+  	  Set<String> usersAllowed = new HashSet<String>();
+
+  	  // we need to get all of the membership items associated with this topic
+  	  
+  	  // first, check to see if it is in the thread
+  	  Set<DBMembershipItem> topicItems = new HashSet<DBMembershipItem>();
+  	  Set<DBMembershipItem> allTopicItems = (Set<DBMembershipItem>)ThreadLocalManager.get("message_center_membership_topic");
+  	  if (allTopicItems != null) {
+  		  for (DBMembershipItem topicItem : allTopicItems) {
+  			  if (topicItem.getId().equals(topicId)) {
+  				  topicItems.add(topicItem);
+  			  }
+  		  }
+  	  } else {
+  		  // it is not already in the thread, so we need to retrieve the membership items
+  		  DiscussionTopic topicWithMemberships = (DiscussionTopic)forumManager.getTopicByIdWithMemberships(topicId);
+  		  if (topicWithMemberships != null && topicWithMemberships.getMembershipItemSet() != null) {
+  			  topicItems = topicWithMemberships.getMembershipItemSet();
+  		  }
+  	  }
+  	  
+  	  Set<Role> rolesInSite = new HashSet<Role>();
+  	  Set<Group> groupsInSite = new HashSet<Group>();
+
+  	  Site currentSite;
+  	  String siteId = ToolManager.getCurrentPlacement().getContext();
+  	  try {
+  		  currentSite = siteService.getSite(siteId);
+
+  		  // get all of the roles in this site
+  		  rolesInSite = currentSite.getRoles();
+  		  Collection<Group> groups = currentSite.getGroups();
+  		  if (groups != null) {
+  			  groupsInSite = new HashSet<Group>(groups);
+  		  } 
+  		  
+  	  } catch (IdUnusedException iue) {
+  		  LOG.warn("No site found with id: " + siteId + ". No users returned by getUsersAllowedToReadTopic");
+  		  return new HashSet<String>();
+  	  }
+  	  
+  	  List<DBMembershipItem> revisedMembershipItemSet = new ArrayList<DBMembershipItem>();
+  	  // we need to get the membership items for the roles separately b/c of default permissions
+  	  if (rolesInSite != null) {
+  		  for (Role role : rolesInSite) {
+  			  DBMembershipItem roleItem = getDBMember(topicItems, role.getId(), DBMembershipItem.TYPE_ROLE);
+  			  if (roleItem != null) {
+  				  revisedMembershipItemSet.add(roleItem);
+  			  }
+  		  }
+  	  }
+  	  // now add in the group perms
+  	  for (Group group : groupsInSite) {
+  		  DBMembershipItem groupItem = getDBMember(topicItems, group.getTitle(), DBMembershipItem.TYPE_GROUP);
+  		  if (groupItem != null) {
+  			  revisedMembershipItemSet.add(groupItem);
+  		  }
+  	  }
+  	  
+  	  // now we have the membership items. let's see which ones can read
+  	  for (DBMembershipItem membershipItem : revisedMembershipItemSet) {
+  		  if ((checkReadPermission && membershipItem.getPermissionLevel().getRead() && !checkModeratePermission) ||
+  				  (!checkReadPermission && checkModeratePermission && membershipItem.getPermissionLevel().getModeratePostings()) ||
+  				  (checkReadPermission && membershipItem.getPermissionLevel().getRead() && checkModeratePermission && membershipItem.getPermissionLevel().getModeratePostings())) {
+  			  if (membershipItem.getType().equals(DBMembershipItem.TYPE_ROLE)) {
+  				  // add the users who are a member of this role
+  				  Set<String> usersInRole = currentSite.getUsersHasRole(membershipItem.getName());
+  				  usersAllowed.addAll(usersInRole);
+  			  } else if (membershipItem.getType().equals(DBMembershipItem.TYPE_GROUP)) {
+  				  String groupName = membershipItem.getName();
+  				  for (Group group : groupsInSite) {
+  					  if (group.getTitle().equals(groupName)) {
+  						  Set<Member> groupMembers = group.getMembers();
+  						  if (groupMembers != null) {
+  							  for (Member member : groupMembers) {
+  								  usersAllowed.add(member.getUserId());
+  							  }
+  						  }
+  					  }
+  				  }
+  			  }
+  		  }
+  	  }
+  		  
+  	  return usersAllowed;
     }
     
 }
