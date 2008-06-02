@@ -384,6 +384,9 @@
         		 <property name="contentHostingService">
         		    <ref bean="org.sakaiproject.content.api.ContentHostingService"/>
 		        </property>
+		        <property name="entityBroker">
+        		    <ref bean="org.sakaiproject.entitybroker.EntityBroker" />
+		        </property>
             </bean>           
         </property>
          <property name="transactionAttributes">

@@ -1050,7 +1050,8 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       return;
     }
 
-    String currentUserAsString = getCurrentUser();
+    User currentUser = UserDirectoryService.getCurrentUser();
+    String currentUserAsString = currentUser.getId();
     List recipientList = new UniqueArrayList();
 
     /** test for draft message */
@@ -1089,8 +1090,6 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       List additionalHeaders = new ArrayList(1);
       additionalHeaders.add("Content-Type: text/html");
       
-
-      User currentUser = UserDirectoryService.getCurrentUser();
       StringBuilder body = new StringBuilder(message.getBody());
       
       body.insert(0, "From: " + currentUser.getDisplayName() + "<p/>"); 
@@ -1212,7 +1211,8 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   	  String url = entityBroker.getEntityURL("/feed-entity/");
   	  HttpClient httpClient= new HttpClient();
   	  PostMethod postMethod = new PostMethod(url);
-  	  postMethod.addParameter("markup", message.getAuthor() + " sent you a message: <strong>" + message.getTitle() + "</strong>");
+  	  postMethod.addParameter("markup", currentUser.getDisplayName() + areaManager.getResourceBundleString("pvt_msg_feed_msg_send", new Object[] {message.getAuthor(),message.getTitle()}));
+  	  
 
   	  // use a date which is related to the current users locale
   	  DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
@@ -1223,7 +1223,10 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
 
   	  for (Iterator recIter = message.getRecipients().iterator(); recIter.hasNext();) {
   		  PrivateMessageRecipient recip = (PrivateMessageRecipient)recIter.next();
-  		  postMethod.addParameter("recipients", recip.getUserId());
+  		  if (recip.getTypeUuid().equals(typeManager.getReceivedPrivateMessageType())) {
+  			postMethod.addParameter("recipients", recip.getUserId());
+  		  }
+  		  
   	  }
 
   	  try {

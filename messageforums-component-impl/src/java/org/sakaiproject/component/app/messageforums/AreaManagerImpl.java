@@ -301,4 +301,10 @@ public class AreaManagerImpl extends HibernateDaoSupport implements AreaManager 
     	final ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
         return rb.getString(key);
     }	
+    
+    public String getResourceBundleString(String key, Object[] args) 
+    {
+    	final ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
+        return rb.getFormattedMessage(key, args);
+    }
 }

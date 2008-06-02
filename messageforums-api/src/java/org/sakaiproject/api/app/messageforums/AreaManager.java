@@ -105,4 +105,12 @@ public interface AreaManager
 	 * @return
 	 */
 	public String getResourceBundleString(String key);
+	
+	/**
+	 * 
+	 * @param key
+	 * @param args
+	 * @return String requested or "[missing key: key]" if not found
+	 */
+	public String getResourceBundleString(String key, Object[] args);
 }
