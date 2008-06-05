@@ -2127,7 +2127,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     LOG.debug("processPvtMsgReplySend()");
 
 		if (setDetailMsgCount != 1) {
-			setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS));
+			setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS , new Object[] {ServerConfigurationService.getString("ui.service")}));
 			return null;
 		} else {
 			PrivateMessage currentMessage = getDetailMsg().getMsg();
@@ -2243,7 +2243,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     LOG.debug("processPvtMsgForwardSend()");
 
 		if (setDetailMsgCount != 1) {
-			setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS));
+			setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS , new Object[] {ServerConfigurationService.getString("ui.service")}));
 			return null;
 		} else {
 
@@ -2350,7 +2350,7 @@ public void processChangeSelectView(ValueChangeEvent eve)
     LOG.debug("processPvtMsgReply All Send()");
     
     if(setDetailMsgCount != 1){
-    	setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS));
+    	setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS , new Object[] {ServerConfigurationService.getString("ui.service")}));
         return null ;
     }
     else {
