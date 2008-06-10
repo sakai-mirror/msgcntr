@@ -315,47 +315,6 @@ public class PrivateMessagesTool
   {    
   }
 
-  private String getLanguage(String navName)
-  {
-	  String Tmp= new String();
-	  Locale loc = null;
-	  //getLocale( String userId )
-	  ResourceLoader rl = new ResourceLoader();
-	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-	 
-	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
-	 
-	  String local_received=getResourceBundleString("pvt_received");
-	  String local_sent = getResourceBundleString("pvt_sent");
-	  String local_deleted= getResourceBundleString("pvt_deleted");
-	  
-	  String current_NAV= getResourceBundleString("pvt_message_nav");
-	  
-	  topicsbyLocalization.add(local_received);
-  	  topicsbyLocalization.add(local_sent);
-      topicsbyLocalization.add(local_deleted);
-	  
-	  String localLanguage=loc.getLanguage();
-	  
-	  if(navName.equals("Received")||navName.equals("Sent")||navName.equals("Deleted"))
-		  {
-		  Tmp = "en";
-			  }
-	  else if(navName.equals("Recibidos")||navName.equals("Enviados")||navName.equals("Borrados"))
-	  {
-		  
-		  Tmp ="es";
-		  
-	  }
-	  
-	  
-	  else//english language
-	  {		  
-		  Tmp="en";		  
-	  }
-    	
-	  return Tmp;	  
-  }
   
   /**
    * @return
@@ -477,44 +436,17 @@ public class PrivateMessagesTool
 	  return area.getSendEmailOut();
   }
   
-  //Return decorated Forum
+  
+//Return decorated Forum
   public PrivateForumDecoratedBean getDecoratedForum()
   {      
       PrivateForumDecoratedBean decoratedForum = new PrivateForumDecoratedBean(getForum()) ;
       
-      
       /** only load topics/counts if area is enabled */
-      
-       	  Locale loc = null;
-    	
-    	  ResourceLoader rl = new ResourceLoader();
-    	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-    	    	  
-    	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
-    	  
-    	  String local_received=getResourceBundleString("pvt_received");
-    	  String local_sent = getResourceBundleString("pvt_sent");
-    	  String local_deleted= getResourceBundleString("pvt_deleted");
-    	  
-    	  String current_NAV= getResourceBundleString("pvt_message_nav");
-    	  
-    	  topicsbyLocalization.add(local_received);
-	  	  topicsbyLocalization.add(local_sent);
-	      topicsbyLocalization.add(local_deleted);
-    	  
-    	  String localLanguage=loc.getLanguage();
-	    	
-    	  
-      if (getPvtAreaEnabled()){  
-    	  
-    	int countForFolderNum = 0;// only three folder 
-    	Iterator iterator = pvtTopics.iterator(); 
-        for (int indexlittlethanTHREE=0;indexlittlethanTHREE<3;indexlittlethanTHREE++)//Iterator iterator = pvtTopics.iterator(); iterator.hasNext();)//only three times
+      if (getPvtAreaEnabled()){        
+        for (Iterator iterator = pvtTopics.iterator(); iterator.hasNext();)
         {
           PrivateTopic topic = (PrivateTopic) iterator.next();
-          String CurrentTopicTitle= topic.getTitle();//folder name
-          String CurrentTopicUUID= topic.getUuid();
-          
           if (topic != null)
           {
           	
@@ -526,60 +458,21 @@ public class PrivateMessagesTool
             }       
           	
             PrivateTopicDecoratedBean decoTopic= new PrivateTopicDecoratedBean(topic) ;
-           
-            String typeUuid="";  // folder uuid
-            if(getLanguage(CurrentTopicTitle).toString().equals(getLanguage(current_NAV).toString()))
-            {
-             typeUuid = getPrivateMessageTypeFromContext(topicsbyLocalization.get(countForFolderNum).toString());
-            
-            
-            }
-            else
-            {
-            	
-             typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());
-                              	
-            }
-            countForFolderNum++;
-            
-            decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid, aggregateList));
-
-            decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid, aggregateList));
-
+            //decoTopic.setTotalNoMessages(prtMsgManager.getTotalNoMessages(topic)) ;
+            //decoTopic.setUnreadNoMessages(prtMsgManager.getUnreadNoMessages(SessionManager.getCurrentSessionUserId(), topic)) ;
           
+            String typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());          
+          
+            decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid, aggregateList));
+            decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid,aggregateList));
             decoratedForum.addTopic(decoTopic);
-          }       
+          }          
         }
-        
-        while(iterator.hasNext())//add more folder 
-        {
-               PrivateTopic topic = (PrivateTopic) iterator.next();
-               if (topic != null)
-               {
-
-               
-               /** filter topics by context and type*/                                                    
-                 if (topic.getTypeUuid() != null
-                 && topic.getTypeUuid().equals(typeManager.getUserDefinedPrivateTopicType())
-                   && topic.getContextId() != null && !topic.getContextId().equals(prtMsgManager.getContextId())){
-                    continue;
-                 }       
-               
-                 PrivateTopicDecoratedBean decoTopic= new PrivateTopicDecoratedBean(topic) ;
-                
-                 String typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());          
-               
-                 decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid, aggregateList));
-                 decoTopic.setUnreadNoMessages(prtMsgManager.findUnreadMessageCount(typeUuid,aggregateList));
-               
-                 decoratedForum.addTopic(decoTopic);
-               }          
-        
-        }
-
-      }//if  getPvtAreaEnabled()
+      }
     return decoratedForum ;
   }
+  
+  
 
   public List getDecoratedPvtMsgs()
   {
@@ -3437,13 +3330,18 @@ private   int   getNum(char letter,   String   a)
   {
     LOG.debug("processPvtMsgFldCreate()");
     
+    String local_received=getResourceBundleString("pvt_received");
+    String local_sent = getResourceBundleString("pvt_sent");
+    String local_deleted= getResourceBundleString("pvt_deleted");
+    String local_drafts= getResourceBundleString("pvt_drafts");
+
     String createFolder=getAddFolder() ;   
     if(createFolder == null || createFolder.trim().length() == 0)
     {
     	setErrorMessage(getResourceBundleString(ENTER_FOLDER_NAME));
-      	return null ;
-    } else if((PVTMSG_MODE_RECEIVED.toLowerCase()).equals(createFolder.toLowerCase().trim()) || (PVTMSG_MODE_SENT.toLowerCase()).equals(createFolder.toLowerCase().trim())|| 
-    		 (PVTMSG_MODE_DELETE.toLowerCase()).equals(createFolder.toLowerCase().trim()) || (PVTMSG_MODE_DRAFT.toLowerCase()).equals(createFolder.toLowerCase().trim()))
+    	return null ;
+    } else if((local_received.toLowerCase()).equals(createFolder.toLowerCase().trim()) || (local_sent.toLowerCase()).equals(createFolder.toLowerCase().trim())|| 
+    		 (local_deleted.toLowerCase()).equals(createFolder.toLowerCase().trim()) || (local_drafts.toLowerCase()).equals(createFolder.toLowerCase().trim()))
     {
     	setErrorMessage(getResourceBundleString(CREATE_DIFF_FOLDER_NAME));
     	return null;
@@ -3481,6 +3379,11 @@ private   int   getNum(char letter,   String   a)
   {
     LOG.debug("processPvtMsgFldRevise()");
     
+    String local_received=getResourceBundleString("pvt_received");
+    String local_sent = getResourceBundleString("pvt_sent");
+    String local_deleted= getResourceBundleString("pvt_deleted");
+    String local_drafts= getResourceBundleString("pvt_drafts");
+
     String newTopicTitle = this.getSelectedNewTopicTitle(); 
     
     if(!hasValue(newTopicTitle))
@@ -3488,8 +3391,8 @@ private   int   getNum(char letter,   String   a)
       setErrorMessage(getResourceBundleString(FOLDER_NAME_BLANK));
       return REVISE_FOLDER_PG;
     }
-    else if((PVTMSG_MODE_RECEIVED.toLowerCase()).equals(newTopicTitle.toLowerCase().trim()) || (PVTMSG_MODE_SENT.toLowerCase()).equals(newTopicTitle.toLowerCase().trim())|| 
-   		 (PVTMSG_MODE_DELETE.toLowerCase()).equals(newTopicTitle.toLowerCase().trim()) || (PVTMSG_MODE_DRAFT.toLowerCase()).equals(newTopicTitle.toLowerCase().trim()))
+    else if((local_received.toLowerCase()).equals(newTopicTitle.toLowerCase().trim()) || (local_sent.toLowerCase()).equals(newTopicTitle.toLowerCase().trim())|| 
+   		 (local_deleted.toLowerCase()).equals(newTopicTitle.toLowerCase().trim()) || (local_drafts.toLowerCase()).equals(newTopicTitle.toLowerCase().trim()))
     {
    	  setErrorMessage(getResourceBundleString(CREATE_DIFF_FOLDER_NAME));
    	  return REVISE_FOLDER_PG;
@@ -3565,16 +3468,21 @@ private   int   getNum(char letter,   String   a)
   {
     LOG.debug("processPvtMsgFldCreate()");
     
+    String local_received=getResourceBundleString("pvt_received");
+    String local_sent = getResourceBundleString("pvt_sent");
+    String local_deleted= getResourceBundleString("pvt_deleted");
+    String local_drafts= getResourceBundleString("pvt_drafts");
+
     PrivateTopic parentTopic=(PrivateTopic) prtMsgManager.getTopicByUuid(selectedTopicId);
-    
+
     String createFolder=getAddFolder() ;
     if(createFolder == null || createFolder.trim().length() == 0)
     {
-      setErrorMessage(getResourceBundleString(ENTER_FOLDER_NAME));
-      return null ;
+    	setErrorMessage(getResourceBundleString(ENTER_FOLDER_NAME));
+    	return null ;
     } 
-    else if((PVTMSG_MODE_RECEIVED.toLowerCase()).equals(createFolder.toLowerCase().trim()) || (PVTMSG_MODE_SENT.toLowerCase()).equals(createFolder.toLowerCase().trim())|| 
-   		 (PVTMSG_MODE_DELETE.toLowerCase()).equals(createFolder.toLowerCase().trim()) || (PVTMSG_MODE_DRAFT.toLowerCase()).equals(createFolder.toLowerCase().trim()))
+    else if((local_received.toLowerCase()).equals(createFolder.toLowerCase().trim()) || (local_sent.toLowerCase()).equals(createFolder.toLowerCase().trim())|| 
+   		 (local_deleted.toLowerCase()).equals(createFolder.toLowerCase().trim()) || (local_drafts.toLowerCase()).equals(createFolder.toLowerCase().trim()))
     {
       setErrorMessage(getResourceBundleString(CREATE_DIFF_FOLDER_NAME));
    	  return null;
@@ -3928,7 +3836,9 @@ private   int   getNum(char letter,   String   a)
    */
   public List createDecoratedDisplay(List msg)
   {
-    List decLs= new ArrayList() ;
+	String local_sent = getResourceBundleString("pvt_sent");
+	  
+	List decLs= new ArrayList() ;
     numberChecked = 0;
 
     for (Iterator iter = msg.iterator(); iter.hasNext();)
@@ -3952,7 +3862,7 @@ private   int   getNum(char letter,   String   a)
         }
       }
       //Add decorate 'TO' String for sent message
-      if(PVTMSG_MODE_SENT.equals(msgNavMode))
+      if(local_sent.equals(msgNavMode))
       {
         dbean.setSendToStringDecorated(createDecoratedSentToDisplay(dbean)); 
       }

@@ -112,7 +112,7 @@
 										            rendered="#{topic.totalNoMessages > 1}"
 										            styleClass="textPanelFooter" />
 									<h:outputText	value=" - #{topic.unreadNoMessages} #{msgs.pvt_unread}"
-										            rendered="#{topic.topic.title != 'Sent'}"
+										            rendered="#{topic.topic.title != msgs.pvt_sent}"
 										            styleClass="textPanelFooter" />
 									<h:outputText value=" #{msgs.cdfm_closeb}" styleClass="textPanelFooter" />
 								</h:panelGroup>
@@ -140,7 +140,7 @@
 										            rendered="#{topic.totalNoMessages > 1}"
 										            styleClass="textPanelFooter" />
 									<h:outputText value=" - #{topic.unreadNoMessages} #{msgs.pvt_unread}"
-										            rendered="#{topic.topic.title != 'Sent'}"
+										            rendered="#{topic.topic.title != msgs.pvt_sent}"
 										            styleClass="textPanelFooter" />
 									<h:outputText value=" #{msgs.cdfm_closeb}"
 										            styleClass="textPanelFooter" />

@@ -48,11 +48,18 @@ import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
+import org.sakaiproject.util.ResourceLoader;
 
 public class MembershipManagerImpl implements MembershipManager{
-
+	
   private static final Log LOG = LogFactory.getLog(MembershipManagerImpl.class);
-          
+  
+  private static final String MESSAGECENTER_BUNDLE = "org.sakaiproject.api.app.messagecenter.bundle.Messages";
+  private static final String PVT_MSG_ROLE = "pvt_msg_role";
+  private static final String PVT_MSG_Group = "pvt_msg_group";
+  private static final String PVT_ALL_PARTICIPANTS = "pvt_all_participants";
+  
+        
   private SiteService siteService;
   private UserDirectoryService userDirectoryService;
   private AuthzGroupService authzGroupService;
@@ -184,7 +191,7 @@ public class MembershipManagerImpl implements MembershipManager{
     if (includeAllParticipantsMember){
       MembershipItem memberAll = MembershipItem.getInstance();
       memberAll.setType(MembershipItem.TYPE_ALL_PARTICIPANTS);
-      memberAll.setName(MembershipItem.ALL_PARTICIPANTS_DESC);
+      memberAll.setName(getResourceBundleString(PVT_ALL_PARTICIPANTS));
       returnMap.put(memberAll.getId(), memberAll);
     }
  
@@ -212,7 +219,7 @@ public class MembershipManagerImpl implements MembershipManager{
       Group currentGroup = (Group) groupIterator.next();      
       MembershipItem member = MembershipItem.getInstance();
       member.setType(MembershipItem.TYPE_GROUP);
-      member.setName(currentGroup.getTitle() + " Group");
+      member.setName(currentGroup.getTitle() + " " + getResourceBundleString(PVT_MSG_Group));
       member.setGroup(currentGroup);
       returnMap.put(member.getId(), member);
     }
@@ -228,7 +235,7 @@ public class MembershipManagerImpl implements MembershipManager{
         if (roleId != null && roleId.length() > 0){
           roleId = roleId.substring(0,1).toUpperCase() + roleId.substring(1); 
         }
-        member.setName(roleId + " Role");
+        member.setName(roleId + " " + getResourceBundleString(PVT_MSG_ROLE));
         member.setRole(role);
         returnMap.put(member.getId(), member);
       }
@@ -387,5 +394,11 @@ public class MembershipManagerImpl implements MembershipManager{
   {
     this.securityService = securityService;
   }
+  
+  public String getResourceBundleString(String key) 
+  {
+	  final ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
+	  return rb.getString(key);
+  }	
 
 }

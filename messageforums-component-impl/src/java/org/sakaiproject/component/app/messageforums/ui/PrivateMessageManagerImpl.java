@@ -215,6 +215,13 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     aggregateList.clear();
     aggregateList.addAll(initializeMessageCounts());
     
+	//check language:
+	String local_received=getResourceBundleString("pvt_received");
+	String local_sent = getResourceBundleString("pvt_sent");
+	String local_deleted= getResourceBundleString("pvt_deleted");
+	String local_drafts= getResourceBundleString("pvt_drafts");
+
+    
     getHibernateTemplate().lock(area, LockMode.NONE);
     
     PrivateForum pf;
@@ -267,8 +274,8 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     			PrivateTopic currentTopic = (PrivateTopic) pvtTopics.get(i);
     			if(currentTopic != null)
     			{
-    				if(!currentTopic.getTitle().equals("Received") && !currentTopic.getTitle().equals("Sent") && !currentTopic.getTitle().equals("Deleted") 
-    						&& !currentTopic.getTitle().equals("Drafts") && area.getContextId().equals(currentTopic.getContextId()))
+    				if(!currentTopic.getTitle().equals(local_received) && !currentTopic.getTitle().equals(local_sent) && !currentTopic.getTitle().equals(local_deleted) 
+    						&& !currentTopic.getTitle().equals(local_drafts) && area.getContextId().equals(currentTopic.getContextId()))
     				{
     					currentTopic.setPrivateForum(pf);
     		      forumManager.savePrivateForumTopic(currentTopic);
@@ -291,9 +298,36 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     }    
     else{      
        //getHibernateTemplate().initialize(pf.getTopicsSet());   
-    	 pf = forumManager.getPrivateForumByOwnerAreaWithAllTopics(getCurrentUser(), area);
+    	pf = forumManager.getPrivateForumByOwnerAreaWithAllTopics(getCurrentUser(), area);
+
+    	Iterator iterator = pf.getTopics().iterator();
+
+    	int count = 0;
+    	while(iterator.hasNext()){
+    		PrivateTopic topic = (PrivateTopic) iterator.next();
+    		boolean changed = false;
+    		if(!topic.getMutable()){
+    			if(count == 0 && !topic.getTitle().equals(local_received)){
+    				topic.setTitle(local_received);
+    				changed = true;
+    			}
+    			if(count == 1 && !topic.getTitle().equals(local_received)){
+    				topic.setTitle(local_sent);
+    				changed = true;
+    			}
+    			if(count == 2 && !topic.getTitle().equals(local_received)){
+    				topic.setTitle(local_deleted);
+    				changed = true;
+    			}
+    			if(changed)
+    				forumManager.savePrivateForumTopic(topic);
+
+    			count++;
+    		}
+    	}
+
     }
-   
+
     return pf;
   }
   
