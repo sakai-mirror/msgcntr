@@ -3,6 +3,9 @@ function setPanelId(thisid)
 {
   panelId = thisid;
 }
+
+
+/*
 function showHideDivBlock(hideDivisionNo, context)
 {
   var tmpdiv = hideDivisionNo + "__hide_division_";
@@ -29,10 +32,90 @@ function showHideDivBlock(hideDivisionNo, context)
     }
     if(panelId != null)
     {
-      setMainFrameHeight(panelId);
+      resizeFrame('grow');
     }
   }
 }
+*/
+
+
+function showHideDivBlock(hideDivisionNo, context)
+{
+	var tmpdiv = hideDivisionNo + "__hide_division_";
+	var tmpimg = hideDivisionNo + "__img_hide_division_";
+	var divisionNo = getTheElement(tmpdiv);
+	var imgNo = getTheElement(tmpimg);
+	// toggle a fade
+	jQuery.fn.fadeToggle = function(speed, easing, callback) {
+		return this.animate({opacity: 'toggle'}, 500, easing, callback);
+	};
+	if(divisionNo){
+		if ( $(divisionNo).is(':visible') ){
+			if (imgNo)
+			{
+				imgNo.src = context + "/images/right_arrow.gif";
+			}
+		}
+		else
+		{
+			if(imgNo)
+			{
+				imgNo.src = context + "/images/down_arrow.gif";
+			}
+		}
+		$(divisionNo).fadeToggle();
+		if(panelId != null)
+		{
+			resizeFrame('grow');
+		}
+	}
+}
+
+
+//this function needs jquery 1.1.2 or later - it resizes the parent iframe without bringing the scroll to the top
+	function resizeFrame(updown)
+	{
+		if (top.location != self.location) 	 {
+			var frame = parent.document.getElementById(window.name);
+		}
+			if( frame )
+		{
+			if(updown=='shrink')
+			{
+				var clientH = document.body.clientHeight - 30;
+			}
+			else
+			{
+				var clientH = document.body.clientHeight + 30;
+			}
+			$( frame ).height( clientH );
+		}
+		else
+		{
+			throw( "resizeFrame did not get the frame (using name=" + window.name + ")" );
+		}
+	}
+
+
+/*
+
+function showHideDivBlock(hideDivisionNo, context){
+
+  var tmpdiv = hideDivisionNo + "__hide_division_";
+  var tmpimg = hideDivisionNo + "__img_hide_division_";
+  var divisionNo = getTheElement(tmpdiv);
+  var imgNo = getTheElement(tmpimg);
+
+
+	if (divisionNo.style.display == "block") {
+		imgNo.src = context + "/images/right_arrow.gif";
+	}
+	else {
+		imgNo.src = context + "/images/down_arrow.gif";
+	}
+}
+
+*/
 function showHideDiv(hideDivisionNo, context)
 {
   var tmpdiv = hideDivisionNo + "__hide_division_";
@@ -86,7 +169,7 @@ function getTheElement(thisid)
     thiselm = document.layers[thisid];
   }
 
-  if(thiselm)   
+  if(thiselm)
   {
     if(thiselm == null)
     {
@@ -101,23 +184,36 @@ function getTheElement(thisid)
 
 function check(field)
  {
-    for (i = 0; i < field.length; i++) 
+    for (i = 0; i < field.length; i++)
     {
         field[i].checked = true;
     }
  }
 function unCheck(field)
 {
-    for (i = 0; i < field.length; i++) 
+    for (i = 0; i < field.length; i++)
     {
-        field[i].checked = false; 
+        field[i].checked = false;
     }
 }
 
 function toggleDisplay(obj) {
 	resize();
 	$("#" + obj).slideToggle("normal", resize);
-	return;    
+	return;
+}
+
+
+jQuery.fn.fadeToggle = function(speed, easing, callback) {
+   return this.animate({opacity: 'toggle'}, speed, easing, callback);
+
+}; 
+function toggleDisplayInline(obj) {
+//	resize();
+//		$("#" + obj).slideToggle("normal", resize);
+		$("#" + obj).fadeToggle();
+
+	return;
 }
 
 function toggleHide(obj){
@@ -127,6 +223,7 @@ function toggleHide(obj){
 		obj.innerHTML = obj.innerHTML.replace(/(<.+>)([^<>]+)/i, "$1 Hide $2");
 	}
 }
+
 function getScrollDist(obj){
 	var curtop = 0;
 	if (obj.offsetParent) {
@@ -137,12 +234,12 @@ function getScrollDist(obj){
 	}
 	return curtop;
 }
-function selectDeselectCheckboxes(mainCheckboxId, myForm) {   
+function selectDeselectCheckboxes(mainCheckboxId, myForm) {
 	var el = getTheElement(mainCheckboxId);
-	var isChecked = el.checked;           
+	var isChecked = el.checked;
 	for ( i = 0; i < myForm.elements.length; i++ ) {
 		if (myForm.elements[i].type == 'checkbox' ) {
-			myForm.elements[i].checked  = isChecked;                                               
+			myForm.elements[i].checked  = isChecked;
 		}
 	}
 }
@@ -150,7 +247,7 @@ function resetMainCheckbox(checkboxId) {
   mainCheckboxEl = getTheElement(checkboxId);
   if (mainCheckboxEl.checked = true) {
   	mainCheckboxEl.checked = false;
-  }                                                  
+  }
 }
 // if the containing frame is small, then offsetHeight is pretty good for all but ie/xp.
 // ie/xp reports clientHeight == offsetHeight, but has a good scrollHeight
@@ -166,8 +263,8 @@ function mySetMainFrameHeight(id)
 
 		var objToResize = (frame.style) ? frame.style : frame;
 
-		var height; 
-		
+		var height;
+
 		var scrollH = document.body.scrollHeight;
 		var offsetH = document.body.offsetHeight;
 		var clientH = document.body.clientHeight;
@@ -194,7 +291,7 @@ function mySetMainFrameHeight(id)
 		}
 
 		// here we fudge to get a little bigger
-		//gsilver: changing this from 50 to 10, and adding extra bottom padding to the portletBody		
+		//gsilver: changing this from 50 to 10, and adding extra bottom padding to the portletBody
 		var newHeight = height + 150;
 		//contributed patch from hedrick@rutgers.edu (for very long documents)
 		if (newHeight > 32760)
@@ -203,7 +300,7 @@ function mySetMainFrameHeight(id)
 		// no need to be smaller than...
 		//if (height < 200) height = 200;
 		objToResize.height=newHeight + "px";
-	
+
 		var s = " scrollH: " + scrollH + " offsetH: " + offsetH + " clientH: " + clientH + " innerDocScrollH: " + innerDocScrollH + " Read height: " + height + " Set height to: " + newHeight;
 
 	}
@@ -220,7 +317,7 @@ function doAjax(messageId, topicId, self){
             }, 500);
          } else {
             $(self).remove();
-            $("#" + messageId).parents("tr:first").css("backgroundColor", "#ffD0DC");         
+            $("#" + messageId).parents("tr:first").css("backgroundColor", "#ffD0DC");
          }
       },
       error: function(){

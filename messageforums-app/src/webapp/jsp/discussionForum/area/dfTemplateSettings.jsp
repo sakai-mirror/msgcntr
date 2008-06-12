@@ -11,6 +11,10 @@
 <f:view>
    <sakai:view title="#{msgs.cdfm_default_template_settings}">           
       <h:form id="revise">
+	  			<style type="text/css">
+				@import url("/sakai-messageforums-tool/css/msgcntr.css");
+			</style>
+
              		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 <!--jsp/discussionForum/area/dfTemplateSettings.jsp-->
@@ -19,11 +23,11 @@
 		  		  <h:outputText id="instruction" value="#{msgs.cdfm_default_template_settings_instruction}"/>
 				</div>
 				
-				<div class="discTria" style="padding: 0.5em;"><h4><h:outputText  value="#{msgs.cdfm_forum_posting}" /></h4></div>
+				<h4><h:outputText  value="#{msgs.cdfm_forum_posting}" /></h4>
 				<h:panelGrid columns="2" columnClasses="shorttext,checkbox">
-				  <h:panelGroup><h:outputLabel id="outputLabel4" for="moderated"  value="#{msgs.cdfm_moderate_forums}"/>	</h:panelGroup>
+				  <h:panelGroup><h:outputText id="outputLabel4"   value="#{msgs.cdfm_moderate_forums}"/>	</h:panelGroup>
 				  <h:panelGroup>
-					  <h:selectOneRadio layout="pageDirection" disabled="#{not ForumTool.editMode}" id="moderated"  value="#{ForumTool.template.moderated}"
+					  <h:selectOneRadio layout="lineDirection" disabled="#{not ForumTool.editMode}" id="moderated"  value="#{ForumTool.template.moderated}"
 					  	onclick="javascript:disableOrEnableModeratePerm();">
     					<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
     					<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>

@@ -13,12 +13,18 @@ org.sakaiproject.tool.cover.SessionManager.getCurrentToolSession().
    <jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messagecenter.bundle.Messages"/>
 </jsp:useBean>
 
+
+
 <f:view>
   <sakai:view title="#{msgs.cdfm_discussion_forums}">
   		<script type="text/javascript" src="/library/js/jquery.js"></script>
   		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
-	<h:form id="msgForum">
+
+		<h:form id="msgForum">
+		<style type="text/css">
+			@import url("/sakai-messageforums-tool/css/msgcntr.css");
+		</style>	
 
   <sakai:tool_bar separator="#{msgs.cdfm_toolbar_separator}" rendered="#{ForumTool.newForum || ForumTool.instructor || ForumTool.displayPendingMsgQueue}">
     <sakai:tool_bar_item value="#{msgs.cdfm_new_forum}" action="#{ForumTool.processActionNewForum}" rendered="#{ForumTool.newForum}"/>
@@ -28,8 +34,8 @@ org.sakaiproject.tool.cover.SessionManager.getCurrentToolSession().
 	  <sakai:tool_bar_item value="#{msgs.cdfm_msg_pending_queue} #{msgs.cdfm_openb}#{ForumTool.numPendingMessages}#{msgs.cdfm_closeb}" action="#{ForumTool.processPendingMsgQueue}" rendered="#{ForumTool.displayPendingMsgQueue}" />
   </sakai:tool_bar>
 
- 	
- 	<div><h3><h:outputText value="#{msgs.cdfm_discussion_forums}" /></h3></div>
+
+ 	<h3 style="margin-bottom:1em"><h:outputText value="#{msgs.cdfm_discussion_forums}" /></h3>
  	
 	<%@include file="/jsp/discussionForum/includes/dfAreaInclude.jsp"%>
 	
