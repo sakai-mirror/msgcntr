@@ -24,8 +24,10 @@
 				</h:commandLink>
 
 				<%--//designNote: delete this forum link, a string now, with a fake rendered attribute - needs a real one --%>
+				<%--
 				<h:outputText  value=" | "   rendered="#{forum.changeSettings}"/>
 				<h:outputText  value=" Delete "  rendered="#{forum.changeSettings}" styleClass="todo"/>
+				--%>
 				<%-- the forum details --%>
 				<h:outputText value="#{forum.forum.shortDescription}" styleClass="shortDescription"/>
 				<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}"  styleClass="show"
@@ -96,9 +98,10 @@
 									<f:param value="#{forum.forum.id}" name="forumId"/>
 							</h:commandLink>
 							<%-- delete this topic  link, a string now - needs a real rendered attribute --%>
+							<%--
 							<h:outputText  value=" | " rendered="#{topic.changeSettings}"/>
 							<h:outputText  value=" Delete " rendered="#{topic.changeSettings}" styleClass="todo"/>
-
+							--%>
 							<%--the topic details --%>
 							<h:outputText id="topic_desc" value="#{topic.topic.shortDescription}" styleClass="shortDescription" />
 							<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show"

@@ -83,11 +83,12 @@
 					<h:graphicImage url="/images/silk/lock.png" alt="#{msgs.cdfm_forum_locked}" rendered="#{ForumTool.selectedForum.forum.locked == 'true' || ForumTool.selectedTopic.topic.locked == 'true'}" style="margin-right:.5em"/>
 					<h:outputText value="#{ForumTool.selectedTopic.topic.title}" styleClass="title"/>
 					  <%--//designNote: for paralellism to other views, need to add read/unread count here as well as Moderated attribute--%>  
-					  <h:outputText value=" #{msgs.cdfm_openb}" styleClass="textPanelFooter"/> 
+					  <%-- 
+					  <h:outputText value=" #{msgs.cdfm_openb}" styleClass="textPanelFooter"/>
 					  <h:outputText value="123 messages - 5 unread" styleClass="textPanelFooter todo" />
 					  <h:outputText id="topic_moderated" value="  #{msgs.cdfm_topic_moderated_flag}"  styleClass="textPanelFooter" rendered="#{ForumTool.selectedTopic.topic.moderated == 'true'}" />
-
 					  <h:outputText value="#{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
+					  --%>
 					  <h:outputText value=" "  styleClass="actionLinks"/>
 					  <%--//designNote: for paralellism to other views, need to move the "Post new thread" link below, but it is a sakai:toolbar item above...same for Topic Settings --%>
 					  <sakai:tool_bar_item value="#{msgs.cdfm_container_title_thread}" action="#{ForumTool.processAddMessage}" id="df_compose_message_dfAllMessages"
