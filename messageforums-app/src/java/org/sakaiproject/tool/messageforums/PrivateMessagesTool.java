@@ -65,6 +65,7 @@ import org.sakaiproject.content.api.FilePickerHelper;
 import org.sakaiproject.content.cover.ContentHostingService;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.i18n.InternationalizedMessages;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.ToolConfiguration;
 import org.sakaiproject.site.cover.SiteService;
@@ -92,7 +93,7 @@ public class PrivateMessagesTool
 
   private static final String MESSAGECENTER_BUNDLE = "org.sakaiproject.api.app.messagecenter.bundle.Messages";
  
-  private static final ResourceBundle rb = ResourceBundle.getBundle(MESSAGECENTER_BUNDLE);
+  private static final ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);
   
   /**
    * List individual private messages details
@@ -122,6 +123,8 @@ public class PrivateMessagesTool
   private static final String MESSAGECENTER_HELPER_TOOL_ID = "sakai.messageforums.helper";
   private static final String MESSAGES_TOOL_ID = "sakai.messages";
   private static final String FORUMS_TOOL_ID = "sakai.forums";
+  private static final String MULTIPLE_WINDOWS = "pvt_multiple_windows";
+
   
   /**
    *Dependency Injected 
@@ -245,6 +248,8 @@ public class PrivateMessagesTool
   
   /** sort member */
   private String sortType = SORT_DATE_DESC;
+  
+  private int setDetailMsgCount = 0;
   
   public PrivateMessagesTool()
   {    
@@ -1357,12 +1362,14 @@ public class PrivateMessagesTool
       PrivateMessageDecoratedBean dMsg= (PrivateMessageDecoratedBean) iter.next();
       if (dMsg.getMsg().getId().equals(new Long(msgId)))
       {
-        this.setDetailMsg(dMsg);  
+        this.setDetailMsg(dMsg); 
+        setDetailMsgCount++;
        
         prtMsgManager.markMessageAsReadForUser(dMsg.getMsg());
                
         PrivateMessage initPrivateMessage = prtMsgManager.initMessageWithAttachmentsAndRecipients(dMsg.getMsg());
         this.setDetailMsg(new PrivateMessageDecoratedBean(initPrivateMessage));
+        setDetailMsgCount++;
         
         List recLs= initPrivateMessage.getRecipients();
         for (Iterator iterator = recLs.iterator(); iterator.hasNext();)
@@ -1419,6 +1426,7 @@ public class PrivateMessagesTool
 //    }
 //    this.setSelectedComposeToList(d);
     //set Dafult Subject
+    setDetailMsgCount = 0;
     if(getDetailMsg() != null)
     {
     	if(getDetailMsg().getMsg().getTitle() != null && !getDetailMsg().getMsg().getTitle().startsWith(getResourceBundleString(REPLY_SUBJECT_PREFIX)))
@@ -1429,6 +1437,7 @@ public class PrivateMessagesTool
     
     //from message detail screen
     this.setDetailMsg(getDetailMsg()) ;
+    setDetailMsgCount++;
 //    
 //    //from compose screen
 //    this.setComposeSendAs(getComposeSendAs()) ;
@@ -1483,7 +1492,6 @@ public class PrivateMessagesTool
    * @return - pvtMsgCompose
    */ 
   public String processPvtMsgCompose() {
-    this.setDetailMsg(new PrivateMessageDecoratedBean(messageManager.createPrivateMessage()));
     setFromMainOrHp();
     LOG.debug("processPvtMsgCompose()");
     return PVTMSG_COMPOSE;
@@ -1629,16 +1637,8 @@ public class PrivateMessagesTool
   // created separate method as to be used with processPvtMsgSend() and processPvtMsgSaveDraft()
   public PrivateMessage constructMessage()
   {
-    PrivateMessage aMsg;
-    // in case of compose this is a new message 
-    if (this.getDetailMsg() == null )
-    {
-      aMsg = messageManager.createPrivateMessage() ;
-    }
-    //if reply to a message then message is existing
-    else {
-      aMsg = (PrivateMessage)this.getDetailMsg().getMsg();       
-    }
+   PrivateMessage aMsg = messageManager.createPrivateMessage();
+   
     if (aMsg != null)
     {
       aMsg.setTitle(getComposeSubject());
@@ -1775,6 +1775,7 @@ public class PrivateMessagesTool
       
       PrivateMessage initPrivateMessage = prtMsgManager.initMessageWithAttachmentsAndRecipients(detailMsg.getMsg());
       this.setDetailMsg(new PrivateMessageDecoratedBean(initPrivateMessage));
+      setDetailMsgCount++;
       
       List recLs= initPrivateMessage.getRecipients();
       for (Iterator iterator = recLs.iterator(); iterator.hasNext();)
@@ -1826,6 +1827,7 @@ public class PrivateMessagesTool
       
       PrivateMessage initPrivateMessage = prtMsgManager.initMessageWithAttachmentsAndRecipients(thisDmb.getMsg());
       this.setDetailMsg(new PrivateMessageDecoratedBean(initPrivateMessage));
+      setDetailMsgCount++;
       
       List recLs= initPrivateMessage.getRecipients();
       for (Iterator iterator = recLs.iterator(); iterator.hasNext();)
@@ -2034,108 +2036,114 @@ public class PrivateMessagesTool
   public String processPvtMsgReplySend() {
     LOG.debug("processPvtMsgReplySend()");
     
+    if (setDetailMsgCount != 1) {
+    	setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS , new Object[] {ServerConfigurationService.getString("ui.service")}));
+    	return null;
+  	 } else {
+  	 
     PrivateMessage currentMessage = getDetailMsg().getMsg() ;
-        
-    //by default add user who sent original message    
-    for (Iterator i = totalComposeToList.iterator(); i.hasNext();) {      
-      MembershipItem membershipItem = (MembershipItem) i.next();                
-      
-      if (MembershipItem.TYPE_USER.equals(membershipItem.getType())) {
-        if (membershipItem.getUser() != null) {
-          if (membershipItem.getUser().getId().equals(currentMessage.getCreatedBy())) {
-            selectedComposeToList.add(membershipItem.getId());
-          }
-        }
-      }
-    }
-    
-    if(!hasValue(getReplyToSubject()))
-    {
-      setErrorMessage(getResourceBundleString(MISSING_SUBJECT));
-      return null ;
-    }
 
-    if(selectedComposeToList.size()<1)
-    {
-      setErrorMessage(getResourceBundleString(SELECT_RECIPIENT_LIST_FOR_REPLY));
-      return null ;
-    }
-        
-    PrivateMessage rrepMsg = messageManager.createPrivateMessage() ;
-       
-    rrepMsg.setTitle(getReplyToSubject()) ; //rrepMsg.setTitle(rMsg.getTitle()) ;
-    rrepMsg.setDraft(Boolean.FALSE);
-    rrepMsg.setDeleted(Boolean.FALSE);
-    
-    rrepMsg.setAuthor(getAuthorString());
-    rrepMsg.setApproved(Boolean.FALSE);
-    rrepMsg.setBody(getReplyToBody()) ;
-    
-    rrepMsg.setLabel(getSelectedLabel());
-    
-    rrepMsg.setInReplyTo(currentMessage) ;
-    
-    //Add the recipientList as String for display in Sent folder
-    // Since some users may be hidden, if some of these are recipients
-    // filter them out (already checked if no recipients)
-    // if only 1 recipient no need to check visibility
-    String sendToString="";
-    String sendToHiddenString="";
-    
-    if (selectedComposeToList.size() == 1) {
-        MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
-        if(membershipItem != null)
-        {
-      		  sendToString +=membershipItem.getName()+"; " ;
-        }          
-    }
-    else {
-    	for (int i = 0; i < selectedComposeToList.size(); i++)
+    	//by default add user who sent original message    
+    	for (Iterator i = totalComposeToList.iterator(); i.hasNext();) {      
+    		MembershipItem membershipItem = (MembershipItem) i.next();                
+
+    		if (MembershipItem.TYPE_USER.equals(membershipItem.getType())) {
+    			if (membershipItem.getUser() != null) {
+    				if (membershipItem.getUser().getId().equals(currentMessage.getCreatedBy())) {
+    					selectedComposeToList.add(membershipItem.getId());
+    				}
+    			}
+    		}
+    	}
+
+    	if(!hasValue(getReplyToSubject()))
     	{
-    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
+    		setErrorMessage(getResourceBundleString(MISSING_SUBJECT));
+    		return null ;
+    	}
+
+    	if(selectedComposeToList.size()<1)
+    	{
+			setErrorMessage(getResourceBundleString(SELECT_RECIPIENT_LIST_FOR_REPLY));
+    		return null ;
+    	}
+
+    	PrivateMessage rrepMsg = messageManager.createPrivateMessage() ;
+
+    	rrepMsg.setTitle(getReplyToSubject()) ; //rrepMsg.setTitle(rMsg.getTitle()) ;
+    	rrepMsg.setDraft(Boolean.FALSE);
+    	rrepMsg.setDeleted(Boolean.FALSE);
+
+    	rrepMsg.setAuthor(getAuthorString());
+    	rrepMsg.setApproved(Boolean.FALSE);
+    	rrepMsg.setBody(getReplyToBody()) ;
+
+    	rrepMsg.setLabel(getSelectedLabel());
+
+    	rrepMsg.setInReplyTo(currentMessage) ;
+
+    	//Add the recipientList as String for display in Sent folder
+    	// Since some users may be hidden, if some of these are recipients
+    	// filter them out (already checked if no recipients)
+    	// if only 1 recipient no need to check visibility
+    	String sendToString="";
+    	String sendToHiddenString="";
+
+    	if (selectedComposeToList.size() == 1) {
+    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
     		if(membershipItem != null)
     		{
-    			if (membershipItem.isViewable()) {
-    				sendToString +=membershipItem.getName()+"; " ;
-    			}
-   		       	else {
-   	        		sendToHiddenString += membershipItem.getName() + "; ";
-   	        	}
-   	        }          
+    			sendToString +=membershipItem.getName()+"; " ;
+    		}          
     	}
-    }
+    	else {
+    		for (int i = 0; i < selectedComposeToList.size(); i++)
+    		{
+    			MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
+    			if(membershipItem != null)
+    			{
+    				if (membershipItem.isViewable()) {
+    					sendToString +=membershipItem.getName()+"; " ;
+    				}
+    				else {
+    					sendToHiddenString += membershipItem.getName() + "; ";
+    				}
+    			}          
+    		}         
+    	}
 
-    if (! "".equals(sendToString)) {
-  	  sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
-    }
+   		if (! "".equals(sendToString)) {
+  	  		sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
+   		}
 
-    if ("".equals(sendToHiddenString)) {
-        rrepMsg.setRecipientsAsText(sendToString);
-    }
-    else {
-    	sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
-    	rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
-    }    
-    
-    //Add attachments
-    for(int i=0; i<allAttachments.size(); i++)
-    {
-      prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
-    }            
-    
-    if((SET_AS_YES).equals(getComposeSendAsPvtMsg()))
-    {
-      prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), false);
-    }
-    else{
-      prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), true);
-    }
-    
-    //reset contents
-    resetComposeContents();
-    
-    return DISPLAY_MESSAGES_PG;
+   		if ("".equals(sendToHiddenString)) {
+    		rrepMsg.setRecipientsAsText(sendToString);
+    	}
+    	else {
+    		sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
+    		rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
+    	}    
 
+	   	//Add attachments
+    	for(int i=0; i<allAttachments.size(); i++)
+    	{
+    		prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
+    	}            
+
+    	if((SET_AS_YES).equals(getComposeSendAsPvtMsg()))
+    	{
+    		prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), false);
+    	}
+    	else{
+    		prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), true);
+    	}
+
+    	//reset contents
+    	resetComposeContents();
+
+    	return DISPLAY_MESSAGES_PG;
+    }
+    
   }
  
   /**
@@ -3577,6 +3585,10 @@ public class PrivateMessagesTool
     public static String getResourceBundleString(String key) 
     {
         return rb.getString(key);
+    }
+    
+    public static String getResourceBundleString(String key, Object[] args) {
+    	return rb.getFormattedMessage(key, args);
     }
 
 
