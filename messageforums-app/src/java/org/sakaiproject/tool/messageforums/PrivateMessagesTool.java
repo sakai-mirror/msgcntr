@@ -161,6 +161,10 @@ public class PrivateMessagesTool
   public static final String MESSAGE_REPLY_PG="pvtMsgReply";
   //SAKAI-1050
   public static final String MESSAGE_FORWARD_PG="pvtMsgForward";
+  
+  //sakai-huxt pvtMsgReplyAll
+  public static final String MESSAGE_ReplyAll_PG="pvtMsgReplyAll";
+  
   public static final String DELETE_MESSAGE_PG="pvtMsgDelete";
   public static final String REVISE_FOLDER_PG="pvtMsgFolderRevise";
   public static final String MOVE_MESSAGE_PG="pvtMsgMove";
