@@ -3453,8 +3453,9 @@ public class DiscussionForumTool
     
     revisedInfo = revisedInfo.concat(currentBody);
 
-    dMsg.setTitle(getComposeTitle());
-    dMsg.setBody(revisedInfo);
+    StringBuilder alertMsg = new StringBuilder();
+    dMsg.setTitle(FormattedText.processFormattedText(getComposeTitle(), alertMsg));
+    dMsg.setBody(FormattedText.processFormattedText(revisedInfo, alertMsg));
     dMsg.setDraft(Boolean.FALSE);
     dMsg.setModified(new Date());
     
