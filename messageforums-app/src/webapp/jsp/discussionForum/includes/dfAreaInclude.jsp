@@ -14,13 +14,22 @@
 				</h:commandLink>
 				<h:outputText value="#{forum.forum.title}" rendered="#{!ForumTool.showForumLinksInNav}"  styleClass="title" />
 				<%-- links to act on this forum --%>
+				
+				<h:outputText id="forum_moderated" value=" #{msgs.cdfm_forum_moderated_flag}" styleClass="textPanelFooter" rendered="#{forum.moderated == 'true'}" />
 				<h:outputText value=" "  styleClass="actionLinks"/>
 				<h:commandLink action="#{ForumTool.processActionNewTopic}" value="#{msgs.cdfm_new_topic}" rendered="#{forum.newTopic}" title="#{msgs.cdfm_new_topic}">
 					<f:param value="#{forum.forum.id}" name="forumId"/>
 				</h:commandLink>
 				<h:outputText  value=" | " rendered="#{forum.changeSettings}"/><%-- gsilver: hiding the pipe when user does not have the ability to change the settings --%>
 				<h:commandLink action="#{ForumTool.processActionForumSettings}"  value="#{msgs.cdfm_forum_settings}" rendered="#{forum.changeSettings}" title="#{msgs.cdfm_forum_settings}">
-					<f:param value="#{forum.forum.id}" name="forumId"/>				
+					<f:param value="#{forum.forum.id}" name="forumId"/>			
+				</h:commandLink>
+				
+				<h:outputText  value=" | " rendered="#{forum.changeSettings}"/>
+				
+				<h:commandLink id="delete" action="#{ForumTool.processActionDeleteForumMainConfirm}" value="#{msgs.cdfm_button_bar_delete}" rendered="#{forum.changeSettings}"
+						accesskey="d">
+					<f:param value="#{forum.forum.id}" name="forumId"/>
 				</h:commandLink>
 
 				<%--//designNote: delete this forum link, a string now, with a fake rendered attribute - needs a real one --%>
@@ -31,7 +40,8 @@
 				<%-- the forum details --%>
 				<h:outputText value="#{forum.forum.shortDescription}" styleClass="shortDescription"/>
 				<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}"  styleClass="show"
-						rendered="#{forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null}"
+						rendered="#{forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null && forum.forum.extendedDescription != '<br/>'}"
+						
 						onclick="resize();$(this).next('.hide').toggle(); $('div.toggle:first', $(this).parents('table.forumHeader')).slideToggle(resize);$(this).toggle();">
 					<h:graphicImage url="/images/collapse.gif" /><h:outputText value="#{msgs.cdfm_read_full_description}" />
 					<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}"  rendered="#{!empty forum.attachList}"/>
@@ -97,6 +107,16 @@
 									<f:param value="#{topic.topic.id}" name="topicId"/>
 									<f:param value="#{forum.forum.id}" name="forumId"/>
 							</h:commandLink>
+							
+							<h:outputText  value=" | " rendered="#{topic.changeSettings}"/>
+							
+							<h:commandLink action="#{ForumTool.processActionDeleteTopicMainConfirm}" id="delete_confirm" value="#{msgs.cdfm_button_bar_delete}" accesskey="d" rendered="#{topic.changeSettings}"
+							title=" #{msgs.cdfm_topic_settings}">
+									<f:param value="#{topic.topic.id}" name="topicId"/>
+									<f:param value="#{forum.forum.id}" name="forumId"/>
+							</h:commandLink>
+							
+							
 							<%-- delete this topic  link, a string now - needs a real rendered attribute --%>
 							<%--
 							<h:outputText  value=" | " rendered="#{topic.changeSettings}"/>
@@ -105,13 +125,13 @@
 							<%--the topic details --%>
 							<h:outputText id="topic_desc" value="#{topic.topic.shortDescription}" styleClass="shortDescription" />
 							<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show"
-									rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null}"
+									rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"
 									onclick="resize();$(this).next('.hide').toggle(); $('td div.toggle', $(this).parents('tr:first').next('tr')).slideToggle(resize);$(this).toggle();">
 									<h:graphicImage url="/images/collapse.gif"/><h:outputText value="#{msgs.cdfm_read_full_description}" />
 									<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}" rendered="#{!empty topic.attachList}"/>
 							</h:outputLink>  
 							<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide_full_description}" style="display:none " styleClass="hide" 
-									rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null}"
+									rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"
 									onclick="resize();$(this).prev('.show').toggle(); $('td div.toggle', $(this).parents('tr:first').next('tr')).slideToggle(resize);$(this).toggle();">
 									<h:graphicImage url="/images/expand.gif"/><h:outputText value="#{msgs.cdfm_hide_full_description}" />
 									<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}"  rendered="#{!empty topic.attachList}"/>

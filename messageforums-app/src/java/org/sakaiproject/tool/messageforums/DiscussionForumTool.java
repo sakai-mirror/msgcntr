@@ -756,7 +756,27 @@ public class DiscussionForumTool
     }
     return FORUM_DETAILS;
   }
+  
+  
+  /**
+   * Action for the delete option present the main forums page
+   * @return
+   */
+  
+  public String processActionDeleteForumMainConfirm()
+  {
 
+	  LOG.debug("processForumMainConfirm()");
+
+	  String forumId = getExternalParameterByKey(FORUM_ID);
+	  DiscussionForum forum = forumManager.getForumById(new Long(forumId));
+	  selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
+
+	  selectedForum.setMarkForDeletion(true);
+	  return FORUM_SETTING;
+  }
+
+  
   /**
    * Forward to delete forum confirmation screen
    * 
@@ -1060,6 +1080,11 @@ public class DiscussionForumTool
     forum.setTitle(FormattedText.processFormattedText(forum.getTitle(), alertMsg));
     forum.setShortDescription(FormattedText.processFormattedText(forum.getShortDescription(), alertMsg));
     
+    if (forum.getExtendedDescription().equals("<br/>"))
+	{
+		forum.setExtendedDescription("");
+	}
+    
     saveForumSelectedAssignment(forum);
     saveForumAttach(forum);  
     setObjectPermissions(forum);
@@ -1337,6 +1362,11 @@ public class DiscussionForumTool
     	topic.setTitle(FormattedText.processFormattedText(topic.getTitle(), alertMsg));
     	topic.setShortDescription(FormattedText.processFormattedText(topic.getShortDescription(), alertMsg));
     	topic.setExtendedDescription(FormattedText.processFormattedText(topic.getExtendedDescription(), alertMsg));
+
+    	if (topic.getExtendedDescription().equals("<br/>"))
+    	{
+    		topic.setExtendedDescription("");
+    	}
     	
         topic.setBaseForum(selectedForum.getForum());
         saveTopicSelectedAssignment(topic);
@@ -1358,7 +1388,40 @@ public class DiscussionForumTool
     }
     return gotoMain();
   }
+  
+   
+  /**
+   * @return
+   */
+  public String processActionDeleteTopicMainConfirm()
+  {
+	  {
+		  LOG.debug("processActionTopicSettings()");
 
+		  DiscussionTopic topic = null;
+		  if(getExternalParameterByKey(TOPIC_ID) != "" && getExternalParameterByKey(TOPIC_ID) != null){
+			  topic = (DiscussionTopic) forumManager.getTopicByIdWithAttachments(new Long(getExternalParameterByKey(TOPIC_ID)));
+		  } else if(selectedTopic != null) {
+			  topic = selectedTopic.getTopic();
+		  }
+		  if (topic == null)
+		  {
+			  return gotoMain();
+		  }
+		  setSelectedForumForCurrentTopic(topic);
+		  if(!uiPermissionsManager.isChangeSettings(topic,selectedForum.getForum()))
+		  {
+			  setErrorMessage(getResourceBundleString(INSUFFICIENT_PRIVILEGES_NEW_TOPIC));
+			  return gotoMain();
+		  }
+		  selectedTopic = new DiscussionTopicBean(topic, selectedForum.getForum(),uiPermissionsManager, forumManager);
+		
+		  selectedTopic.setMarkForDeletion(true);
+		    return TOPIC_SETTING;
+	  }
+  }
+
+  
   /**
    * @return
    */
@@ -1379,6 +1442,7 @@ public class DiscussionForumTool
     selectedTopic.setMarkForDeletion(true);
     return TOPIC_SETTING;
   }
+
 
   /**
    * @return
