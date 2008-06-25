@@ -33,7 +33,11 @@
 				<h:outputText id="draft_space" value=" -  " rendered="#{ForumTool.selectedForum.forum.draft == 'true'}" styleClass="title"/>
 				<h:graphicImage url="/images/silk/lock.png" alt="#{msgs.cdfm_forum_locked}" rendered="#{ForumTool.selectedForum.forum.locked == 'true'}" style="margin-right:.5em"/>	
 				<h:outputText value="#{ForumTool.selectedForum.forum.title}" styleClass="title"/>
+				
+				
+				<h:outputText id="forum_moderated" value=" #{msgs.cdfm_forum_moderated_flag}" styleClass="textPanelFooter" rendered="#{ForumTool.selectedForum.forum.moderated == 'true'}" />
 				<h:outputText value=" "  styleClass="actionLinks"/>
+				
 				<h:commandLink action="#{ForumTool.processActionNewTopic}"  value="#{msgs.cdfm_new_topic}" rendered="#{ForumTool.selectedForum.newTopic}" 
 					title=" #{msgs.cdfm_new_topic}">
 					<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
@@ -47,6 +51,13 @@
 				<h:outputText  value=" | "   rendered="#{ForumTool.selectedForum.changeSettings}"/>
 				<h:outputText  value=" Delete "  styleClass="todo"  rendered="#{ForumTool.selectedForum.changeSettings}"/>
 				--%>
+				<h:outputText  value=" | " rendered="#{ForumTool.selectedForum.changeSettings}"/>
+				<h:commandLink id="delete" action="#{ForumTool.processActionDeleteForumConfirm}" value="#{msgs.cdfm_button_bar_delete}" rendered="#{ForumTool.selectedForum.changeSettings}"
+						accesskey="d">
+					<f:param value="#{forum.forum.id}" name="forumId"/>
+				</h:commandLink>
+				
+				
 				<h:outputText value="#{ForumTool.selectedForum.forum.shortDescription}" styleClass="shortDescription"/>
 
 				<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show" 
@@ -104,10 +115,19 @@
 								<f:param value="#{topic.topic.id}" name="topicId"/>
 								<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
 						</h:commandLink>
-						<%--
-						<h:outputText  value=" | "   rendered="#{topic.changeSettings}" />
-						<h:outputText  value=" Delete "  styleClass="todo" rendered="#{topic.changeSettings}" />						
-						--%>
+						
+												
+						<h:outputText  value=" | " rendered="#{topic.changeSettings}"/>
+						<h:commandLink action="#{ForumTool.processActionDeleteTopicMainConfirm}" id="delete_confirm" value="#{msgs.cdfm_button_bar_delete}" 
+							accesskey="d" rendered="#{topic.changeSettings}">							
+									<f:param value="#{topic.topic.id}" name="topicId"/>
+									<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
+							</h:commandLink>
+						
+						
+						
+						
+						
 						<h:outputText id="topic_desc" value="#{topic.topic.shortDescription}" styleClass="shortDescription" />
 						<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show" 
 			    				rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null}"

@@ -14,9 +14,10 @@
 				</h:commandLink>
 				<h:outputText value="#{forum.forum.title}" rendered="#{!ForumTool.showForumLinksInNav}"  styleClass="title" />
 				<%-- links to act on this forum --%>
-				
+			
 				<h:outputText id="forum_moderated" value=" #{msgs.cdfm_forum_moderated_flag}" styleClass="textPanelFooter" rendered="#{forum.moderated == 'true'}" />
-				<h:outputText value=" "  styleClass="actionLinks"/>
+				<h:outputText value="  "  styleClass="actionLinks"/>
+				
 				<h:commandLink action="#{ForumTool.processActionNewTopic}" value="#{msgs.cdfm_new_topic}" rendered="#{forum.newTopic}" title="#{msgs.cdfm_new_topic}">
 					<f:param value="#{forum.forum.id}" name="forumId"/>
 				</h:commandLink>
@@ -109,19 +110,12 @@
 							</h:commandLink>
 							
 							<h:outputText  value=" | " rendered="#{topic.changeSettings}"/>
-							
-							<h:commandLink action="#{ForumTool.processActionDeleteTopicMainConfirm}" id="delete_confirm" value="#{msgs.cdfm_button_bar_delete}" accesskey="d" rendered="#{topic.changeSettings}"
-							title=" #{msgs.cdfm_topic_settings}">
+							<h:commandLink action="#{ForumTool.processActionDeleteTopicMainConfirm}" id="delete_confirm" value="#{msgs.cdfm_button_bar_delete}" accesskey="d" rendered="#{topic.changeSettings}">
 									<f:param value="#{topic.topic.id}" name="topicId"/>
 									<f:param value="#{forum.forum.id}" name="forumId"/>
 							</h:commandLink>
 							
-							
-							<%-- delete this topic  link, a string now - needs a real rendered attribute --%>
-							<%--
-							<h:outputText  value=" | " rendered="#{topic.changeSettings}"/>
-							<h:outputText  value=" Delete " rendered="#{topic.changeSettings}" styleClass="todo"/>
-							--%>
+						
 							<%--the topic details --%>
 							<h:outputText id="topic_desc" value="#{topic.topic.shortDescription}" styleClass="shortDescription" />
 							<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show"
