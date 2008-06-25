@@ -60,16 +60,20 @@
 				
 				<h:outputText value="#{ForumTool.selectedForum.forum.shortDescription}" styleClass="shortDescription"/>
 
-				<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show" 
-						rendered="#{ForumTool.selectedForum.forum.extendedDescription != '' && ForumTool.selectedForum.forum.extendedDescription != null}"
-						onclick="resize();$(this).next('.hide').toggle(); $('div.toggle', $(this).parents('table.forumHeader')).slideToggle(resize);$(this).toggle();">
-					<h:graphicImage url="/images/collapse.gif" /><h:outputText value="#{msgs.cdfm_read_full_description}" />
+				<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_view}"  styleClass="show"
+						rendered="#{ForumTool.selectedForum.forum.extendedDescription != '' && ForumTool.selectedForum.forum.extendedDescription != null && ForumTool.selectedForum.forum.extendedDescription != '<br/>'}"
+						onclick="resize();$(this).next('.hide').toggle(); $('div.toggle:first', $(this).parents('table.forumHeader')).slideToggle(resize);$(this).toggle();">
+					<h:graphicImage url="/images/collapse.gif" /><h:outputText value="#{msgs.cdfm_view}" />
+					<h:outputText value=" #{msgs.cdfm_full_description}"  rendered="#{ForumTool.selectedForum.forum.extendedDescription != '' && ForumTool.selectedForum.forum.extendedDescription != null && ForumTool.selectedForum.forum.extendedDescription != '<br/>'}"/>
 				</h:outputLink>
-				<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide_full_description}" style="display:none" styleClass="hide" 
-						rendered="#{ForumTool.selectedForum.forum.extendedDescription != '' && ForumTool.selectedForum.forum.extendedDescription != null}"
-						onclick="resize();$(this).prev('.show').toggle(); $('div.toggle', $(this).parents('table.forumHeader')).slideToggle(resize);$(this).toggle();">
-					<h:graphicImage url="/images/expand.gif" /><h:outputText value="#{msgs.cdfm_hide_full_description}" />
+								
+				<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide}" style="display:none;" styleClass="hide" 
+				rendered="#{ForumTool.selectedForum.forum.extendedDescription != '' && ForumTool.selectedForum.forum.extendedDescription != null && ForumTool.selectedForum.forum.extendedDescription != '<br/>'}"
+						onclick="resize();$(this).prev('.show').toggle(); $('div.toggle:first', $(this).parents('table.forumHeader')).slideToggle(resize);$(this).toggle();">
+					<h:graphicImage url="/images/expand.gif"/> <h:outputText value="#{msgs.cdfm_hide}" />
+					<h:outputText value=" #{msgs.cdfm_full_description}"  rendered="#{ForumTool.selectedForum.forum.extendedDescription != '' && ForumTool.selectedForum.forum.extendedDescription != null && ForumTool.selectedForum.forum.extendedDescription != '<br/>'}"/>
 				</h:outputLink>
+				
 			 	<f:verbatim><div class="toggle" style="display:none"></f:verbatim>
 					<mf:htmlShowArea value="#{ForumTool.selectedForum.forum.extendedDescription}"  
 						hideBorder="true" />
@@ -123,24 +127,29 @@
 									<f:param value="#{topic.topic.id}" name="topicId"/>
 									<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
 							</h:commandLink>
-						
-						
-						
-						
+									
 						
 						<h:outputText id="topic_desc" value="#{topic.topic.shortDescription}" styleClass="shortDescription" />
-						<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show" 
-			    				rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null}"
-								onclick="resize();$(this).next('.hide').toggle(); $('div.toggle', $(this).parents('table.topicBloc')).slideToggle(resize);$(this).toggle();">
-							<h:graphicImage url="/images/collapse.gif" /><h:outputText value="#{msgs.cdfm_read_full_description}" />
-							<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}"  rendered="#{!empty topic.attachList}"/>
+												
+						<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_view}" styleClass="show"
+								rendered="#{!empty topic.attachList || topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"
+								onclick="resize();$(this).next('.hide').toggle(); $('td div.toggle', $(this).parents('tr:first').next('tr')).slideToggle(resize);$(this).toggle();">
+								<h:graphicImage url="/images/collapse.gif"/><h:outputText value="#{msgs.cdfm_view}" />
+								<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty topic.attachList && topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_attach}" rendered="#{!empty topic.attachList}"/>
 						</h:outputLink>  
-						<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide_full_description}" style="display:none" styleClass="hide" 
-				    			rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null}"
-								onclick="resize();$(this).prev('.show').toggle(); $('div.toggle', $(this).parents('table.topicBloc')).slideToggle(resize);$(this).toggle();">
-							<h:graphicImage url="/images/expand.gif"/><h:outputText value="#{msgs.cdfm_hide_full_description}" />
-							<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}"  rendered="#{!empty topic.attachList}"/>
-						</h:outputLink>
+							
+						<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide}" style="display:none " styleClass="hide" 
+								rendered="#{!empty topic.attachList || topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"
+								onclick="resize();$(this).prev('.show').toggle(); $('td div.toggle', $(this).parents('tr:first').next('tr')).slideToggle(resize);$(this).toggle();">
+								<h:graphicImage url="/images/expand.gif"/><h:outputText value="#{msgs.cdfm_hide}" />
+								<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty topic.attachList && topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_attach}" rendered="#{!empty topic.attachList}"/>
+						</h:outputLink> 
+						
+						
 					</h:panelGroup>	
 					<h:panelGroup>
 						<f:verbatim><div class="toggle" style="display:none"></f:verbatim>
