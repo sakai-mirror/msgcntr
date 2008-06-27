@@ -3475,6 +3475,13 @@ public class DiscussionForumTool
   public String processDfMsgRevisedCancel()
   {
 	  getThreadFromMessage();
+	  
+	  this.composeBody = null;
+	  this.composeLabel = null;
+	  this.composeTitle = null;
+
+	  this.attachments.clear();
+	  
 	  return MESSAGE_VIEW;
   }
   
