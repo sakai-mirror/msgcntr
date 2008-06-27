@@ -107,7 +107,8 @@
 					<sakai:tool_bar_item action="#{ForumTool.processActionTopicSettings}" id="topic_setting" value="#{msgs.cdfm_topic_settings}" 
 					rendered="#{ForumTool.selectedTopic.changeSettings}" /> 
 					
-					<h:outputText  value=" | " rendered="#{ForumTool.selectedTopic.changeSettings && !ForumTool.selectedForum.forum.locked == 'true' && !ForumTool.selectedTopic.topic.locked == 'true'}" />
+					<h:outputText  value=" | " rendered="#{!ForumTool.selectedTopic.markForDeletion && ForumTool.displayTopicDeleteOption}" />
+
 					<h:commandLink action="#{ForumTool.processActionDeleteTopicConfirm}" id="delete_confirm" 
 			value="#{msgs.cdfm_button_bar_delete}" accesskey="d" rendered="#{!ForumTool.selectedTopic.markForDeletion && ForumTool.displayTopicDeleteOption}">
 			<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId"/>
@@ -155,7 +156,7 @@
 			</h:panelGrid>	
 			<%--<%@include file="dfViewSearchBar.jsp"%> --%>
 			<%--//designNote: need a rendered attribute here that will toggle the display of the table (if messages) or a textblock (class="instruction") if there are no messages--%> 				
-			<h:outputText value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.selectedTopic.messages}"  styleClass="messageInformation" style=""/>
+			<h:outputText value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.selectedTopic.messages}"  styleClass="instruction" style="display:block"/>
 			<mf:hierDataTable styleClass=" listHier  specialLink allMessages" id="messagesInHierDataTable" rendered="#{!empty ForumTool.selectedTopic.messages}"  value="#{ForumTool.messages}" var="message" expanded="#{ForumTool.expanded}"
 					columnClasses="attach,messageTitle,bogus,bogus" cellspacing="0" cellpadding="0" style="border:none">
 				<h:column id="_toggle">

@@ -77,7 +77,7 @@
 			</h:panelGrid>
 	
 		<%--rjlowe: Expanded View to show the message bodies, threaded --%>
-		<h:outputText   value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.messages}"   styleClass="messageInformation" />
+		<h:outputText   value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.messages}"   styleClass="instruction" style="display:block" />
 		<mf:hierDataTable id="expandedThreadedMessages" value="#{ForumTool.messages}" var="message" 
    	 		noarrows="true" styleClass="listHier messagesThreaded" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
 			<h:column id="_msg_subject">

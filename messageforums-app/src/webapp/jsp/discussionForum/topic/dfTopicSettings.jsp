@@ -49,10 +49,10 @@
 				<h:outputText id="topic_shortDescription"  value="#{ForumTool.selectedTopic.topic.shortDescription}"/>
 			</p>
 			<p><a id="show" class="show"  href="#">
-				<h:graphicImage url="/images/collapse.gif" /><h:outputText   value="#{msgs.cdfm_read_full_description}"/>
+				<h:graphicImage url="/images/collapse.gif" /><h:outputText   value="#{msgs.cdfm_full_description}"/>
 			</a></p>
 			<p><a id="hide" class="hide"  href="#">
-				<h:graphicImage url="/images/expand.gif" /><h:outputText   value="#{msgs.cdfm_hide_full_description}"/>
+				<h:graphicImage url="/images/expand.gif" /><h:outputText   value="#{msgs.cdfm_full_description}"/>
 			</a></p>
 
 			<div class="textPanel toggle"  id="toggle">

@@ -80,7 +80,7 @@
 
 				 <%@include file="dfViewSearchBarThread.jsp"%>
 				 
-		<h:outputText value="#{msgs.cdfm_no_unread_messages}" rendered="#{empty ForumTool.selectedThread}" />
+		<h:outputText value="#{msgs.cdfm_no_unread_messages}" rendered="#{empty ForumTool.selectedThread}" styleClass="instruction" style="display:block"/>
 		
 		<%--rjlowe: Expanded View to show the message bodies, but not threaded --%>
 		<h:dataTable id="expandedMessages" value="#{ForumTool.selectedThread}" var="message" rendered="#{!ForumTool.threaded}"
