@@ -96,6 +96,7 @@
 
 		<%--//designNote: need a rendered atttrib for the folowing predicated on the existence of topics in this forum--%>
 		 <h:outputText value="#{msgs.cdfm_no_topics}" rendered="#{empty ForumTool.selectedForum.topics}"    styleClass="messageInformation" />
+		
 		<h:dataTable id="topics"  rendered="#{!empty ForumTool.selectedForum.topics}" value="#{ForumTool.selectedForum.topics}" var="topic" width="100%"  cellspacing="0" cellpadding="0">
 			<h:column rendered="#{! topic.nonePermission}">
 				<h:panelGrid columns="1" summary="layout" width="100%"  styleClass="topicBloc specialLink"  cellspacing="0" cellpadding="0">

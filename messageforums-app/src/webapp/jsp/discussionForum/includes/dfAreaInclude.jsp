@@ -82,7 +82,7 @@
 		</h:panelGrid>
 		<%-- the topic list  --%>
 		<%--//designNote: need a rendered atttrib for the folowing predicated on the existence of topics in this forum--%>
-		<h:dataTable id="topics" value="#{forum.topics}" var="topic"  width="100%"   cellspacing="0" cellpadding="0" summary="layout">
+		<h:dataTable id="topics" rendered="#{!empty forum.topics}" value="#{forum.topics}" var="topic"  width="100%"   cellspacing="0" cellpadding="0" summary="layout">
 			<h:column rendered="#{! topic.nonePermission}">
 					<h:panelGrid columns="1" summary="layout" width="100%" styleClass="specialLink topicBloc" cellpadding="0" cellspacing="0">
 						<h:panelGroup>

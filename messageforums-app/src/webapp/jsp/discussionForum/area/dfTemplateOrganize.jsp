@@ -141,7 +141,7 @@
 					<h:outputText id="forumTitle" value="#{forum.forum.title}" style="font-weight:bold;font-size:1.3em;"/>
 					</h:panelGroup>
 						<%--//designNote: need a rendered atttrib for the folowing predicated on the existence of topics in this forum--%>
-					<h:dataTable id="topics" value="#{forum.forum.topics}" var="topic" width="100%" cellspacing="0" cellpadding="0" summary="layout">
+					<h:dataTable id="topics" rendered="#{!empty forum.forum.topics}" value="#{forum.forum.topics}" var="topic" width="100%" cellspacing="0" cellpadding="0" summary="layout">
 						<h:column>
 							<h:panelGroup style="display:block;width:90%;padding:.2em;margin:.2em 0 .2em .5em" styleClass="topicBloc">
 								<h:selectOneMenu id="topicIndex" value="#{topic.sortIndex}" onchange="updateTopics(#{ForumTool.forumTable.rowIndex}, this);" style="margin-left:.3em;margin-right:1em">

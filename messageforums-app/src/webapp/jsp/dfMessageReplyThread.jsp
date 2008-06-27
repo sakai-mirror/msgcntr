@@ -135,7 +135,7 @@
 		<%-- //designNote: moving rendered attr from column to table to avoid childless table if empty--%>
 		<h:dataTable styleClass="attachPanel" id="attmsg"  value="#{ForumTool.attachments}" var="eachAttach"   rendered="#{!empty ForumTool.attachments}"
 			columnClasses="attach,bogus,specialLink itemAction,bogus,bogus" style="width:auto">
-			<h:column rendered="#{!empty ForumTool.attachments}">
+			<h:column>
 					<h:graphicImage url="/images/excel.gif" rendered="#{eachAttach.attachment.attachmentType == 'application/vnd.ms-excel'}" alt="" />
 					<h:graphicImage url="/images/html.gif" rendered="#{eachAttach.attachment.attachmentType == 'text/html'}" alt="" />
 					<h:graphicImage url="/images/pdf.gif" rendered="#{eachAttach.attachment.attachmentType == 'application/pdf'}"/>
@@ -159,13 +159,13 @@
 					<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>
 				</h:commandLink>
 			</h:column>
-			<h:column rendered="#{!empty ForumTool.attachments}">
+			<h:column>
 				<f:facet name="header">
 					<h:outputText value="#{msgs.cdfm_attsize}" />
 				</f:facet>
 				<h:outputText value="#{eachAttach.attachment.attachmentSize}"/>
 			</h:column>
-			<h:column rendered="#{!empty ForumTool.attachments}">
+			<h:column>
 				<f:facet name="header">
 					<h:outputText value="#{msgs.cdfm_atttype}" />
 				</f:facet>
