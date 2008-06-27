@@ -7,12 +7,9 @@
 </jsp:useBean>
 
 <f:view>
-	<sakai:view title="#{msgs.cdfm_container_title}">
+	<sakai:view title="#{msgs.cdfm_container_title}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 		<!--jsp/dfCompose.jsp-->
 		<h:form id="dfCompose">
-			<style type="text/css">
-				@import url("/sakai-messageforums-tool/css/msgcntr.css");
-			</style>
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 			<h3><h:outputText value="#{msgs.cdfm_tool_bar_message}" /></h3>

@@ -6,11 +6,8 @@
 	<jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messagecenter.bundle.Messages"/>
 </jsp:useBean>
 <f:view>
-<sakai:view>
+<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 	<h:form id="msgForum" rendered="#{!ForumTool.selectedForum.forum.draft || ForumTool.selectedForum.forum.createdBy == ForumTool.userId}">
-		<style type="text/css">
-			@import url("/sakai-messageforums-tool/css/msgcntr.css");
-		</style>
 		<script type="text/javascript" src="/library/js/jquery.js"></script>
 		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>

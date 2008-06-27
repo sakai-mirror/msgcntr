@@ -7,12 +7,8 @@
 </jsp:useBean>
 
 <f:view>
-	<sakai:view>
+	<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 		<h:form id="msgForum">
-			<style type="text/css">
-			@import url("/sakai-messageforums-tool/css/msgcntr.css");
-			</style>
-			
 			<!--jsp/discussionForum/message/printFriendly.jsp-->
 			
 			<div class="navIntraTool">

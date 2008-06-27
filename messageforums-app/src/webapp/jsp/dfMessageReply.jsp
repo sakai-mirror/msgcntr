@@ -7,13 +7,9 @@
 </jsp:useBean>
 
 <f:view>
-	<sakai:view title="#{msgs.cdfm_reply_tool_bar_message}">
+	<sakai:view title="#{msgs.cdfm_reply_tool_bar_message}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 	<!--jsp/dfMessageReply.jsp-->    
 		<h:form id="dfCompose">
-			<style type="text/css">
-				@import url("/sakai-messageforums-tool/css/msgcntr.css");
-			</style>
-			
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 			<h:outputText styleClass="messageAlert" value="#{msgs.cdfm_reply_deleted}" rendered="#{ForumTool.errorSynch}" />

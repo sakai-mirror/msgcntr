@@ -121,11 +121,8 @@
          
 		 </script>
 	</f:verbatim>
-	<sakai:view title="#{msgs.cdfm_default_template_organize}">           
+	<sakai:view title="#{msgs.cdfm_default_template_organize}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">           
 		<h:form id="revise">
-		<style type="text/css">
-			@import url("/sakai-messageforums-tool/css/msgcntr.css");
-		</style>
 		
 			<!--jsp/discussionForum/area/dfTemplateOrganize.jsp-->
 			<sakai:tool_bar_message value="#{msgs.cdfm_default_template_organize}" />

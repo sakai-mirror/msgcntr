@@ -7,7 +7,7 @@
 </jsp:useBean>
 
 <f:view>
-	<sakai:view>
+	<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 		<script type="text/javascript">
 			// open print preview in another browser window so can size approx what actual
 			// print out will look like
@@ -16,9 +16,6 @@
 			if (window.focus) {newwindow.focus()}
 			}
 		</script>
-			<style type="text/css">
-				@import url("/sakai-messageforums-tool/css/msgcntr.css");
-			</style>
 		<h:form id="msgForum"   rendered="#{!ForumTool.selectedTopic.topic.draft || ForumTool.selectedTopic.topic.createdBy == ForumTool.userId}">
 			<!--jsp/discussionForum/message/dfAllMessages.jsp-->
 	

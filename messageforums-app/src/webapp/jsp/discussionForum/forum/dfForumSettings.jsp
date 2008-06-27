@@ -9,14 +9,11 @@
 </jsp:useBean>
 
 <f:view>
-	<sakai:view>
+	<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 	
 		<h:form id="revise">
 		<script type="text/javascript" src="/library/js/jquery.js"></script>
 		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
-		<style type="text/css">
-			@import url("/sakai-messageforums-tool/css/msgcntr.css");
-		</style>
 
 		<script type="text/javascript">
 			$(document).ready(function(){
