@@ -35,12 +35,12 @@
 					<f:convertDateTime pattern="#{msgs.date_format_paren}" />
 				</h:outputText>
 				<%-- mark as read link --%>
-				<h:graphicImage value="/images/12-em-check.png"
-					alt="#{msgs.cdfm_mark_as_read}" 
-					title="#{msgs.cdfm_mark_as_read}" 
-					rendered="#{!message.read}"
-					style="cursor:pointer;margin-left:1em"
-					onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);"/>
+					<h:graphicImage value="/images/trans.gif"
+						alt="#{msgs.cdfm_mark_as_read}" 
+						title="#{msgs.cdfm_mark_as_read}" 
+						rendered="#{!message.read}"
+						styleClass="markAsReadIcon"
+						onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);"/>
 			</h:panelGroup>
 		<%-- reply and other actions panel --%>
 			<%-- If message actually deleted, don't display links --%>

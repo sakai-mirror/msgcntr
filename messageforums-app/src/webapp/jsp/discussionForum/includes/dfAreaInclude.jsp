@@ -86,12 +86,11 @@
 			<h:column rendered="#{! topic.nonePermission}">
 					<h:panelGrid columns="1" summary="layout" width="100%" styleClass="specialLink topicBloc" cellpadding="0" cellspacing="0">
 						<h:panelGroup>
+							
+							<h:graphicImage url="/images/folder.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages == 0 }" styleClass="topicIcon" style="margin-right:.5em"/>
+							<h:graphicImage url="/images/folder_unread.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages > 0 }" styleClass="topicIcon" style="margin-right:.5em"/>
 							<%--//desNote: only show the new "new" message if there are no unread messages --%>
 							<h:outputText styleClass="messageNew" value=" #{msgs.cdfm_newflag}"  rendered="#{topic.unreadNoMessages > 0 }" />
-							<%--
-							<h:graphicImage url="/images/icon_new_blank.png" alt="Topic Folder" rendered="#{topic.unreadNoMessages > 0 }" style="margin-right:.5em"/>
-							<h:graphicImage url="/images/folder.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages == 0 }" style="margin-right:.5em"/>
-							<h:graphicImage url="/images/folder_unread.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages > 0 }" style="margin-right:.5em"/>--%>
 							<h:outputText styleClass="highlight title" id="draft" value="#{msgs.cdfm_draft}" rendered="#{topic.topic.draft == 'true'}"/>
 							<h:outputText id="draft_space" value="  - " rendered="#{topic.topic.draft == 'true'}" styleClass="title"/>
 							<h:graphicImage url="/images/silk/lock.png" alt="#{msgs.cdfm_forum_locked}" rendered="#{forum.locked == 'true' || topic.locked == 'true'}" style="margin-right:.5em"/>

@@ -222,9 +222,9 @@
 						</h:commandLink>
 						<%-- //designNote: icon to mark as read, does it belong here? Is it the right icon? Is this functionality desired?--%>
 						<h:outputText value="  " />
-						<h:graphicImage value="/images/12-em-check.png" rendered="#{!message.read}" style="cursor:pointer"
+						<h:graphicImage value="/images/trans.gif" rendered="#{!message.read}"
 							alt="#{msgs.cdfm_mark_as_read}" title="#{msgs.cdfm_mark_as_read}"
-							onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);"/>
+							onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);" styleClass="markAsReadIcon"/>
 					</h:panelGroup>
 					<%--  thread metadata (count) --%>
 					<%-- designNote: debug block --%>
