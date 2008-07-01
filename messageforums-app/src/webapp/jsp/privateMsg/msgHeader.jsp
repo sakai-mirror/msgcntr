@@ -93,7 +93,7 @@
 </h:panelGrid>
 
 <div class="navPanel">
-  <div style="float:left; display:inline; width: 33%; padding-top: 0.5em;">
+  <div style="float:left; display:inline; width: auto; padding-top: 0.5em;">
     <%-- Mark All As Read --%>
   	<h:commandLink action="#{PrivateMessagesTool.processActionMarkCheckedAsRead}" id="markAsread" title="#{msgs.cdfm_mark_check_as_read}" >
  		<h:graphicImage value="/../../library/image/silk/email.png" />
@@ -105,11 +105,11 @@
 			second link renders on Deleted folder page and does the 'actual' delete --%>
 	<h:outputText value="  | " /><h:outputText value=" " />
 	<h:commandLink action="#{PrivateMessagesTool.processActionDeleteChecked}" id="deleteMarked"
-				title="#{msgs.cdfm_mark_check_as_delete}" rendered="#{PrivateMessagesTool.msgNavMode != 'Deleted'}" >
+				title="#{msgs.cdfm_mark_check_as_delete}" rendered="#{PrivateMessagesTool.msgNavMode != 'pvt_deleted'}" >
 		<h:graphicImage value="/../../library/image/silk/email_delete.png" />
 		<h:outputText value=" #{msgs.cdfm_mark_check_as_delete}" />
 	</h:commandLink>
- 	<h:commandLink id="deleteChecked" action="#{PrivateMessagesTool.processPvtMsgEmptyDelete}" rendered="#{PrivateMessagesTool.msgNavMode == 'Deleted'}" 
+ 	<h:commandLink id="deleteChecked" action="#{PrivateMessagesTool.processPvtMsgEmptyDelete}" rendered="#{PrivateMessagesTool.msgNavMode == 'pvt_deleted'}" 
  				 onkeypress="document.forms[0].submit;" accesskey="x" >
  		<h:graphicImage value="/../../library/image/silk/email_delete.png" />
 		<h:outputText value=" #{msgs.cdfm_mark_check_as_delete}" />

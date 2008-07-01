@@ -125,6 +125,7 @@ public class PrivateMessagesTool
   private static final String SELECT_RECIPIENT_LIST_FOR_REPLY = "pvt_select_reply_recipients_list";
   private static final String MISSING_SUBJECT = "pvt_missing_subject";
   private static final String SELECT_MSG_RECIPIENT = "pvt_select_msg_recipient";
+  private static final String MULTIPLE_WINDOWS = "pvt_multiple_windows";
   //skai-huxt reply all 
   private static final String SELECT_MSG_RECIPIENT_replyall = "pvt_select_msg_recipient_replyall";
   
@@ -186,10 +187,10 @@ public class PrivateMessagesTool
   
   //need to modified to support internationalization by huxt
   /** portlet configuration parameter values**/
-  public static final String PVTMSG_MODE_RECEIVED = "Received";
-  public static final String PVTMSG_MODE_SENT = "Sent";
-  public static final String PVTMSG_MODE_DELETE = "Deleted";
-  public static final String PVTMSG_MODE_DRAFT = "Drafts";
+  public static final String PVTMSG_MODE_RECEIVED = "pvt_received";
+  public static final String PVTMSG_MODE_SENT = "pvt_sent";
+  public static final String PVTMSG_MODE_DELETE = "pvt_deleted";
+  public static final String PVTMSG_MODE_DRAFT = "pvt_drafts";
   public static final String PVTMSG_MODE_CASE = "Personal Folders";
   
   public static final String RECIPIANTS_ENTIRE_CLASS= "All Participants";
@@ -308,50 +309,10 @@ public class PrivateMessagesTool
   /** sort member */
   private String sortType = SORT_DATE_DESC;
   
+  private int setDetailMsgCount = 0;
+  
   public PrivateMessagesTool()
   {    
-  }
-
-  private String getLanguage(String navName)
-  {
-	  String Tmp= new String();
-	  Locale loc = null;
-	  //getLocale( String userId )
-	  ResourceLoader rl = new ResourceLoader();
-	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-	 
-	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
-	 
-	  String local_received=getResourceBundleString("pvt_received");
-	  String local_sent = getResourceBundleString("pvt_sent");
-	  String local_deleted= getResourceBundleString("pvt_deleted");
-	  
-	  String current_NAV= getResourceBundleString("pvt_message_nav");
-	  
-	  topicsbyLocalization.add(local_received);
-  	  topicsbyLocalization.add(local_sent);
-      topicsbyLocalization.add(local_deleted);
-	  
-	  String localLanguage=loc.getLanguage();
-	  
-	  if(navName.equals("Received")||navName.equals("Sent")||navName.equals("Deleted"))
-		  {
-		  Tmp = "en";
-			  }
-	  else if(navName.equals("Recibidos")||navName.equals("Enviados")||navName.equals("Borrados"))
-	  {
-		  
-		  Tmp ="es";
-		  
-	  }
-	  
-	  
-	  else//english language
-	  {		  
-		  Tmp="en";		  
-	  }
-    	
-	  return Tmp;	  
   }
   
   /**
@@ -399,22 +360,7 @@ public class PrivateMessagesTool
   public void initializePrivateMessageArea()
   {           
     /** get area per request */
-//===huxt bgein
-	  
-	  /** The type string for this "application": should not change over time as it may be stored in various parts of persistent entities. */
-		String APPLICATION_ID = "sakai:resourceloader";
-
-		/** Preferences key for user's regional language locale */
-		String LOCALE_KEY = "locale";
-
-  
-	  Locale loc = null;
-	  //getLocale( String userId )
-	  ResourceLoader rl = new ResourceLoader();
-	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-	  
-	
-    area = prtMsgManager.getPrivateMessageArea();
+	area = prtMsgManager.getPrivateMessageArea();
     
     
     if (! area.getEnabled() && isMessages()) {
@@ -480,27 +426,7 @@ public class PrivateMessagesTool
       PrivateForumDecoratedBean decoratedForum = new PrivateForumDecoratedBean(getForum()) ;
       
       
-      /** only load topics/counts if area is enabled */
-      
-       	  Locale loc = null;
-    	
-    	  ResourceLoader rl = new ResourceLoader();
-    	  loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-    	    	  
-    	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
-    	  
-    	  String local_received=getResourceBundleString("pvt_received");
-    	  String local_sent = getResourceBundleString("pvt_sent");
-    	  String local_deleted= getResourceBundleString("pvt_deleted");
-    	  
-    	  String current_NAV= getResourceBundleString("pvt_message_nav");
-    	  
-    	  topicsbyLocalization.add(local_received);
-	  	  topicsbyLocalization.add(local_sent);
-	      topicsbyLocalization.add(local_deleted);
-    	  
-    	  String localLanguage=loc.getLanguage();
-	    	
+      /** only load topics/counts if area is enabled */	    	
     	  
       if (getPvtAreaEnabled()){  
     	  
@@ -524,19 +450,9 @@ public class PrivateMessagesTool
           	
             PrivateTopicDecoratedBean decoTopic= new PrivateTopicDecoratedBean(topic) ;
            
-            String typeUuid="";  // folder uuid
-            if(getLanguage(CurrentTopicTitle).toString().equals(getLanguage(current_NAV).toString()))
-            {
-             typeUuid = getPrivateMessageTypeFromContext(topicsbyLocalization.get(countForFolderNum).toString());
-            
-            
-            }
-            else
-            {
-            	
-             typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());
-                              	
-            }
+            // folder uuid
+            String typeUuid = getPrivateMessageTypeFromContext(topic.getTitle());
+             
             countForFolderNum++;
             
             decoTopic.setTotalNoMessages(prtMsgManager.findMessageCount(typeUuid, aggregateList));
@@ -585,18 +501,6 @@ public class PrivateMessagesTool
   	    solution -- only call during render_response phase
   	    8/29/07 JLR - if coming from the synoptic tool, we need to process
   	*/
-
-	  /** The type string for this "application": should not change over time as it may be stored in various parts of persistent entities. */
-		String APPLICATION_ID = "sakai:resourceloader";
-
-		/** Preferences key for user's regional language locale */
-		String LOCALE_KEY = "locale";
-
-		Locale loc = null;
-	  //getLocale( String userId )
-		ResourceLoader rl = new ResourceLoader();
-		loc=rl.getLocale();//===country = "US"  language="en"
-	
 	  
   	if (!FacesContext.getCurrentInstance().getRenderResponse() && !viewChanged &&
   			getExternalParameterByKey(EXTERNAL_WHICH_TOPIC) == null) { 
@@ -621,8 +525,6 @@ public class PrivateMessagesTool
   	String typeUuid;
   	
    	typeUuid = getPrivateMessageTypeFromContext(msgNavMode);//=======Recibidios by huxt
-   	
-    String current_NAV= getResourceBundleString("pvt_message_nav");
 
   	/** support for sorting */
   	/* if the view was changed to "All Messages", we want to retain the previous
@@ -1379,12 +1281,14 @@ public void processChangeSelectView(ValueChangeEvent eve)
       PrivateMessageDecoratedBean dMsg= (PrivateMessageDecoratedBean) iter.next();
       if (dMsg.getMsg().getId().equals(new Long(msgId)))
       {
-        this.setDetailMsg(dMsg);  
+        this.setDetailMsg(dMsg); 
+        setDetailMsgCount++;
        
         prtMsgManager.markMessageAsReadForUser(dMsg.getMsg());
                
         PrivateMessage initPrivateMessage = prtMsgManager.initMessageWithAttachmentsAndRecipients(dMsg.getMsg());
         this.setDetailMsg(new PrivateMessageDecoratedBean(initPrivateMessage));
+        setDetailMsgCount++;
         
         List recLs= initPrivateMessage.getRecipients();
         for (Iterator iterator = recLs.iterator(); iterator.hasNext();)
@@ -1430,6 +1334,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
    */ 
   public String processPvtMsgReply() {
     LOG.debug("processPvtMsgReply()");
+    
+    setDetailMsgCount = 0;
 
     if (getDetailMsg() == null)
     	return null;
@@ -1488,6 +1394,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
     //from message detail screen
     this.setDetailMsg(getDetailMsg()) ;
     
+    setDetailMsgCount++;
+    
     return MESSAGE_REPLY_PG;
   }
   
@@ -1498,6 +1406,9 @@ public void processChangeSelectView(ValueChangeEvent eve)
    */ 
   public String processPvtMsgForward() {
 	    LOG.debug("processPvtMsgForward()");
+	    
+	    setDetailMsgCount = 0;
+	    
 	    if (getDetailMsg() == null)
 	    	return null;
 	    
@@ -1564,6 +1475,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
 	    this.setForwardBody(forwardedText.toString());
 	    //from message detail screen
 	    this.setDetailMsg(getDetailMsg()) ;
+	    
+	    setDetailMsgCount++;
 
 	    return MESSAGE_FORWARD_PG;
 	  }
@@ -1589,6 +1502,9 @@ private   int   getNum(char letter,   String   a)
    */ 
   public String processPvtMsgReplyAll() {
 	    LOG.debug("processPvtMsgReplyAll()");
+	    
+	    setDetailMsgCount = 0;
+	    
 	    if (getDetailMsg() == null)
 	    	return null;
 	    
@@ -1726,6 +1642,8 @@ private   int   getNum(char letter,   String   a)
 	    }
 	    
 	    this.setDetailMsg(getDetailMsg()) ;
+	    
+	    setDetailMsgCount++;
 	  
 	    return MESSAGE_ReplyAll_PG;//MESSAGE_FORWARD_PG;
 	  }
@@ -1777,7 +1695,6 @@ private   int   getNum(char letter,   String   a)
    * @return - pvtMsgCompose
    */ 
   public String processPvtMsgCompose() {
-    this.setDetailMsg(new PrivateMessageDecoratedBean(messageManager.createPrivateMessage()));
     setFromMainOrHp();
     fromMain = (msgNavMode == "") || (msgNavMode == "privateMessages");
     LOG.debug("processPvtMsgCompose()");
@@ -1925,16 +1842,8 @@ private   int   getNum(char letter,   String   a)
   // created separate method as to be used with processPvtMsgSend() and processPvtMsgSaveDraft()
   public PrivateMessage constructMessage()
   {
-    PrivateMessage aMsg;
-    // in case of compose this is a new message 
-    if (this.getDetailMsg() == null )
-    {
-      aMsg = messageManager.createPrivateMessage() ;
-    }
-    //if reply to a message then message is existing
-    else {
-      aMsg = (PrivateMessage)this.getDetailMsg().getMsg();       
-    }
+    PrivateMessage aMsg = messageManager.createPrivateMessage();
+    
     if (aMsg != null)
     {
       aMsg.setTitle(getComposeSubject());
@@ -2068,6 +1977,7 @@ private   int   getNum(char letter,   String   a)
       
       PrivateMessage initPrivateMessage = prtMsgManager.initMessageWithAttachmentsAndRecipients(detailMsg.getMsg());
       this.setDetailMsg(new PrivateMessageDecoratedBean(initPrivateMessage));
+      setDetailMsgCount++;
       
       List recLs= initPrivateMessage.getRecipients();
       for (Iterator iterator = recLs.iterator(); iterator.hasNext();)
@@ -2119,6 +2029,7 @@ private   int   getNum(char letter,   String   a)
       
       PrivateMessage initPrivateMessage = prtMsgManager.initMessageWithAttachmentsAndRecipients(thisDmb.getMsg());
       this.setDetailMsg(new PrivateMessageDecoratedBean(initPrivateMessage));
+      setDetailMsgCount++;
       
       List recLs= initPrivateMessage.getRecipients();
       for (Iterator iterator = recLs.iterator(); iterator.hasNext();)
@@ -2341,393 +2252,401 @@ private   int   getNum(char letter,   String   a)
   }
   
   //////////////////////REPLY SEND  /////////////////
-  public String processPvtMsgReplySend() {
+ public String processPvtMsgReplySend() {
     LOG.debug("processPvtMsgReplySend()");
+    if (setDetailMsgCount != 1) {
+    	setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS , new Object[] {ServerConfigurationService.getString("ui.service")}));
+    	return null;
+    } else {
     
-    PrivateMessage currentMessage = getDetailMsg().getMsg() ;
-        
-    //by default add user who sent original message    
-    for (Iterator i = totalComposeToList.iterator(); i.hasNext();) {      
-      MembershipItem membershipItem = (MembershipItem) i.next();                
-      
-      if (MembershipItem.TYPE_USER.equals(membershipItem.getType())) {
-        if (membershipItem.getUser() != null) {
-          if (membershipItem.getUser().getId().equals(currentMessage.getCreatedBy())) {
-            selectedComposeToList.add(membershipItem.getId());
-          }
-        }
-      }
-    }
-    
-    if(!hasValue(getReplyToSubject()))
-    {
-      setErrorMessage(getResourceBundleString(MISSING_SUBJECT));
-      return null ;
-    }
+    	PrivateMessage currentMessage = getDetailMsg().getMsg() ;
+    	//by default add user who sent original message    
+    	for (Iterator i = totalComposeToList.iterator(); i.hasNext();) {      
+    		MembershipItem membershipItem = (MembershipItem) i.next();                
 
-    if(selectedComposeToList.size()<1)
-    {
-      setErrorMessage(getResourceBundleString(SELECT_RECIPIENT_LIST_FOR_REPLY));
-      return null ;
-    }
-        
-    PrivateMessage rrepMsg = messageManager.createPrivateMessage() ;
-       
-    rrepMsg.setTitle(getReplyToSubject()) ; //rrepMsg.setTitle(rMsg.getTitle()) ;
-    rrepMsg.setDraft(Boolean.FALSE);
-    rrepMsg.setDeleted(Boolean.FALSE);
-    
-    rrepMsg.setAuthor(getAuthorString());
-    rrepMsg.setApproved(Boolean.FALSE);
-    rrepMsg.setBody(getReplyToBody()) ;
-    
-    rrepMsg.setLabel(getSelectedLabel());
-    
-    rrepMsg.setInReplyTo(currentMessage) ;
-    
-    //Add the recipientList as String for display in Sent folder
-    // Since some users may be hidden, if some of these are recipients
-    // filter them out (already checked if no recipients)
-    // if only 1 recipient no need to check visibility
-    String sendToString="";
-    String sendToHiddenString="";
-    
-    if (selectedComposeToList.size() == 1) {
-        MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
-        if(membershipItem != null)
-        {
-      		  sendToString +=membershipItem.getName()+"; " ;
-        }          
-    }
-    else {
-    	for (int i = 0; i < selectedComposeToList.size(); i++)
+    		if (MembershipItem.TYPE_USER.equals(membershipItem.getType())) {
+    			if (membershipItem.getUser() != null) {
+    				if (membershipItem.getUser().getId().equals(currentMessage.getCreatedBy())) {
+    					selectedComposeToList.add(membershipItem.getId());
+    				}
+    			}
+    		}
+    	}
+
+    	if(!hasValue(getReplyToSubject()))
     	{
-    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
+    		setErrorMessage(getResourceBundleString(MISSING_SUBJECT));
+    		return null ;
+    	}
+
+    	if(selectedComposeToList.size()<1)
+    	{
+    		setErrorMessage(getResourceBundleString(SELECT_RECIPIENT_LIST_FOR_REPLY));
+    		return null ;
+    	}
+
+    	PrivateMessage rrepMsg = messageManager.createPrivateMessage() ;
+
+    	rrepMsg.setTitle(getReplyToSubject()) ; //rrepMsg.setTitle(rMsg.getTitle()) ;
+    	rrepMsg.setDraft(Boolean.FALSE);
+    	rrepMsg.setDeleted(Boolean.FALSE);
+
+    	rrepMsg.setAuthor(getAuthorString());
+    	rrepMsg.setApproved(Boolean.FALSE);
+    	rrepMsg.setBody(getReplyToBody()) ;
+
+    	rrepMsg.setLabel(getSelectedLabel());
+
+    	rrepMsg.setInReplyTo(currentMessage) ;
+
+    	//Add the recipientList as String for display in Sent folder
+    	// Since some users may be hidden, if some of these are recipients
+    	// filter them out (already checked if no recipients)
+    	// if only 1 recipient no need to check visibility
+    	String sendToString="";
+    	String sendToHiddenString="";
+
+    	if (selectedComposeToList.size() == 1) {
+    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
     		if(membershipItem != null)
     		{
-    			if (membershipItem.isViewable()) {
-    				sendToString +=membershipItem.getName()+"; " ;
-    			}
-   		       	else {
-   	        		sendToHiddenString += membershipItem.getName() + "; ";
-   	        	}
-   	        }          
+    			sendToString +=membershipItem.getName()+"; " ;
+    		}          
     	}
-    }
+    	else {
+    		for (int i = 0; i < selectedComposeToList.size(); i++)
+    		{
+    			MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
+    			if(membershipItem != null)
+    			{
+    				if (membershipItem.isViewable()) {
+    					sendToString +=membershipItem.getName()+"; " ;
+    				}
+    				else {
+    					sendToHiddenString += membershipItem.getName() + "; ";
+    				}
+    			}          
+    		}
+    	}
 
-    if (! "".equals(sendToString)) {
-  	  sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
-    }
+    	if (! "".equals(sendToString)) {
+    		sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
+    	}
 
-    if ("".equals(sendToHiddenString)) {
-        rrepMsg.setRecipientsAsText(sendToString);
-    }
-    else {
-    	sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
-    	rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
-    }    
-    
-    //Add attachments
-    for(int i=0; i<allAttachments.size(); i++)
-    {
-      prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
-    }            
-    
-    if(!getBooleanEmailOut())
-    {
-      prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), false);
-    }
-    else{
-      prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), true);
-    }
-    
-    //reset contents
-    resetComposeContents();
-    
-    EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_RESPONSE, getEventMessage(rrepMsg), false));
+    	if ("".equals(sendToHiddenString)) {
+    		rrepMsg.setRecipientsAsText(sendToString);
+    	}
+    	else {
+    		sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
+    		rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
+    	}    
 
-    return DISPLAY_MESSAGES_PG;
+    	//Add attachments
+    	for(int i=0; i<allAttachments.size(); i++)
+    	{
+    		prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
+    	}            
+
+    	if(!getBooleanEmailOut())
+    	{
+    		prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), false);
+    	}
+    	else{
+    		prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), true);
+    	}
+
+    	//reset contents
+    	resetComposeContents();
+
+    	EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_RESPONSE, getEventMessage(rrepMsg), false));
+
+    	return DISPLAY_MESSAGES_PG;
+    }
 
   }
   
-  //////////////////////Forward SEND  /////////////////
-  public String processPvtMsgForwardSend() {
+  // ////////////////////Forward SEND /////////////////
+ public String processPvtMsgForwardSend() {
     LOG.debug("processPvtMsgForwardSend()");
-    
-    PrivateMessage currentMessage = getDetailMsg().getMsg() ;
-  
-    if(!hasValue(getForwardSubject()))
-    {
-      setErrorMessage(getResourceBundleString(MISSING_SUBJECT));
-      return null ;
-    }
-    
-    if(getSelectedComposeToList().size()<1)
-    {
-      setErrorMessage(getResourceBundleString(SELECT_MSG_RECIPIENT));
-      return null ;
-    }
+    if (setDetailMsgCount != 1) {
+    	setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS , new Object[] {ServerConfigurationService.getString("ui.service")}));
+    	return null;
+    } else {
 
-        
-    PrivateMessage rrepMsg = messageManager.createPrivateMessage() ;
-       
-    rrepMsg.setTitle(getForwardSubject()) ; 
-    rrepMsg.setDraft(Boolean.FALSE);
-    rrepMsg.setDeleted(Boolean.FALSE);
-    
-    rrepMsg.setAuthor(getAuthorString());
-    rrepMsg.setApproved(Boolean.FALSE);
-    rrepMsg.setBody(getForwardBody()) ;
-    
-    rrepMsg.setLabel(getSelectedLabel());
-    
-    rrepMsg.setInReplyTo(currentMessage) ;
-    
-    //Add the recipientList as String for display in Sent folder
-    // Since some users may be hidden, if some of these are recipients
-    // filter them out (already checked if no recipients)
-    // if only 1 recipient no need to check visibility
-    String sendToString="";
-    String sendToHiddenString="";
-    
-    if (selectedComposeToList.size() == 1) {
-        MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
-        if(membershipItem != null)
-        {
-      		  sendToString +=membershipItem.getName()+"; " ;
-        }          
-    }
-    else {
-    	for (int i = 0; i < selectedComposeToList.size(); i++)
+    	PrivateMessage currentMessage = getDetailMsg().getMsg() ;
+
+    	if(!hasValue(getForwardSubject()))
     	{
-    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
+    		setErrorMessage(getResourceBundleString(MISSING_SUBJECT));
+    		return null ;
+    	}
+
+    	if(getSelectedComposeToList().size()<1)
+    	{
+    		setErrorMessage(getResourceBundleString(SELECT_MSG_RECIPIENT));
+    		return null ;
+    	}
+
+
+    	PrivateMessage rrepMsg = messageManager.createPrivateMessage() ;
+
+    	rrepMsg.setTitle(getForwardSubject()) ; 
+    	rrepMsg.setDraft(Boolean.FALSE);
+    	rrepMsg.setDeleted(Boolean.FALSE);
+
+    	rrepMsg.setAuthor(getAuthorString());
+    	rrepMsg.setApproved(Boolean.FALSE);
+    	rrepMsg.setBody(getForwardBody()) ;
+
+    	rrepMsg.setLabel(getSelectedLabel());
+
+    	rrepMsg.setInReplyTo(currentMessage) ;
+
+    	//Add the recipientList as String for display in Sent folder
+    	// Since some users may be hidden, if some of these are recipients
+    	// filter them out (already checked if no recipients)
+    	// if only 1 recipient no need to check visibility
+    	String sendToString="";
+    	String sendToHiddenString="";
+
+    	if (selectedComposeToList.size() == 1) {
+    		MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(0));
     		if(membershipItem != null)
     		{
-    			if (membershipItem.isViewable()) {
-    				sendToString +=membershipItem.getName()+"; " ;
-    			}
-   		       	else {
-   	        		sendToHiddenString += membershipItem.getName() + "; ";
-   	        	}
-   	        }          
+    			sendToString +=membershipItem.getName()+"; " ;
+    		}          
     	}
-    }
+    	else {
+    		for (int i = 0; i < selectedComposeToList.size(); i++)
+    		{
+    			MembershipItem membershipItem = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(i));
+    			if(membershipItem != null)
+    			{
+    				if (membershipItem.isViewable()) {
+    					sendToString +=membershipItem.getName()+"; " ;
+    				}
+    				else {
+    					sendToHiddenString += membershipItem.getName() + "; ";
+    				}
+    			}          
+    		}
+    	}
 
-    if (! "".equals(sendToString)) {
-  	  sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
-    }
+    	if (! "".equals(sendToString)) {
+    		sendToString=sendToString.substring(0, sendToString.length()-2); //remove last comma and space
+    	}
 
-    if ("".equals(sendToHiddenString)) {
-        rrepMsg.setRecipientsAsText(sendToString);
+    	if ("".equals(sendToHiddenString)) {
+    		rrepMsg.setRecipientsAsText(sendToString);
+    	}
+    	else {
+    		sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
+    		rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
+    	}    
+
+    	//Add attachments
+    	for(int i=0; i<allAttachments.size(); i++)
+    	{
+    		prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
+    	}            
+
+    	if(!getBooleanEmailOut())
+    	{
+    		prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), false);
+    	}
+    	else{
+    		prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), true);
+    	}
+
+    	//reset contents
+    	resetComposeContents();
+
+    	EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_FORWARD, getEventMessage(rrepMsg), false));
+
+    	return DISPLAY_MESSAGES_PG;
     }
-    else {
-    	sendToHiddenString=sendToHiddenString.substring(0, sendToHiddenString.length()-2); //remove last comma and space    
-    	rrepMsg.setRecipientsAsText(sendToString + " (" + sendToHiddenString + ")");
-    }    
-    
-    //Add attachments
-    for(int i=0; i<allAttachments.size(); i++)
-    {
-      prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
-    }            
-    
-    if(!getBooleanEmailOut())
-    {
-      prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), false);
-    }
-    else{
-      prtMsgManager.sendPrivateMessage(rrepMsg, getRecipients(), true);
-    }
-    
-    //reset contents
-    resetComposeContents();
-    
-    EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_FORWARD, getEventMessage(rrepMsg), false));
-    
-    return DISPLAY_MESSAGES_PG;
 
   }
   
   
   
-
-  
-/*
- * Raply to all
- * 
- * */
   public String processPvtMsgReplyAllSend() {
     LOG.debug("processPvtMsgReply All Send()");
-  
-    PrivateMessage currentMessage = getDetailMsg().getMsg() ;
-  
-    String msgauther=currentMessage.getAuthor();//string   "Test"      
-    
-    //Select Forward Recipients
-    if(!hasValue(getForwardSubject()))
-    {
-      setErrorMessage(getResourceBundleString(MISSING_SUBJECT));
-      return null ;
-    }
-    int selcomposetolistsize=getSelectedComposeToList().size();
-   
-        
-    PrivateMessage rrepMsg = messageManager.createPrivateMessage() ;
-    
-       
-    rrepMsg.setTitle(getForwardSubject()) ; 
-    rrepMsg.setDraft(Boolean.FALSE);
-    rrepMsg.setDeleted(Boolean.FALSE);
-    
-    rrepMsg.setAuthor(getAuthorString());
-    rrepMsg.setApproved(Boolean.FALSE);
-    //add some emty space to the msg composite, by huxt
-    String replyAllbody="  ";
-    replyAllbody=getForwardBody();
-    
-    
-    rrepMsg.setBody(replyAllbody);//getForwardBody()) ;// ad some blank;
-    rrepMsg.setLabel(getSelectedLabel());
-    rrepMsg.setInReplyTo(currentMessage) ;
-      
-    
-    //Add the recipientList as String for display in Sent folder
-    // Since some users may be hidden, if some of these are recipients
-    // filter them out (already checked if no recipients)
-    // if only 1 recipient no need to check visibility
-    String sendToString="";
-    String sendToHiddenString="";
-    
-    String sendReplyAllstring1="";
-    String sendReplyAllstring2="";
-    sendReplyAllstring2=getDetailMsg().getVisibleRecipientsAsText();
-    
-    sendReplyAllstring1=getDetailMsg().getRecipientsAsText();
-    
-         
-    //Add attachments
-    for(int i=0; i<allAttachments.size(); i++)
-    {
-      prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
-    }            
-    
-    
-    Set returnSetreplyall = new HashSet();
-    Set returnSetreplyall2 = new HashSet();
+    if (setDetailMsgCount != 1) {
+    	setErrorMessage(getResourceBundleString(MULTIPLE_WINDOWS , new Object[] {ServerConfigurationService.getString("ui.service")}));
+    	return null;
+    } else {
 
-    returnSetreplyall=getRecipients();
-//1
-    List returnSetreplyall22=null;
-    returnSetreplyall22=currentMessage.getRecipients();//
-    User autheruser=null;
-	try {
-		autheruser = UserDirectoryService.getUser(currentMessage.getCreatedBy());
-	} catch (UserNotDefinedException e) {
-		e.printStackTrace();
-	}
-	
-	User currentuser=null;
-	try {
-		currentuser = UserDirectoryService.getUser(getUserId());
-	} catch (UserNotDefinedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	
-    List tmpRecipList = currentMessage.getRecipients();
-    List replyalllist=new ArrayList();
-    Set returnSet = new HashSet();
-    String sendToStringreplyall="";
-       
-    Iterator iter = tmpRecipList.iterator();
-    while (iter.hasNext())
-    {
-    	PrivateMessageRecipient tmpPMR = (PrivateMessageRecipient)iter.next();
-    	User replyrecipientaddtmp=null;
-		try {
-			replyrecipientaddtmp = UserDirectoryService.getUser(tmpPMR.getUserId());
-		} catch (UserNotDefinedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-  	
-	
-		if (replyrecipientaddtmp == null)
-				throw new IllegalStateException(
-						"User replyrecipientaddtmp == null!");
-		if((!(replyrecipientaddtmp.getDisplayName()).equals(getUserName()) ) )//&&(!(replyrecipientaddtmp.getDisplayName()).equals(msgauther)))
-       {
-    	returnSet.add(replyrecipientaddtmp);
-    	sendToStringreplyall+=replyrecipientaddtmp.getDisplayName()+"; " ;
-    	
-		}
-		
-    }
-    
-    if(returnSet.isEmpty()) {
-    	returnSet.add(autheruser);
-    	sendToStringreplyall+= msgauther+"; " ;
-    	
-    }
-       
-    //(2)
-    // when clienter  want to add more recepitents
-    User tmpusr=null;
-    if(selectedComposeToList.size() > 0)
-	{
-		for (int iemb = 0; iemb < selectedComposeToList.size(); iemb++)
+    	PrivateMessage currentMessage = getDetailMsg().getMsg() ;
+
+    	String msgauther=currentMessage.getAuthor();//string   "Test"      
+
+    	//Select Forward Recipients
+    	if(!hasValue(getForwardSubject()))
     	{
-    		MembershipItem membershipItemtmp = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(iemb));
-    		tmpusr =membershipItemtmp.getUser();
-    		boolean iscontained=containedInList(tmpusr,tmpRecipList);
-    		if((tmpusr!=null)&&(!iscontained))//&&(!(tmpusr.getDisplayName()).equals(getUserName()) )) //&&(!(tmpusr.getDisplayName()).equals(msgauther)))
-    		{
-    			returnSet.add(tmpusr);
-    			sendToStringreplyall+=tmpusr.getDisplayName()+"; " ;
-    			
-    		}
-    		
-    		    		
-    		if((tmpusr!=null)&&((tmpusr.getDisplayName()).equals(getUserName())))
-            {
-            	this.selectedComposedlistequalCurrentuser=true;
-            }
-    		
-    		
+    		setErrorMessage(getResourceBundleString(MISSING_SUBJECT));
+    		return null ;
     	}
-		
-	}
-  
-    if((selectedComposedlistequalCurrentuser==true)&&(currentuser!=autheruser))
-    {
-    	returnSet.add(currentuser);
-     
+    	int selcomposetolistsize=getSelectedComposeToList().size();
+
+
+    	PrivateMessage rrepMsg = messageManager.createPrivateMessage() ;
+
+
+    	rrepMsg.setTitle(getForwardSubject()) ; 
+    	rrepMsg.setDraft(Boolean.FALSE);
+    	rrepMsg.setDeleted(Boolean.FALSE);
+
+    	rrepMsg.setAuthor(getAuthorString());
+    	rrepMsg.setApproved(Boolean.FALSE);
+    	//add some emty space to the msg composite, by huxt
+    	String replyAllbody="  ";
+    	replyAllbody=getForwardBody();
+
+
+    	rrepMsg.setBody(replyAllbody);//getForwardBody()) ;// ad some blank;
+    	rrepMsg.setLabel(getSelectedLabel());
+    	rrepMsg.setInReplyTo(currentMessage) ;
+
+
+    	//Add the recipientList as String for display in Sent folder
+    	// Since some users may be hidden, if some of these are recipients
+    	// filter them out (already checked if no recipients)
+    	// if only 1 recipient no need to check visibility
+    	String sendToString="";
+    	String sendToHiddenString="";
+
+    	String sendReplyAllstring1="";
+    	String sendReplyAllstring2="";
+    	sendReplyAllstring2=getDetailMsg().getVisibleRecipientsAsText();
+
+    	sendReplyAllstring1=getDetailMsg().getRecipientsAsText();
+
+
+    	//Add attachments
+    	for(int i=0; i<allAttachments.size(); i++)
+    	{
+    		prtMsgManager.addAttachToPvtMsg(rrepMsg, ((DecoratedAttachment)allAttachments.get(i)).getAttachment());         
+    	}            
+
+
+    	Set returnSetreplyall = new HashSet();
+    	Set returnSetreplyall2 = new HashSet();
+
+    	returnSetreplyall=getRecipients();
+//  	1
+    	List returnSetreplyall22=null;
+    	returnSetreplyall22=currentMessage.getRecipients();//
+    	User autheruser=null;
+    	try {
+    		autheruser = UserDirectoryService.getUser(currentMessage.getCreatedBy());
+    	} catch (UserNotDefinedException e) {
+    		e.printStackTrace();
+    	}
+
+    	User currentuser=null;
+    	try {
+    		currentuser = UserDirectoryService.getUser(getUserId());
+    	} catch (UserNotDefinedException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	}
+
+    	List tmpRecipList = currentMessage.getRecipients();
+    	List replyalllist=new ArrayList();
+    	Set returnSet = new HashSet();
+    	String sendToStringreplyall="";
+
+    	Iterator iter = tmpRecipList.iterator();
+    	while (iter.hasNext())
+    	{
+    		PrivateMessageRecipient tmpPMR = (PrivateMessageRecipient)iter.next();
+    		User replyrecipientaddtmp=null;
+    		try {
+    			replyrecipientaddtmp = UserDirectoryService.getUser(tmpPMR.getUserId());
+    		} catch (UserNotDefinedException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+
+
+    		if (replyrecipientaddtmp == null)
+    			throw new IllegalStateException(
+    			"User replyrecipientaddtmp == null!");
+    		if((!(replyrecipientaddtmp.getDisplayName()).equals(getUserName()) ) )//&&(!(replyrecipientaddtmp.getDisplayName()).equals(msgauther)))
+    		{
+    			returnSet.add(replyrecipientaddtmp);
+    			sendToStringreplyall+=replyrecipientaddtmp.getDisplayName()+"; " ;
+
+    		}
+
+    	}
+
+    	if(returnSet.isEmpty()) {
+    		returnSet.add(autheruser);
+    		sendToStringreplyall+= msgauther+"; " ;
+
+    	}
+
+    	//(2)
+    	// when clienter  want to add more recepitents
+    	User tmpusr=null;
+    	if(selectedComposeToList.size() > 0)
+    	{
+    		for (int iemb = 0; iemb < selectedComposeToList.size(); iemb++)
+    		{
+    			MembershipItem membershipItemtmp = (MembershipItem) courseMemberMap.get(selectedComposeToList.get(iemb));
+    			tmpusr =membershipItemtmp.getUser();
+    			boolean iscontained=containedInList(tmpusr,tmpRecipList);
+    			if((tmpusr!=null)&&(!iscontained))//&&(!(tmpusr.getDisplayName()).equals(getUserName()) )) //&&(!(tmpusr.getDisplayName()).equals(msgauther)))
+    			{
+    				returnSet.add(tmpusr);
+    				sendToStringreplyall+=tmpusr.getDisplayName()+"; " ;
+
+    			}
+
+
+    			if((tmpusr!=null)&&((tmpusr.getDisplayName()).equals(getUserName())))
+    			{
+    				this.selectedComposedlistequalCurrentuser=true;
+    			}
+
+
+    		}
+
+    	}
+
+    	if((selectedComposedlistequalCurrentuser==true)&&(currentuser!=autheruser))
+    	{
+    		returnSet.add(currentuser);
+
+    	}
+
+
+    	if(!"".equals(sendToStringreplyall))
+    	{
+    		sendToStringreplyall=sendToStringreplyall.substring(0, sendToStringreplyall.length()-2); //remove last comma and space    
+    		rrepMsg.setRecipientsAsText(sendToStringreplyall);// + " (" + sendToHiddenString + ")");
+
+    	}
+
+
+    	if(!getBooleanEmailOut())
+    	{
+
+    		prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, false);//getRecipients()  replyalllist
+    	}
+    	else{
+    		prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, true);//getRecipients()  replyalllist
+    	}
+
+    	//reset contents
+    	resetComposeContents();
+
+    	EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_FORWARD, getEventMessage(rrepMsg), false));
+
+    	return DISPLAY_MESSAGES_PG;
     }
-    
-    
-    if(!"".equals(sendToStringreplyall))
-    {
-    	sendToStringreplyall=sendToStringreplyall.substring(0, sendToStringreplyall.length()-2); //remove last comma and space    
-    	rrepMsg.setRecipientsAsText(sendToStringreplyall);// + " (" + sendToHiddenString + ")");
-    	
-    }
-    
-      
-    if(!getBooleanEmailOut())
-    {
-    	
-      prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, false);//getRecipients()  replyalllist
-    }
-    else{
-      prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, true);//getRecipients()  replyalllist
-    }
-    
-    //reset contents
-    resetComposeContents();
-    
-    EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_FORWARD, getEventMessage(rrepMsg), false));
-    
-    return DISPLAY_MESSAGES_PG;
 
   }
   
@@ -2769,7 +2688,6 @@ private   int   getNum(char letter,   String   a)
 	  	   
   }
 		
-  //process PvtMsgReplyAll  modified by huxt end
   /**
    * process from Compose screen
    * @return - pvtMsg
@@ -2863,13 +2781,13 @@ private   int   getNum(char letter,   String   a)
         prtMsgManager.deletePrivateMessage(element, getPrivateMessageTypeFromContext(msgNavMode)) ;        
       }      
       
-      if ("Deleted".equals(msgNavMode))
+      if ("pvt_deleted".equals(msgNavMode))
     	  EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_REMOVE, getEventMessage((Message) element), false));
     }
     
     if (deleted)
     {
-    	if ("Deleted".equals(msgNavMode))
+    	if ("pvt_deleted".equals(msgNavMode))
     		multiDeleteSuccessMsg = getResourceBundleString(PERM_DELETE_SUCCESS_MSG);
     	else
     		multiDeleteSuccessMsg = getResourceBundleString(MULTIDELETE_SUCCESS_MSG);
@@ -4115,59 +4033,17 @@ private   int   getNum(char letter,   String   a)
     return returnSet;    
   }
       
-  private String getPrivateMessageTypeFromContext(String navMode){
-	 
-      Locale loc = null;
-    	  //getLocale( String userId )
-     ResourceLoader rl = new ResourceLoader();
-     loc = rl.getLocale();//( userId);//SessionManager.getCurrentSessionUserId() );
-    
-	  List topicsbyLocalization= new ArrayList();// only three folder supported, if need more, please modifify here
-	 
-
-	  String local_received=getResourceBundleString("pvt_received");
-	  String local_sent = getResourceBundleString("pvt_sent");
-	  String local_deleted= getResourceBundleString("pvt_deleted");
-	
-	  
-	  String current_NAV= getResourceBundleString("pvt_message_nav");
-	  
-	  topicsbyLocalization.add(local_received);
-  	  topicsbyLocalization.add(local_sent);
-      topicsbyLocalization.add(local_deleted);
-	  
-		  
-	  
-	 
-    
-      String stringCurrentTopicTitle=new String();
-      stringCurrentTopicTitle=navMode;//most important
-      
-      String current_NAV2= getResourceBundleString("pvt_message_nav");
-      String typeUuid="";  // folder uuid
-   
-    
-    //need to add more dictionary to support more language
-    if (((String) topicsbyLocalization.get(0)).equalsIgnoreCase(navMode)||"Recibidos".equalsIgnoreCase(navMode)||"Received".equalsIgnoreCase(navMode)){
-      return typeManager.getReceivedPrivateMessageType();
-    }
-    else if (((String) topicsbyLocalization.get(1)).equalsIgnoreCase(navMode)||"Enviados".equalsIgnoreCase(navMode)||"Sent".equalsIgnoreCase(navMode)){
-      return typeManager.getSentPrivateMessageType();
-    }
-    else if (((String) topicsbyLocalization.get(2)).equalsIgnoreCase(navMode)||"Borrados".equalsIgnoreCase(navMode)||"Deleted".equalsIgnoreCase(navMode)){
-      return typeManager.getDeletedPrivateMessageType(); 
-    }
-    else if (PVTMSG_MODE_DRAFT.equalsIgnoreCase(navMode)){
-      return typeManager.getDraftPrivateMessageType();
-    }
-    else{
-      return typeManager.getCustomTopicType(navMode);
-    }    
-    
-    
-    
-    
-    
+  private String getPrivateMessageTypeFromContext(String navMode){    
+    if(navMode.equals("pvt_received"))
+        return typeManager.getReceivedPrivateMessageType();
+   	else if(navMode.equals("pvt_sent"))
+        return typeManager.getSentPrivateMessageType();
+   	else if(navMode.equals("pvt_deleted"))
+        return typeManager.getDeletedPrivateMessageType(); 
+   	else if (PVTMSG_MODE_DRAFT.equalsIgnoreCase(navMode))
+   		return typeManager.getDraftPrivateMessageType();
+   	else
+   		return typeManager.getCustomTopicType(navMode);    
   }
 
   //////// GETTER AND SETTER  ///////////////////  
