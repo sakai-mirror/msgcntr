@@ -1411,7 +1411,7 @@ public class DiscussionForumTool
     setEditMode(true);
     setPermissionMode(PERMISSION_MODE_TOPIC);
     DiscussionTopic topic = null;
-    if(getExternalParameterByKey(TOPIC_ID) != "" && getExternalParameterByKey(TOPIC_ID) != null){
+    if(!getExternalParameterByKey(TOPIC_ID).equals("") && getExternalParameterByKey(TOPIC_ID) != null){
 	    topic = (DiscussionTopic) forumManager
 	        .getTopicByIdWithAttachments(new Long(
 	            getExternalParameterByKey(TOPIC_ID)));
