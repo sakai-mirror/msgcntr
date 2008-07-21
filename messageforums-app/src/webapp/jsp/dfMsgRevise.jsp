@@ -6,10 +6,13 @@
 </jsp:useBean>
 
 <f:view>
-	<sakai:view_container title="#{msgs.cdfm_revise_forum_msg}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
+	<sakai:view_container title="#{msgs.cdfm_revise_forum_msg}">
 		<sakai:view_content>
 		<!--jsp/dfMsgRevise.jsp-->
 		<h:form id="dfCompose">
+			<style type="text/css">
+				@import url("/sakai-messageforums-tool/css/msgcntr.css");
+			</style>
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 			<h3><h:outputText value="#{msgs.cdfm_revise_forum_msg}" /></h3>
