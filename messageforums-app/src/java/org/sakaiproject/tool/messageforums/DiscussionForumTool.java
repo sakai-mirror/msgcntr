@@ -775,6 +775,7 @@ public class DiscussionForumTool
 	  selectedForum.setMarkForDeletion(true);
 	  return FORUM_SETTING;
   }
+  
 
   
   /**
@@ -981,6 +982,7 @@ public class DiscussionForumTool
       prepareRemoveAttach.clear();
       return gotoMain();
     }
+    setPermissionMode(PERMISSION_MODE_TOPIC);
     attachments.clear();
     prepareRemoveAttach.clear();
     return TOPIC_SETTING_REVISE;
@@ -2283,7 +2285,7 @@ public class DiscussionForumTool
           
         }
       }
-
+      
     }
     return gotoMain();
   }
@@ -6098,7 +6100,8 @@ public class DiscussionForumTool
 		   if(returnToPage.equals(ALL_MESSAGES) && selectedTopic != null)
 		   {
 			   selectedTopic = getDecoratedTopic(selectedTopic.getTopic());
-			   return ALL_MESSAGES;
+			   //return ALL_MESSAGES;
+			   //return displayHomeWithExtendedForumDescription();
 		   }
 		   if(returnToPage.equals(FORUM_DETAILS) && selectedForum != null)
 		   {
