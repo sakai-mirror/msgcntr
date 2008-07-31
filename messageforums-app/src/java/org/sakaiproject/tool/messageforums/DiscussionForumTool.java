@@ -6100,8 +6100,7 @@ public class DiscussionForumTool
 		   if(returnToPage.equals(ALL_MESSAGES) && selectedTopic != null)
 		   {
 			   selectedTopic = getDecoratedTopic(selectedTopic.getTopic());
-			   //return ALL_MESSAGES;
-			   //return displayHomeWithExtendedForumDescription();
+			   return ALL_MESSAGES;
 		   }
 		   if(returnToPage.equals(FORUM_DETAILS) && selectedForum != null)
 		   {
