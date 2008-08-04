@@ -104,7 +104,7 @@
 .messagesFlat tbody tr td div.hierItemBlock,.messagesThreaded tbody tr td div.hierItemBlock{
 	padding: 0 0 0 .5em !important;
 	border-left: 2px solid #cd5 !important;
-	width: 100%;
+	width: 95%;
 	margin: .5em !important;
 }
 .messagesThreaded tbody tr td{
