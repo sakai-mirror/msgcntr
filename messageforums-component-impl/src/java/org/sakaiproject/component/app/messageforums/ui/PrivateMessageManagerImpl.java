@@ -97,6 +97,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   private static final String PVT_RECEIVED = "pvt_received";
   private static final String PVT_SENT = "pvt_sent";
   private static final String PVT_DELETED = "pvt_deleted";
+  private static final String PVT_DRAFTS = "pvt_drafts";
  
   /** String ids for email footer messsage */
   private static final String EMAIL_FOOTER1 = "pvt_email_footer1";
@@ -215,8 +216,8 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     			PrivateTopic currentTopic = (PrivateTopic) pvtTopics.get(i);
     			if(currentTopic != null)
     			{
-    				if(!currentTopic.getTitle().equals("Received") && !currentTopic.getTitle().equals("Sent") && !currentTopic.getTitle().equals("Deleted") 
-    						&& !currentTopic.getTitle().equals("Drafts") && area.getContextId().equals(currentTopic.getContextId()))
+    				if(!currentTopic.getTitle().equals(PVT_RECEIVED) && !currentTopic.getTitle().equals(PVT_SENT) && !currentTopic.getTitle().equals(PVT_DELETED) 
+    						&& !currentTopic.getTitle().equals(PVT_DRAFTS) && area.getContextId().equals(currentTopic.getContextId()))
     				{
     					currentTopic.setPrivateForum(pf);
     		      forumManager.savePrivateForumTopic(currentTopic);
@@ -1379,19 +1380,19 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   {
     String topicTypeUuid;
 
-    if(getResourceBundleString(PVTMSG_MODE_RECEIVED).equals(topicTitle))
+    if(PVTMSG_MODE_RECEIVED.equals(topicTitle))
     {
       topicTypeUuid=typeManager.getReceivedPrivateMessageType();
     }
-    else if(getResourceBundleString(PVTMSG_MODE_SENT).equals(topicTitle))
+    else if(PVTMSG_MODE_SENT.equals(topicTitle))
     {
       topicTypeUuid=typeManager.getSentPrivateMessageType();
     }
-    else if(getResourceBundleString(PVTMSG_MODE_DELETE).equals(topicTitle))
+    else if(PVTMSG_MODE_DELETE.equals(topicTitle))
     {
       topicTypeUuid=typeManager.getDeletedPrivateMessageType();
     }
-    else if(getResourceBundleString(PVTMSG_MODE_DRAFT).equals(topicTitle))
+    else if(PVTMSG_MODE_DRAFT.equals(topicTitle))
     {
       topicTypeUuid=typeManager.getDraftPrivateMessageType();
     }
