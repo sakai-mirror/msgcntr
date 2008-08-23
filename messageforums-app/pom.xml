@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-jsf-sun-ri-tool</artifactId>
-      <version>${sakai.version}</version>
+     
       <type>pom</type>
     </dependency>
 <!--javax.servletservlet-api${sakai.servletapi.version}-->
@@ -53,20 +53,18 @@
     <dependency>
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-messageforums-api</artifactId>
-      <version>${sakai.version}</version>
+     
     </dependency>
     <dependency>
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-messageforums-hbm</artifactId>
-      <version>${sakai.version}</version>
+     
       <scope>provided</scope>
     </dependency>
 <!--org.sakaiprojectsakai-entity-api${sakai.version}-->
     <dependency>
       <groupId>org.sakaiproject.entitybroker</groupId>
       <artifactId>entitybroker-api</artifactId>
-      <version>1.2.0</version>
-      <scope>provided</scope>
     </dependency>
 <!--org.sakaiprojectsakai-event-api${sakai.version}-->
 <!--org.sakaiprojectsakai-component-api${sakai.version}-->
@@ -81,7 +79,7 @@
     <dependency>
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-gradebook-service-api</artifactId>
-      <version>${sakai.version}</version>
+     
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
