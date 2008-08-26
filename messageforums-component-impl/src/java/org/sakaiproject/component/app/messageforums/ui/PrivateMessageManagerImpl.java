@@ -180,13 +180,13 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       //pf.setArea(area);
       //areaManager.saveArea(area);
       
-      PrivateTopic receivedTopic = forumManager.createPrivateForumTopic(getResourceBundleString(PVT_RECEIVED), true,false,
+      PrivateTopic receivedTopic = forumManager.createPrivateForumTopic(PVT_RECEIVED, true,false,
           userId, pf.getId());     
 
-      PrivateTopic sentTopic = forumManager.createPrivateForumTopic(getResourceBundleString(PVT_SENT), true,false,
+      PrivateTopic sentTopic = forumManager.createPrivateForumTopic(PVT_SENT, true,false,
           userId, pf.getId());      
 
-      PrivateTopic deletedTopic = forumManager.createPrivateForumTopic(getResourceBundleString(PVT_DELETED), true,false,
+      PrivateTopic deletedTopic = forumManager.createPrivateForumTopic(PVT_DELETED, true,false,
           userId, pf.getId());      
 
       //PrivateTopic draftTopic = forumManager.createPrivateForumTopic("Drafts", true,false,
