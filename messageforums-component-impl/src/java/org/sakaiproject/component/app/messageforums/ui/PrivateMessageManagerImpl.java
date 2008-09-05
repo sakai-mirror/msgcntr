@@ -1021,6 +1021,19 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       return;
     }
 
+    //build the message body
+    List additionalHeaders = new ArrayList(1);
+    additionalHeaders.add("Content-Type: text/html");
+    
+
+    /** determines if default in sakai.properties is set, if not will make a reasonable default */
+    String defaultEmail = "postmaster@" + ServerConfigurationService.getServerName();
+    String systemEmail = ServerConfigurationService.getString("msgcntr.notification.from.address", defaultEmail);
+   
+    String bodyString = buildMessageBody(message);
+
+    
+    //this only needs to be doen if the message is not being sen
     for (Iterator i = recipients.iterator(); i.hasNext();)
     {
       User u = (User) i.next();      
@@ -1040,12 +1053,62 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       {
       	forwardingEnabled = true;
       }
+            
+      /** determine if current user is equal to recipient */
+      Boolean isRecipientCurrentUser = 
+        (currentUserAsString.equals(userId) ? Boolean.TRUE : Boolean.FALSE);      
       
-      List additionalHeaders = new ArrayList(1);
-      additionalHeaders.add("Content-Type: text/html");
-      
+      if (!asEmail && forwardingEnabled){
+      	  if(pf != null)
+      	  {
+      	  	emailService.send(systemEmail, pf.getAutoForwardEmail(), message.getTitle(), 
+              bodyString, u.getEmail(), null, additionalHeaders);
+      	  }
+      	  else if(oldPf != null)
+      	  {
+      	  	emailService.send(systemEmail, oldPf.getAutoForwardEmail(), message.getTitle(), 
+                bodyString, u.getEmail(), null, additionalHeaders);      	  	
+      	  }
+          
+          // use forwarded address if set
+          
+          PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
+              userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
+              isRecipientCurrentUser);
+          recipientList.add(receiver);                    
+      }      
+      else {        
+        PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
+            userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
+            isRecipientCurrentUser);
+        recipientList.add(receiver);
+      }
+    }
 
-      User currentUser = UserDirectoryService.getCurrentUser();
+    //send as 1 action to all recipients
+    if (asEmail){
+    	//we need to add som headers
+    	additionalHeaders.add("From: " + systemEmail);
+    	additionalHeaders.add("Subject: " + message.getTitle());
+    	emailService.sendToUsers(recipients, additionalHeaders, bodyString);
+	
+ }
+    
+    
+    /** add sender as a saved recipient */
+    PrivateMessageRecipientImpl sender = new PrivateMessageRecipientImpl(
+    		currentUserAsString, typeManager.getSentPrivateMessageType(),
+        getContextId(), Boolean.TRUE);
+
+    recipientList.add(sender);
+
+    message.setRecipients(recipientList);
+
+    savePrivateMessage(message, false);
+  }
+
+private String buildMessageBody(PrivateMessage message) {
+	User currentUser = UserDirectoryService.getCurrentUser();
       StringBuilder body = new StringBuilder(message.getBody());
       
       body.insert(0, "From: " + currentUser.getDisplayName() + "<p/>"); 
@@ -1106,63 +1169,8 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       body.append(footer);
 
       String bodyString = body.toString();
-      
-      /** determines if default in sakai.properties is set, if not will make a reasonable default */
-      String defaultEmail = "postmaster@" + ServerConfigurationService.getServerName();
-      String systemEmail = ServerConfigurationService.getString("msgcntr.notification.from.address", defaultEmail);
-      
-      /** determine if current user is equal to recipient */
-      Boolean isRecipientCurrentUser = 
-        (currentUserAsString.equals(userId) ? Boolean.TRUE : Boolean.FALSE);      
-      
-      if (!asEmail && forwardingEnabled){
-      	  if(pf != null)
-      	  {
-      	  	emailService.send(systemEmail, pf.getAutoForwardEmail(), message.getTitle(), 
-              bodyString, u.getEmail(), null, additionalHeaders);
-      	  }
-      	  else if(oldPf != null)
-      	  {
-      	  	emailService.send(systemEmail, oldPf.getAutoForwardEmail(), message.getTitle(), 
-                bodyString, u.getEmail(), null, additionalHeaders);      	  	
-      	  }
-          
-          // use forwarded address if set
-          
-          PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
-              userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
-              isRecipientCurrentUser);
-          recipientList.add(receiver);                    
-      }      
-      else if (asEmail){
-    	  
-    	 PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
-                  userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
-                  isRecipientCurrentUser);
-    	 recipientList.add(receiver);
-    	  
-         emailService.send(systemEmail, u.getEmail(), message.getTitle(), 
-            bodyString, u.getEmail(), null, additionalHeaders);
-      }      
-      else{        
-        PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
-            userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
-            isRecipientCurrentUser);
-        recipientList.add(receiver);
-      }
-    }
-
-    /** add sender as a saved recipient */
-    PrivateMessageRecipientImpl sender = new PrivateMessageRecipientImpl(
-    		currentUserAsString, typeManager.getSentPrivateMessageType(),
-        getContextId(), Boolean.TRUE);
-
-    recipientList.add(sender);
-
-    message.setRecipients(recipientList);
-
-    savePrivateMessage(message, false);
-  }
+	return bodyString;
+}
 
   /**
    * @see org.sakaiproject.api.app.messageforums.ui.PrivateMessageManager#markMessageAsReadForUser(org.sakaiproject.api.app.messageforums.PrivateMessage)
