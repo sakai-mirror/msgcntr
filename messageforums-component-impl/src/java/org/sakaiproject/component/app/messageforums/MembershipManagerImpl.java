@@ -301,6 +301,7 @@ public class MembershipManagerImpl implements MembershipManager{
     if (realm == null)
 			throw new IllegalStateException("AuthzGroup realm == null!");
     Set users = realm.getMembers();
+    List<User> userList = userDirectoryService.getUsers(users);
     if (users == null)
 		throw new Error("Could not obtain members from realm!");
 
@@ -310,16 +311,15 @@ public class MembershipManagerImpl implements MembershipManager{
       Role userRole = member.getRole();            
       
       User user = null;
-      try{
+      
       	if(realm.getMember(userId) != null && realm.getMember(userId).isActive())
       	{
-      		user = userDirectoryService.getUser(userId);
+      		user = getUserFromList(member.getUserId(), userList);
       	}
-      } catch (UserNotDefinedException e) {
-		// TODO Auto-generated catch block
-		// e.printStackTrace();
-    	  LOG.warn(" User " + userId + " not defined");
-	}            
+      	if (user == null){
+      		//user does not exits
+      		continue;
+      	}
       
       if(user != null)
       {
@@ -351,6 +351,16 @@ public class MembershipManagerImpl implements MembershipManager{
     return Arrays.asList(membershipArray);     
   }
   
+  private User getUserFromList(String userId, List<User> userList) {
+	  User u = null;
+	  for (int i = 0; i < userList.size(); i++) {
+		  User tu = (User) userList.get(i);
+		  if (userId.equals(tu.getId()))
+			  return tu;
+	  }
+	  
+	  return u;
+  }
     
   /**
    * get site reference
