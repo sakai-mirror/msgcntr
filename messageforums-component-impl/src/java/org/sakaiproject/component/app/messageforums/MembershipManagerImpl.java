@@ -303,6 +303,7 @@ public class MembershipManagerImpl implements MembershipManager{
     Set users = realm.getMembers();
     List userIds = getRealmIdList(users);
     List<User> userList = userDirectoryService.getUsers(userIds);
+    Map<String, User> userMMap = getuserMap(userList);
     if (users == null)
 		throw new Error("Could not obtain members from realm!");
 
@@ -315,7 +316,9 @@ public class MembershipManagerImpl implements MembershipManager{
       
       	if(realm.getMember(userId) != null && realm.getMember(userId).isActive())
       	{
-      		user = getUserFromList(member.getUserId(), userList);
+      		if (userMMap.containsKey(member.getUserId())) {
+      			user = getUserFromList(member.getUserId(), userList);
+      		}
       	}
       	if (user == null){
       		//user does not exits
@@ -369,6 +372,15 @@ public class MembershipManagerImpl implements MembershipManager{
 	  while (it.hasNext()) {
 		  Member mem = (Member)it.next();
 		  ret.add(mem.getUserId());
+	  }
+	  return ret;
+  }
+  
+  private Map<String, User>  getuserMap(List userList) {
+	  Map<String, User> ret = new HashMap<String, User>();
+	  for (int i = 0; i < userList.size(); i++) {
+		  User tu = (User) userList.get(i);
+		  ret.put(tu.getId(), tu);
 	  }
 	  return ret;
   }
