@@ -302,7 +302,7 @@ public class MembershipManagerImpl implements MembershipManager{
 			throw new IllegalStateException("AuthzGroup realm == null!");
     Set users = realm.getMembers();
     List userIds = getRealmIdList(users);
-    List<User> userList = userDirectoryService.getUsers(users);
+    List<User> userList = userDirectoryService.getUsers(userIds);
     if (users == null)
 		throw new Error("Could not obtain members from realm!");
 
