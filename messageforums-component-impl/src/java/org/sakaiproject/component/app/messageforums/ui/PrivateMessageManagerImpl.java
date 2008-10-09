@@ -23,9 +23,11 @@ package org.sakaiproject.component.app.messageforums.ui;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Hibernate;
@@ -1034,6 +1036,13 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
 
     Area currentArea = getAreaByContextIdAndTypeId(typeManager.getPrivateMessageAreaType());
     List<PrivateForum> privateForums = currentArea.getPrivateForums();
+    
+    //create a map for efficient lookup for large sites
+    Map<String, PrivateForum> pfMap = new HashMap<String, PrivateForum>();
+    for (int i = 0; i < privateForums.size(); i++) {
+    	PrivateForum pf1 = (PrivateForum)privateForums.get(i);
+    	pfMap.put(pf1.getOwner(), pf1);
+    }
     //this only needs to be done if the message is not being sent
     for (Iterator i = recipients.iterator(); i.hasNext();)
     {
@@ -1044,11 +1053,13 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       
       boolean forwardingEnabled = false;
       String forwardAddress = null;
-      //as this is a hefty overhead only do this if we're not sendign as email
+      //as this is a hefty overhead only do this if we're not sending as email
       if (!asEmail) {
     	  /** determine if recipient has forwarding enabled */
           
-          PrivateForum pf = getPrivateForumFormSiteList(currentArea, userId, privateForums);
+          PrivateForum pf = null;
+          if (pfMap.containsKey(userId))
+        	  pfMap.get(userId);
           
     	  if (pf != null && pf.getAutoForward().booleanValue()){
     		  forwardingEnabled = true;
@@ -1111,16 +1122,6 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     savePrivateMessage(message, false);
   }
 
-private PrivateForum getPrivateForumFormSiteList(Area currentArea, String userId, List<PrivateForum> siteForumList) {
-	
-	PrivateForum pf = null;
-	for (int i = 0; i < siteForumList.size(); i++) {
-		PrivateForum pf1 = (PrivateForum)siteForumList.get(i);
-		if (pf1.getOwner().equals(userId))
-			return pf1;
-	}
-	return pf;
-}
 
 private String buildMessageBody(PrivateMessage message) {
 	User currentUser = UserDirectoryService.getCurrentUser();
