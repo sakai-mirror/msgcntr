@@ -301,6 +301,7 @@ public class MembershipManagerImpl implements MembershipManager{
     if (realm == null)
 			throw new IllegalStateException("AuthzGroup realm == null!");
     Set users = realm.getMembers();
+    List userIds = getRealmIdList(users);
     List<User> userList = userDirectoryService.getUsers(users);
     if (users == null)
 		throw new Error("Could not obtain members from realm!");
@@ -362,6 +363,16 @@ public class MembershipManagerImpl implements MembershipManager{
 	  return u;
   }
     
+  private List<String> getRealmIdList(Set realmUsers) {
+	  List ret = new ArrayList();
+	  Iterator it = realmUsers.iterator();
+	  while (it.hasNext()) {
+		  Member mem = (Member)it.next();
+		  ret.add(mem.getUserId());
+	  }
+	  return ret;
+  }
+  
   /**
    * get site reference
    * @return siteId
