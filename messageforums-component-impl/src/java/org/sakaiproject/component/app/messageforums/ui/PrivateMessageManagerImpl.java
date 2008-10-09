@@ -1058,9 +1058,10 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     	  {
     		  //only check for default settings if the pf is null
     		  PrivateForum oldPf = forumManager.getPrivateForumByOwnerAreaNull(userId);
-    		  if (oldPf != null && oldPf.getAutoForward().booleanValue())
+    		  if (oldPf != null && oldPf.getAutoForward().booleanValue()) {
     			  forwardAddress = oldPf.getAutoForwardEmail();
-    		  forwardingEnabled = true;
+    			  forwardingEnabled = true;
+    		  }
     	  }
 
       }
