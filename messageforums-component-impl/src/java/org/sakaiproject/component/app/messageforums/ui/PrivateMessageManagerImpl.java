@@ -1040,86 +1040,86 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     
     if (!asEmail) {
     	currentArea = getAreaByContextIdAndTypeId(typeManager.getPrivateMessageAreaType());
-    	
+
     	//this is fairly inneficient and should realy be a convenience method to lookup
     	// the users who want to forward their messages
     	privateForums = currentArea.getPrivateForums();
-    	
+
     	//create a map for efficient lookup for large sites
-        pfMap = new HashMap<String, PrivateForum>();
-        for (int i = 0; i < privateForums.size(); i++) {
-        	PrivateForum pf1 = (PrivateForum)privateForums.get(i);
-        	pfMap.put(pf1.getOwner(), pf1);
-        }
-    }
-    
-    
-    
-    //this only needs to be done if the message is not being sent
-    for (Iterator i = recipients.iterator(); i.hasNext();)
-    {
-      User u = (User) i.next();      
-      String userId = u.getId();
-      
-      
-      
-      boolean forwardingEnabled = false;
-      String forwardAddress = null;
-      //as this is a hefty overhead only do this if we're not sending as email
-      if (!asEmail) {
-    	  /** determine if recipient has forwarding enabled */
-          
-          PrivateForum pf = null;
-          if (pfMap.containsKey(userId))
-        	  pfMap.get(userId);
-          
-    	  if (pf != null && pf.getAutoForward().booleanValue()){
-    		  forwardingEnabled = true;
-    		  forwardAddress = pf.getAutoForwardEmail();
-    	  }
-    	  if( pf == null)  
-    	  {
-    		  //only check for default settings if the pf is null
-    		  PrivateForum oldPf = forumManager.getPrivateForumByOwnerAreaNull(userId);
-    		  if (oldPf != null && oldPf.getAutoForward().booleanValue()) {
-    			  forwardAddress = oldPf.getAutoForwardEmail();
-    			  forwardingEnabled = true;
-    		  }
-    	  }
+    	pfMap = new HashMap<String, PrivateForum>();
+    	for (int i = 0; i < privateForums.size(); i++) {
+    		PrivateForum pf1 = (PrivateForum)privateForums.get(i);
+    		pfMap.put(pf1.getOwner(), pf1);
+    	}
 
-      }
-      /** determine if current user is equal to recipient */
-      Boolean isRecipientCurrentUser = 
-        (currentUserAsString.equals(userId) ? Boolean.TRUE : Boolean.FALSE);      
-      
-      if (!asEmail && forwardingEnabled){
-      	  	emailService.send(systemEmail, forwardAddress, message.getTitle(), 
-              bodyString, u.getEmail(), null, additionalHeaders);
-      	  
-          
-          // use forwarded address if set
-          
-          PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
-              userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
-              isRecipientCurrentUser);
-          recipientList.add(receiver);                    
-      }      
-      else {        
-        PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
-            userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
-            isRecipientCurrentUser);
-        recipientList.add(receiver);
-      }
-    }
 
-    //send as 1 action to all recipients
-    if (asEmail){
+
+
+    	//this only needs to be done if the message is not being sent
+    	for (Iterator i = recipients.iterator(); i.hasNext();)
+    	{
+    		User u = (User) i.next();      
+    		String userId = u.getId();
+
+
+
+    		boolean forwardingEnabled = false;
+    		String forwardAddress = null;
+    		//as this is a hefty overhead only do this if we're not sending as email
+    		if (!asEmail) {
+    			/** determine if recipient has forwarding enabled */
+
+    			PrivateForum pf = null;
+    			if (pfMap.containsKey(userId))
+    				pfMap.get(userId);
+
+    			if (pf != null && pf.getAutoForward().booleanValue()){
+    				forwardingEnabled = true;
+    				forwardAddress = pf.getAutoForwardEmail();
+    			}
+    			if( pf == null)  
+    			{
+    				//only check for default settings if the pf is null
+    				PrivateForum oldPf = forumManager.getPrivateForumByOwnerAreaNull(userId);
+    				if (oldPf != null && oldPf.getAutoForward().booleanValue()) {
+    					forwardAddress = oldPf.getAutoForwardEmail();
+    					forwardingEnabled = true;
+    				}
+    			}
+
+    		}
+    		/** determine if current user is equal to recipient */
+    		Boolean isRecipientCurrentUser = 
+    			(currentUserAsString.equals(userId) ? Boolean.TRUE : Boolean.FALSE);      
+
+    		if (!asEmail && forwardingEnabled){
+    			emailService.send(systemEmail, forwardAddress, message.getTitle(), 
+    					bodyString, u.getEmail(), null, additionalHeaders);
+
+
+    			// use forwarded address if set
+
+    			PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
+    					userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
+    					isRecipientCurrentUser);
+    			recipientList.add(receiver);                    
+    		}      
+    		else {        
+    			PrivateMessageRecipientImpl receiver = new PrivateMessageRecipientImpl(
+    					userId, typeManager.getReceivedPrivateMessageType(), getContextId(),
+    					isRecipientCurrentUser);
+    			recipientList.add(receiver);
+    		}
+    	}
+
+    } else {
+    	//send as 1 action to all recipients
     	//we need to add some headers
     	additionalHeaders.add("From: " + systemEmail);
     	additionalHeaders.add("Subject: " + message.getTitle());
     	emailService.sendToUsers(recipients, additionalHeaders, bodyString);
-	
- }
+
+    }
     
     
     /** add sender as a saved recipient */
