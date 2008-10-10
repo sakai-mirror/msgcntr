@@ -1023,6 +1023,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       return;
     }
 
+
     //build the message body
     List additionalHeaders = new ArrayList(1);
     additionalHeaders.add("Content-Type: text/html");
@@ -1197,7 +1198,7 @@ private String buildMessageBody(PrivateMessage message) {
       body.append(footer);
 
       String bodyString = body.toString();
-	return bodyString;
+      return bodyString;
 }
 
   /**
