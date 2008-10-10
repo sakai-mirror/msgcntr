@@ -1008,6 +1008,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     }
 
     String currentUserAsString = getCurrentUser();
+    User currentUser = UserDirectoryService.getCurrentUser();
     List recipientList = new UniqueArrayList();
 
     /** test for draft message */
@@ -1033,6 +1034,15 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     String defaultEmail = "postmaster@" + ServerConfigurationService.getServerName();
     String systemEmail = ServerConfigurationService.getString("msgcntr.notification.from.address", defaultEmail);
    
+    if (!ServerConfigurationService.getBoolean("msgcntr.notification.user.real.from", false)) {
+    	systemEmail = ServerConfigurationService.getString("msgcntr.notification.from.address", defaultEmail);
+    } else  {
+    	if (currentUser.getEmail() != null)
+    		systemEmail = currentUser.getEmail();
+    	else
+    		systemEmail = ServerConfigurationService.getString("msgcntr.notification.from.address", defaultEmail);
+
+    
     String bodyString = buildMessageBody(message);
     
     Area currentArea = null;
