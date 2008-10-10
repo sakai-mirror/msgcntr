@@ -1033,16 +1033,28 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     String systemEmail = ServerConfigurationService.getString("msgcntr.notification.from.address", defaultEmail);
    
     String bodyString = buildMessageBody(message);
-
-    Area currentArea = getAreaByContextIdAndTypeId(typeManager.getPrivateMessageAreaType());
-    List<PrivateForum> privateForums = currentArea.getPrivateForums();
     
-    //create a map for efficient lookup for large sites
-    Map<String, PrivateForum> pfMap = new HashMap<String, PrivateForum>();
-    for (int i = 0; i < privateForums.size(); i++) {
-    	PrivateForum pf1 = (PrivateForum)privateForums.get(i);
-    	pfMap.put(pf1.getOwner(), pf1);
+    Area currentArea = null;
+    List<PrivateForum> privateForums = null;
+    Map<String, PrivateForum> pfMap = null;
+    
+    if (!asEmail) {
+    	currentArea = getAreaByContextIdAndTypeId(typeManager.getPrivateMessageAreaType());
+    	
+    	//this is fairly inneficient and should realy be a convenience method to lookup
+    	// the users who want to forward their messages
+    	privateForums = currentArea.getPrivateForums();
+    	
+    	//create a map for efficient lookup for large sites
+        pfMap = new HashMap<String, PrivateForum>();
+        for (int i = 0; i < privateForums.size(); i++) {
+        	PrivateForum pf1 = (PrivateForum)privateForums.get(i);
+        	pfMap.put(pf1.getOwner(), pf1);
+        }
     }
+    
+    
+    
     //this only needs to be done if the message is not being sent
     for (Iterator i = recipients.iterator(); i.hasNext();)
     {
