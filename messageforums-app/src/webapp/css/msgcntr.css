@@ -20,7 +20,7 @@
 	/*a spacer between title + metadata and the links*/
 	padding-left: 1em;
 }
-.topicBloc a.show,.topicBloc a.hide,.forumHeader a.show,.forumHeader a.hide,.singleMessage a.show,.singleMessage a.hide{
+.topicBloc a.show,.topicBloc a.hide,.forumHeader a.show,.forumHeader a.hide,.singleMessage a.show,.singleMessage a.hide, .singleMessageReply a.show,.singleMessageReply a.hide{
 	/*show and hide descr links in various places*/
 	color: #f55 !important;
 	font-size: 95%;
@@ -28,7 +28,7 @@
 	margin: .4em 0;
 	vertical-align: middle;
 }
-.topicBloc a.show img,.topicBloc a.hide img,.forumHeader a.show img,.forumHeader a.hide img,.singleMessage a.show img,.singleMessage a.hide img{
+.topicBloc a.show img,.topicBloc a.hide img,.forumHeader a.show img,.forumHeader a.hide img, .singleMessage a.show img,.singleMessage a.hide img,  .singleMessageReply a.show img,.singleMessageReply a.hide img{
 	/*image associated with show and hide descr links in various places*/
 	vertical-align: middle;
 	padding: 2px 0;
@@ -55,7 +55,7 @@
 	/*inner container topic metadata adjutments in single topic view*/
 	margin: .5em 0 1em 0;
 }
-.singleMessage .title,.topicBloc .title,.pendingApproval .title{
+.singleMessage .title, .singleMessageReply .title, .topicBloc .title,.pendingApproval .title{
 	/*	title for all the above cases*/
 	font-weight: bold;
 	font-size: 1.2em;
@@ -72,6 +72,20 @@
 	margin-right: 5px;
 	/*	display:none; - uncomment to hide the "new" message */
 }
+.childrenNew{
+	color: #f50;
+	font-size:87%;
+	outline:1px solid #f96;
+	font-weight:bold;
+	/*border:1px solid #f50;*/
+	background: #fff;
+	padding: 0 3px;
+	margin: 5px;
+	/*	display:none; - uncomment to hide the "new" message */
+}
+.childrenNewThread{
+		outline:none;
+	}
 .topicIcon{
 	display:none; /*	comment to show blue or orange speech balloons by topics in Forum list view */
 }
@@ -161,13 +175,11 @@
 }
 .otherActions{
 	/*parent of all links in the "other actions" link list*/
-	padding: .2em .4em;
-	margin-left: 1em;
+	padding: 0;
+	color:#ccc;
 	text-align: left;
-	background: #eee;
-	display: inline;
 	white-space: nowrap;
-	font-size: 1em;
+	font-size: .87em;
 }
 .allMessages .messageTitle .firstChild{
 	/*first post in a thread in topic listing (no body)*/
@@ -179,6 +191,10 @@
 	border-left: 1px solid #69d;
 	padding-left: 5px;
 }
+
+.allMessages td.attach{
+	vertical-align:middle;
+}
 .pendingApproval{
 	/*listing of a message pending aproval*/
 	border-left: 2px solid #ccc;
@@ -187,9 +203,17 @@
 /*PART 3 - SINGLE MESSAGE DISPLAY*/
 .singleMessage{
 	/*title + metadata block of a single message display*/
-	border-left: 2px solid #ccc;
+	border-left:2px solid #ccc;
+	background:#fff;
 	margin-top: 1em;
-	padding-left: .5em;
+	padding:.3em  .5em;
+}
+.singleMessageReply{
+	/*title + metadata block of a single message display*/
+	border:1px solid #ccc;
+	background:#ffe;
+	margin-top: 1em;
+	padding:.3em  .5em;
 }
 table.messageActions {
 	/*single message action links top container*/
@@ -204,7 +228,7 @@ table.messageActions td{
 .messageActions a{
 	/*single message action links*/
 	text-decoration: none !important;
-	border: 1px solid #ccc !important;
+	border: 1px solid #ccc !important; 
 	background: #fff;
 	padding: 2px 5px;
 	vertical-align: middle;
@@ -246,6 +270,10 @@ span.messageAlert,span.messageInformation,.messageComfirm{
 	padding-right: 1em;
 }
 /*utils, special cases, sakai overrides*/
+.upLevel{
+	/*go up one level link, uncomment to show*/
+	/*display:none*/
+}
 td.attach{
 	vertical-align: middle;
 	padding: 2px 0;
@@ -380,4 +408,10 @@ table.discTria:hover{
 	white-space: nowrap;
 	padding: 0 .3em;
 	background: #ffe;
+}
+.messageMetadata{
+	padding:1px 0
+}
+.messageMetadata span.md{
+	border-bottom:1px solid #ccc;
 }
