@@ -213,6 +213,11 @@ public interface DiscussionForumManager
   /**
    * @return
    */
+  public boolean isSectionTA();
+
+  /**
+   * @return
+   */
   public DiscussionForum createForum();
 
   /**

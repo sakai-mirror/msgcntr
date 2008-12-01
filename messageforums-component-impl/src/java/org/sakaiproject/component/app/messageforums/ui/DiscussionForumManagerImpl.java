@@ -831,7 +831,20 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     else
       return false;
   }
+  
+  
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#isInstructor()
+   */
+  public boolean isSectionTA()
+  {
+    LOG.debug("isSectionTA()");
+    return isSectionTA(userDirectoryService.getCurrentUser());
+  }
 
+  
   /**
    * Check if the given user has site.upd access
    * 
@@ -847,6 +860,24 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     if (user != null)
       return securityService.unlock(user, "site.upd", siteId);
+    else
+      return false;
+  }
+
+  /**
+   * Check if the given user has section.role.ta access
+   * 
+   * @param user
+   * @return
+   */
+  private boolean isSectionTA(User user)
+  {
+    if (LOG.isDebugEnabled())
+    {
+      LOG.debug("isSectionTA(User " + user + ")");
+    }
+    if (user != null)
+      return securityService.unlock(user, "section.role.ta", getContextSiteId());
     else
       return false;
   }
