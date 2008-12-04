@@ -83,7 +83,7 @@ public class ForumsEmailService {
 	 */
 	public ForumsEmailService(List toEmailAddress, Message reply,
 			DiscussionMessageBean currthread) {
-		this.toEmailAddress = toEmailAddress;
+		this.toEmailAddress = filterMailAddresses(toEmailAddress);
 		this.reply = reply;
 		this.smtpServer = ServerConfigurationService
 				.getString("smtp@org.sakaiproject.email.api.EmailService");
@@ -97,7 +97,7 @@ public class ForumsEmailService {
 		List attachmentList = null;
 		Attachment a = null;
 		try {
-			Properties props = new Properties();
+			Properties props = System.getProperties();
 			// TODO
 
 			// check for testMode@org.sakaiproject.email.api.EmailService
@@ -110,25 +110,27 @@ public class ForumsEmailService {
 				return;
 			}
 			props.setProperty("mail.smtp.host", smtpServer);
-
+				
 			Session session;
-			session = Session.getInstance(props);
+			session = Session.getInstance(props, null);
 			session.setDebug(true);
+			
 			MimeMessage msg = new MimeMessage(session);
+			
 
-			String fromName = DiscussionForumTool
-					.getResourceBundleString("email.fromName");
+			String fromName = ServerConfigurationService.getString("ui.service", "LocalSakaiName");
 
-			String fromEmailAddress = DiscussionForumTool
-					.getResourceBundleString("email.fromAddress");
-
+			String fromEmailAddress = DiscussionForumTool.getResourceBundleString("email.fromAddress", 
+					new Object[]{ServerConfigurationService.getString("serverName", "localhost")});
+			log.info(fromEmailAddress);
+			
 			String subject = DiscussionForumTool
 					.getResourceBundleString("email.subject");
 
 			InternetAddress fromIA = new InternetAddress(fromEmailAddress,
 					fromName);
 			msg.setFrom(fromIA);
-
+			log.debug("from: " + fromName + "<" + fromEmailAddress + ">");
 			// form the list of to: addresses from the users users collection
 			InternetAddress[] to = new InternetAddress[toEmailAddress.size()];
 
@@ -136,7 +138,9 @@ public class ForumsEmailService {
 			int indx = 0;
 			while (useriter.hasNext()) {
 				String email = (String) useriter.next();
-				if ((email != null) && (email.length() > 0)) {
+				log.info("got mail <" + email + ">");
+				if ((email != null) && (email.length() > 0) && isValidEmail(email)) {
+					log.info("adding email <" + email + ">");
 					try {
 						to[indx] = new InternetAddress(email);
 						indx++;
@@ -224,9 +228,10 @@ public class ForumsEmailService {
 			Multipart multipart = new MimeMultipart();
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
 			messageBodyPart.setContent(content.toString(), "text/html");
-			multipart.addBodyPart(messageBodyPart);
+			messageBodyPart.addHeader("Content-Transfer-Encoding", "quoted-printable");
+            multipart.addBodyPart(messageBodyPart);
 			msg.setContent(multipart);
-
+			
 			for (int count = 0; count < fileList.size(); count++) {
 				messageBodyPart = new MimeBodyPart();
 				FileDataSource source = new FileDataSource((File) fileList
@@ -350,4 +355,41 @@ public class ForumsEmailService {
 		return redirecturl;
 
 	}
+	private boolean isValidEmail(String email) {
+		
+		// TODO: Use a generic Sakai utility class (when a suitable one exists)
+		
+		if (email == null || email.equals(""))
+			return false;
+		
+		email = email.trim();
+		//must contain @
+		if (email.indexOf("@") == -1)
+			return false;
+		
+		//an email can't contain spaces
+		if (email.indexOf(" ") > 0)
+			return false;
+		
+		
+		if (email.matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*$")) 
+			return true;
+	
+		log.warn(email + " is not a valid eamil address");
+		return false;
+	}
+	
+	private List<String> filterMailAddresses(List<String> toEmailAddress) {
+		
+		List<String> ret = new ArrayList<String>();
+		for (int i = 0; i < toEmailAddress.size(); i++) {
+			String mail = (String)toEmailAddress.get(i);
+			if (isValidEmail(mail))
+				ret.add(mail);
+		}
+		
+		return ret;
+		
+	}
+
 }
