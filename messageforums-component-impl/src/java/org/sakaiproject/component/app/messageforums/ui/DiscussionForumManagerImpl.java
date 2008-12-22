@@ -1489,7 +1489,22 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     {
       LOG.debug("getTopicAccess(DiscussionTopic" + t + ")");
     }
-    if (t.getDraft().equals(Boolean.FALSE)
+    //SAK-12685 If topic's permission level name is "None", then can't access 
+    boolean nonePermission = false;
+    User user=userDirectoryService.getCurrentUser();
+    String role=AuthzGroupService.getUserRole(user.getId(), getContextSiteId());
+    Set membershipItemSet = t.getMembershipItemSet();
+    Iterator it = membershipItemSet.iterator();
+    while(it.hasNext()) {
+    	DBMembershipItem membershipItem =(DBMembershipItem)it.next();
+    	String roleName = membershipItem.getName();
+    	String permissionName = membershipItem.getPermissionLevelName();
+    	if(roleName.equals(role) && permissionName.equals(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONE)){
+    		nonePermission = true;
+    	}    	
+    }   
+
+    if ((t.getDraft().equals(Boolean.FALSE) && !nonePermission)
         || (t.getDraft().equals(Boolean.TRUE) && t.getCreatedBy().equals(
             sessionManager.getCurrentSessionUserId())) || isInstructor()
         || securityService.isSuperUser()
