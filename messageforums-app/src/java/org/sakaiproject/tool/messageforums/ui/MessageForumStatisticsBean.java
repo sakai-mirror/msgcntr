@@ -713,4 +713,8 @@ public class MessageForumStatisticsBean {
 	    
 	    return (String) paramMap.get(parameterId);    
 	  }
+
+    public String getCurrentSiteId() {
+        return ToolManager.getCurrentPlacement().getContext();
+    }
 }

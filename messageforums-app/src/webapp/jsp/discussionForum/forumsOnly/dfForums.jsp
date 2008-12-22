@@ -25,6 +25,7 @@ org.sakaiproject.tool.cover.SessionManager.getCurrentToolSession().
     <sakai:tool_bar_item value="#{msgs.cdfm_organize}" action="#{ForumTool.processActionTemplateOrganize}" rendered="#{ForumTool.instructor}" />
 	  <sakai:tool_bar_item value="#{msgs.cdfm_template_setting}" action="#{ForumTool.processActionTemplateSettings}" rendered="#{ForumTool.instructor}" />
 	  <sakai:tool_bar_item value="#{msgs.stat_list}" action="#{ForumTool.processActionStatistics}" rendered="#{ForumTool.instructor}" />
+	  <sakai:tool_bar_item value="#{msgs.extended_stat_list}" action="#{ForumTool.processActionExtendedStatistics}" rendered="#{ForumTool.instructor && ForumTool.displayExtendedStatsOption}" />
 	  <sakai:tool_bar_item value="#{msgs.cdfm_msg_pending_queue} #{msgs.cdfm_openb}#{ForumTool.numPendingMessages}#{msgs.cdfm_closeb}" action="#{ForumTool.processPendingMsgQueue}" rendered="#{ForumTool.displayPendingMsgQueue}" />
   </sakai:tool_bar>
 

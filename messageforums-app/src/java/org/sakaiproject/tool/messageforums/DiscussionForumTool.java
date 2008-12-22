@@ -126,6 +126,7 @@ public class DiscussionForumTool
   private static final String UNREAD_VIEW = "dfUnreadView";
   private static final String GRADE_MESSAGE = "dfMsgGrade";
   private static final String FORUM_STATISTICS = "dfStatisticsList";
+  private static final String FORUM_EXTENDED_STATISTICS = "dfExtendedStatistics";
   private static final String FORUM_STATISTICS_USER = "dfStatisticsUser";
   private static final String ADD_COMMENT = "dfMsgAddComment";
   private static final String PENDING_MSG_QUEUE = "dfPendingMessages";
@@ -133,6 +134,9 @@ public class DiscussionForumTool
   private static final String PERMISSION_MODE_TEMPLATE = "template";
   private static final String PERMISSION_MODE_FORUM = "forum";
   private static final String PERMISSION_MODE_TOPIC = "topic";
+
+  private static final String STATS_MODE_FORUM = "forum";
+  private static final String STATS_MODE_USER = "user";
 
   private DiscussionForumBean selectedForum;
   private DiscussionTopicBean selectedTopic;
@@ -254,6 +258,7 @@ public class DiscussionForumTool
   
   private boolean editMode = true;
   private String permissionMode;
+  private String statsMode;
   
   //grading 
   private static final String DEFAULT_GB_ITEM = "Default_0";
@@ -564,6 +569,26 @@ public class DiscussionForumTool
   {
     LOG.debug("processActionStatistics()");
     return FORUM_STATISTICS;
+  }
+  
+  /**
+   * @return
+   */
+  public String processActionExtendedStatistics()
+  {
+    LOG.debug("processActionExtendedStatistics()");
+    setStatsMode(STATS_MODE_FORUM);
+    return FORUM_EXTENDED_STATISTICS;
+  }
+  
+  /**
+   * @return
+   */
+  public String processActionExtendedStatisticsUser()
+  {
+    LOG.debug("processActionExtendedStatisticsUser()");
+    setStatsMode(STATS_MODE_USER);
+    return FORUM_EXTENDED_STATISTICS;
   }
   
   /**
@@ -2852,6 +2877,28 @@ public class DiscussionForumTool
 	  OpenForum forumInDb = forumManager.getForumById(forum.getId());
 	  
 	  return forumInDb != null;
+  }
+
+  public static final String PROP_EXTENDED_STATS_SITE = "forums.stats.extended";
+  public static final String PROP_EXTENDED_STATS_GLOBAL = "forums.stats.extended.global";
+
+  public boolean isDisplayExtendedStatsOption()
+  {
+        String global = ServerConfigurationService.getString(PROP_EXTENDED_STATS_GLOBAL);
+        if ("".equals(global)) {
+            String site = null;
+            try {
+                Site currentSite = SiteService.getSite(ToolManager.getCurrentPlacement().getContext());
+                site = currentSite.getProperties().getProperty(PROP_EXTENDED_STATS_SITE);
+            } catch (IdUnusedException e) {
+                site = null;
+            }
+
+            if (site == null || "".equals(site)) {
+                return false;
+            }
+        }
+        return true;
   }
 
   public String processDfComposeToggle()
@@ -5821,6 +5868,14 @@ public class DiscussionForumTool
 		public void setPermissionMode(String permissionMode) {
 			this.permissionMode = permissionMode;
 		}
+
+        public String getStatsMode() {
+            return statsMode;
+        }
+        
+        public void setStatsMode(String statsMode) {
+            this.statsMode = statsMode;
+        }
 
 		public List getSelectedGroupsUsersList() {
 			return selectedGroupsUsersList;
