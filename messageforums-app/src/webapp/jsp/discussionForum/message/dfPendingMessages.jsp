@@ -13,6 +13,7 @@
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
+			
 
 			<h3>
 				<h:commandLink action="#{ForumTool.processActionHome}" value="#{msgs.cdfm_message_forums}" title=" #{msgs.cdfm_message_forums}"
@@ -22,6 +23,32 @@
 				<h:outputText value=" " /><h:outputText value=" / " /><h:outputText value=" " />
 				<h:outputText value="#{msgs.cdfm_msg_pending_queue_title}" />
 			</h3>
+			<script type="text/javascript">
+				$(document).ready(function() {
+				$('.listHier tr th a').fadeTo("fast",0.50)	
+			    //deactivate remove link if nothing checked
+			    $(':checkbox').click(function(){
+			        var makeActive = false
+			        $('tr').removeClass('selectedSelected');
+			        $('td :checkbox').each(function(){
+			            if (this.checked) {
+			                makeActive = true
+			                $(this).parents("tr").addClass('selectedSelected');
+			            }
+			        });
+			        if (makeActive) {
+						$('.listHier tr th a').fadeTo("fast",1)
+			        }
+			        else {
+						$('.listHier tr th a').fadeTo("fast",0.50)			        }
+			        
+			    });
+
+
+
+
+				});
+			</script>
 			
 			<div class="instruction">
 				<p>	

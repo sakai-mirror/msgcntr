@@ -24,7 +24,7 @@
 			<f:verbatim><h:outputText value=" " /><h:outputText value=" / " /><h:outputText value=" " /></f:verbatim>
 			<h:outputText value="#{ForumTool.selectedForum.forum.title}" />
 		</h3>
-		<h:panelGrid columns="1" summary="layout" styleClass="forumHeader">
+		<h:panelGrid columns="1" summary="layout" styleClass="forumHeader specialLink">
 			<h:panelGroup>
 				<h:outputText styleClass="highlight title" id="draft" value="#{msgs.cdfm_draft}" rendered="#{ForumTool.selectedForum.forum.draft == 'true'}"/>
 				<h:outputText id="draft_space" value=" -  " rendered="#{ForumTool.selectedForum.forum.draft == 'true'}" styleClass="title"/>
@@ -113,8 +113,12 @@
 						</h:commandLink>
 						<h:outputText styleClass="textPanelFooter" id="topic_msg_count" value=" #{msgs.cdfm_openb} #{topic.totalNoMessages} #{msgs.cdfm_lowercase_msg} - #{topic.unreadNoMessages} #{msgs.cdfm_unread}" rendered="#{topic.isRead && topic.totalNoMessages == 1}"/>
 						<h:outputText styleClass="textPanelFooter" id="topic_msgs_count" value=" #{msgs.cdfm_openb} #{topic.totalNoMessages} #{msgs.cdfm_lowercase_msgs} - #{topic.unreadNoMessages} #{msgs.cdfm_unread}" rendered="#{topic.isRead && (topic.totalNoMessages > 1 ||  topic.totalNoMessages == 0)}"/>
+
+
+
+
 						<h:outputText id="topic_moderated" value="#{msgs.cdfm_topic_moderated_flag}" styleClass="textPanelFooter" rendered="#{topic.moderated == 'true'}" />
-						<h:outputText value=" #{msgs.cdfm_closeb}"styleClass="textPanelFooter" />
+						<h:outputText value=" #{msgs.cdfm_closeb}" styleClass="textPanelFooter" />
 
 						<h:outputText styleClass="childrenNew" value=" #{msgs.cdfm_newflagparent}"  rendered="#{topic.unreadNoMessages > 0 }" />
 

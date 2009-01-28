@@ -15,6 +15,19 @@
 		<h:form id="revise">
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>      
+			<script type="text/javascript" src="/sakai-messageforums-tool/js/jquery.charcounter.js"> </script>
+			
+			  <script type="text/javascript">
+            $(document).ready(function(){
+				jQuery.noConflict();
+				var charRemFormat = $('.charRemFormat').text();
+				$(".forum_shortDescriptionClass").charCounter(255, {
+					container: ".charsRemaining",
+					format: charRemFormat
+				 });
+			 });				 
+        </script>
+	
 			<sakai:tool_bar_message value="#{msgs.cdfm_discussion_topic_settings}" />
 				<div class="instruction">
 					<h:outputText id="instruction"  value="#{msgs.cdfm_settings_instruction}"/>
@@ -34,8 +47,17 @@
 			</h:panelGrid>
 			<h:panelGrid columns="1"  columnClasses="longtext">
 				<h:panelGroup>
-					<h:outputLabel id="outputLabel1" for="topic_shortDescription"  value="#{msgs.cdfm_shortDescription}"  styleClass="block"/>
-					<h:inputTextarea rows="3" cols="45" id="topic_shortDescription"  value="#{ForumTool.selectedTopic.topic.shortDescription}"/>
+					<h:outputLabel id="outputLabel1" for="topic_shortDescription"  value="#{msgs.cdfm_shortDescription}" />
+
+							<h:outputText value="#{msgs.cdfm_shortDescriptionCharsRem}"  styleClass="charRemFormat" style="display:none"/>
+							<%--							
+							<h:outputText value="%1 chars remain"  styleClass="charRemFormat" style="display:none"/>
+							--%>
+							<h:outputText value="" styleClass="charsRemaining" style="padding-left:3em;font-size:.85em;"/>
+							<h:outputText value=""  style="display:block"/>
+					
+
+					<h:inputTextarea rows="3" cols="45" id="topic_shortDescription"  value="#{ForumTool.selectedTopic.topic.shortDescription}" styleClass="forum_shortDescriptionClass" style="float:none"/>
 				</h:panelGroup>	
 			</h:panelGrid>
 

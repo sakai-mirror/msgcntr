@@ -9,8 +9,24 @@
 <f:view>
 	<sakai:view title="#{msgs.cdfm_reply_tool_bar_message}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 	<!--jsp/dfMessageReply.jsp-->    
-		<h:form id="dfCompose">
+		<h:form id="dfCompose" styleClass="specialLink">
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
+			<script type="text/javascript">
+				$(document).ready(function() {
+					$('#openLinkBlock').hide();
+					jQuery('.toggle').click(function(e) { 
+						$('#replytomessage').toggle('slow');
+						$('.toggleParent').toggle();					
+						 resizeFrame('grow')
+				});
+				$('#countme').click(function(e){
+					$('#counttotal').text ((countStuff()));
+					msgupdatecounts = $('.msg-updatecount').text();
+					$('#countmetitle').text(msgupdatecounts);
+				});					
+				});
+			</script>
+				
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 			<h:outputText styleClass="messageAlert" value="#{msgs.cdfm_reply_deleted}" rendered="#{ForumTool.errorSynch}" />
 			<h3><h:outputText value="#{msgs.cdfm_reply_tool_bar_message}"  /></h3>
@@ -35,9 +51,20 @@
 						<f:convertDateTime pattern="#{msgs.date_format}" />  
 					</h:outputText>
 					<h:outputText value=" #{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
-			<%-- //designNote: need to make this toggle look and behave exactly like the  rest --%> 
-				<p style="padding:0;margin:.5em 0"><a href="javascript:$('#replytomessage').toggle();resizeFrame('grow')" class="show"><h:outputText value="#{msgs.cdfm_replytoshowhide}"/></a></p>
-				<div  id="replytomessage">   
+					<p style="padding:0;margin:.5em 0" id="openLinkBlock" class="toggleParent">
+						<a href="#" id="showMessage" class="toggle show">
+							<h:graphicImage url="/images/collapse.gif"/>	
+							<h:outputText value=" #{msgs.cdfm_read_full_rep_tomessage}" />
+						</a>
+					</p>
+					<p style="padding:0;margin:.5em 0" id="hideLinkBlock" class="toggleParent">
+						<a href="#" id="hideMessage" class="toggle show">
+							<h:graphicImage url="/images/expand.gif" />					
+							<h:outputText value=" #{msgs.cdfm_hide_full_rep_tomessage}"/>
+						</a>
+					</p>
+
+				<div id="replytomessage">   
 					<mf:htmlShowArea value="#{ForumTool.selectedMessage.message.body}" hideBorder="true" />
 					<h:dataTable value="#{ForumTool.selectedMessage.message.attachments}" var="eachAttach"  rendered="#{!empty ForumTool.selectedMessage.message.attachments}" columnClasses="attach,bogus" styleClass="attachList">
 						<h:column rendered="#{!empty ForumTool.selectedMessage.message.attachments}">
@@ -63,7 +90,6 @@
 		</p>	 
 
 			<h:panelGrid styleClass="jsfFormTable" columns="1" style="width: 100%;margin:0;">
-				
 			<h:panelGroup>
 				<h:message for="df_compose_title" styleClass="messageAlert" id="errorMessages"/>	
 				<h:outputLabel for="df_compose_title" styleClass="block" style="display:block;float:none;clear:both;padding-bottom:.3em;padding-top:.5em"><h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStar"/><h:outputText value="#{msgs.cdfm_reply_title}" /></h:outputLabel>
@@ -75,15 +101,42 @@
 				<h:inputHidden id="msgHidden" value="#{ForumTool.selectedMessage.message.body}" />
 				<h:inputHidden id="titleHidden" value="#{ForumTool.selectedMessage.message.title}" />
 				<h:outputText value="&nbsp;&nbsp;&nbsp; " escape="false" />
-				<a  href="#"  onclick="InsertHTML();">
-				<img src="/library/image/silk/paste_plain.png" />
-				<h:outputText value="#{msgs.cdfm_message_insert}" /></a>
+				<a href="#"  onclick="InsertHTML();">
+					<img src="/library/image/silk/paste_plain.png" />
+					<h:outputText value="#{msgs.cdfm_message_insert}" />
+				</a>
+				<a  id="countme" href="#" style="margin-left:3em"><img src="/library/image/silk/table_add.png" /> <span id="countmetitle"><h:outputText value="#{msgs.cdfm_message_count}" /></span></a>
+				<span  id="counttotal" class="highlight"> </span>
+				<h:outputText value="#{msgs.cdfm_message_count_update}" styleClass="msg-updatecount skip"/>		
 			</div>	
 			<sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
 			<script language="javascript" type="text/javascript">
-				var textareas = document.getElementsByTagName("textarea");
-				var rteId = textareas.item(0).id;
-	
+			 function countStuff() 
+			 {
+				var textInfo
+					var textareas = document.getElementsByTagName("textarea");
+					var rteId = textareas.item(0).id;
+					var oEditor = FCKeditorAPI.GetInstance(rteId) ;
+					var oDOM = oEditor.EditorDocument ;
+					if ( document.all ) // If Internet Explorer.
+					{
+						 charCount = oDOM.body.innerText.length ;
+						 wordCount=oDOM.body.innerText.split(" ").length;
+					}
+					else // If Gecko.
+					{
+						var r = oDOM.createRange();	
+						r.selectNodeContents(oDOM.body);
+						charCount = r.toString().length;
+						wordCount = r.toString().split(" ").length;
+					}
+					msgupdatecounts = $('.msg-updatecount').text();
+					textInfo = "(" + wordCount + ")"
+					return textInfo;
+				}
+			</script>
+			<script language="javascript" type="text/javascript">
+				
 				//	        function FCKeditor_OnComplete( editorInstance )
 				//	        {
 				//	          // clears the FCK editor after initial loading
@@ -91,6 +144,9 @@
 				//	        }
 							
 				// set the previous message variable
+				var textareas = document.getElementsByTagName("textarea");
+				var rteId = textareas.item(0).id;
+
 				var messagetext = document.forms['dfCompose'].elements['dfCompose:msgHidden'].value;
 				var titletext = document.forms['dfCompose'].elements['dfCompose:titleHidden'].value;
 			

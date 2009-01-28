@@ -3537,14 +3537,14 @@ public class DiscussionForumTool
       }
     }
     String currentBody = getComposeBody();
-    String revisedInfo = getResourceBundleString(LAST_REVISE_BY);
+    String revisedInfo = "<p class=\"lastRevise textPanelFooter\">" + getResourceBundleString(LAST_REVISE_BY);
     int wc=wordCount(currentBody);
 
     revisedInfo += getUserNameOrEid();
     
     revisedInfo  += " " + getResourceBundleString(LAST_REVISE_ON);
     Date now = new Date();
-    revisedInfo += now.toString() + " <br/> ";
+    revisedInfo += now.toString() + " </p> ";
     
 /*    if(currentBody != null && currentBody.length()>0 && currentBody.startsWith("Last Revised By "))
     {
@@ -4202,13 +4202,16 @@ public class DiscussionForumTool
 	  Message currMessage = selectedMessage.getMessage();
 	  
 	  StringBuilder sb = new StringBuilder();
-	  sb.append("<div style=\"font-style:italic; padding-bottom: 1.0em;\">");
-	  sb.append("<div style=\"font-weight:bold;\">");
+	  sb.append("<div class=\"messageCommentWrap\">");
+	  sb.append("<div class=\"messageCommentMD\">");
 	  sb.append(getResourceBundleString(MOD_COMMENT_TEXT) + " ");
 	  sb.append(UserDirectoryService.getCurrentUser().getDisplayName());
 	  sb.append("</div>");
+	  sb.append("<div class=\"messageCommentBody\">");
 	  sb.append(moderatorComments);
 	  sb.append("</div>");
+	  sb.append("</div>");
+
 	  
 	  String originalText = currMessage.getBody();
 	  currMessage.setBody(sb.toString() + originalText);

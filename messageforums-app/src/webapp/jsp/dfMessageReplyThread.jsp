@@ -13,7 +13,23 @@
 		<script type="text/javascript" src="/library/js/jquery.js"></script>
 		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 		<h:outputText styleClass="alertMessage" value="#{msgs.cdfm_reply_deleted}" rendered="#{ForumTool.errorSynch}" />
-		
+		<script type="text/javascript">
+				$(document).ready(function() {
+					$('#openLinkBlock').hide();
+					jQuery('.toggle').click(function(e) { 
+						$('#replytomessage').toggle('slow');
+						$('.toggleParent').toggle();					
+						resizeFrame('grow')
+				});					
+				$('#countme').click(function(e){
+					$('#counttotal').text ((countStuff()));
+					msgupdatecounts = $('.msg-updatecount').text();
+					$('#countmetitle').text(msgupdatecounts);
+					return null
+				});					
+				});
+			</script>
+
 		
 		<h3><h:outputText value="#{msgs.cdfm_reply_thread_tool_bar_message}"  /></h3>
 	
@@ -42,7 +58,20 @@
 				</h:outputText>
 				<h:outputText value=" #{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
 	
-				<p style="padding:0;margin:.5em 0"><a href="javascript:$('#replytomessage').toggle();resizeFrame('grow');" class="show"><h:outputText value="#{msgs.cdfm_replytoshowhide}"/></a></p>	
+					<p style="padding:0;margin:.5em 0" id="openLinkBlock" class="toggleParent">
+						<a href="#" id="showMessage" class="toggle show">
+							<h:graphicImage url="/images/collapse.gif"/>	
+							<h:outputText value=" #{msgs.cdfm_read_full_rep_tomessage}" />
+						</a>
+					</p>
+					<p style="padding:0;margin:.5em 0" id="hideLinkBlock" class="toggleParent">
+						<a href="#" id="hideMessage" class="toggle show">
+							<h:graphicImage url="/images/expand.gif" />					
+							<h:outputText value=" #{msgs.cdfm_hide_full_rep_tomessage}"/>
+						</a>
+					</p>
+
+
 			<div  id="replytomessage">	
 				<mf:htmlShowArea value="#{ForumTool.selectedMessage.message.body}" hideBorder="true" />
 	
@@ -89,8 +118,36 @@
 			<img src="/library/image/silk/paste_plain.png" />
 			<a  href="#"  onclick="InsertHTML();">
 			<h:outputText value="#{msgs.cdfm_message_insert}" /></a>
+			<a  id="countme" href="#" style="margin-left:3em"><img src="/library/image/silk/table_add.png" /> <span id="countmetitle"><h:outputText value="#{msgs.cdfm_message_count}" /></span></a>
+			<span  id="counttotal" class="highlight"> </span>
+			<h:outputText value="#{msgs.cdfm_message_count_update}" styleClass="msg-updatecount skip"/>		
+			
 		</div>
 		<sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
+			<script language="javascript" type="text/javascript">
+			 function countStuff() 
+			 {
+				var textInfo
+					var textareas = document.getElementsByTagName("textarea");
+					var rteId = textareas.item(0).id;
+					var oEditor = FCKeditorAPI.GetInstance(rteId) ;
+					var oDOM = oEditor.EditorDocument ;
+					if ( document.all ) // If Internet Explorer.
+					{
+						 wordCount=oDOM.body.innerText.split(" ").length;
+					}
+					else // If Gecko.
+					{
+						var r = oDOM.createRange();	
+						r.selectNodeContents(oDOM.body);
+						wordCount = r.toString().split(" ").length;
+					}
+					msgupdatecounts = $('.msg-updatecount').text();
+					textInfo =  "(" + wordCount + ")";
+					return textInfo;
+				}
+			</script>
+
 		<script language="javascript" type="text/javascript">
 			var textareas = document.getElementsByTagName("textarea");
 			var rteId = textareas.item(0).id;

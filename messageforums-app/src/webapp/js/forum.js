@@ -5,7 +5,6 @@ function setPanelId(thisid)
 }
 
 
-/*
 function showHideDivBlock(hideDivisionNo, context)
 {
   var tmpdiv = hideDivisionNo + "__hide_division_";
@@ -13,6 +12,7 @@ function showHideDivBlock(hideDivisionNo, context)
   var divisionNo = getTheElement(tmpdiv);
   var imgNo = getTheElement(tmpimg);
   if(divisionNo)
+ 
   {
     if(divisionNo.style.display =="block")
     {
@@ -35,40 +35,6 @@ function showHideDivBlock(hideDivisionNo, context)
       resizeFrame('grow');
     }
   }
-}
-*/
-
-
-function showHideDivBlock(hideDivisionNo, context)
-{
-	var tmpdiv = hideDivisionNo + "__hide_division_";
-	var tmpimg = hideDivisionNo + "__img_hide_division_";
-	var divisionNo = getTheElement(tmpdiv);
-	var imgNo = getTheElement(tmpimg);
-	// toggle a fade
-	jQuery.fn.fadeToggle = function(speed, easing, callback) {
-		return this.animate({opacity: 'toggle'}, 500, easing, callback);
-	};
-	if(divisionNo){
-		if ( $(divisionNo).is(':visible') ){
-			if (imgNo)
-			{
-				imgNo.src = context + "/images/right_arrow.gif";
-			}
-		}
-		else
-		{
-			if(imgNo)
-			{
-				imgNo.src = context + "/images/down_arrow.gif";
-			}
-		}
-		$(divisionNo).fadeToggle();
-		if(panelId != null)
-		{
-			resizeFrame('grow');
-		}
-	}
 }
 
 
@@ -306,12 +272,50 @@ function mySetMainFrameHeight(id)
 	}
 }
 
+
+function setupMessageNav(messageType){
+  	if ($("." + messageType).size() >= 1) {
+		if (messageType =="messageNew"){
+			tofirst=$("#firstNewItemTitleHolder").text();
+			tonext=$("#nextNewItemTitleHolder").text();
+			last=$("#lastNewItemTitleHolder").text();
+		}
+		else{
+			tofirst=$("#firstPendingItemTitleHolder").text();
+			tonext=$("#nextPendingItemTitleHolder").text();
+			last=$("#lastPendingItemTitleHolder").text();
+		}
+		$('#messNavHolder').append("<span class='jumpToNew specialLink'><a href='#" + messageType + "newMess0'>" + tofirst + "</a></span>");
+  		$("." + messageType).each(function(intIndex){
+  			$(this).after("<a name='" + messageType + "newMess" + intIndex + "'></a>");
+  			if (intIndex !== ($("." + messageType).size() - 1)) {
+  				$(this).css({
+  					cursor: "pointer"
+  				});
+					$(this).attr("title",tonext);
+  					$(this).click(function(){
+  					document.location = "#" + messageType + "newMess" + (intIndex + 1);
+  				});
+  			}
+				else{
+					$(this).attr("title",last);
+				}
+  		});
+  	}
+  	if ($(".messageNew").size() < 1 && $(".messagePending").size() < 1) {
+		$('#messNavHolder').remove()
+	}
+  }
+
+
 function doAjax(messageId, topicId, self){
  	$(self).attr('src', '/library/image/sakai/spinner.gif');
 	$.ajax({ type: "GET", url: "dfAjax", data: "action=markMessageAsRead&messageId=" + messageId + "&topicId=" + topicId,
       success: function(msg){
          if(msg.match(/SUCCESS/)){
      		setTimeout(function(){
+							$(self).parents("tr").children("td").children("span").children("span.messageNew").hide();
+							$(self).parents("div").parents("div").children("span.messageNew").hide();
               $(self).remove();
                $("#" + messageId).parents("tr:first").children("td").each(function(){this.innerHTML = this.innerHTML.replace(/unreadMsg/g, 'bogus'); });
             }, 500);

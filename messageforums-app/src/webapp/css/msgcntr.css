@@ -22,7 +22,7 @@
 }
 .topicBloc a.show,.topicBloc a.hide,.forumHeader a.show,.forumHeader a.hide,.singleMessage a.show,.singleMessage a.hide, .singleMessageReply a.show,.singleMessageReply a.hide{
 	/*show and hide descr links in various places*/
-	color: #f55 !important;
+/*	color: #f55 !important;*/
 	font-size: 95%;
 	text-decoration: none !important;
 	margin: .4em 0;
@@ -35,7 +35,7 @@
 }
 .toggle{
 /*	long description toggled container*/
-	padding-left: 1em;
+	padding-left:0;
 	font-size: .92em;
 	line-height: 1.5em;
 }
@@ -66,54 +66,76 @@
 	margin: .5em 0;
 }
 .messageNew{
-	color: #fff;
-	background: #f50;
-	padding: 0 3px;
+	color: #000;
+	font: .84em/1em verdana, arial,sans-serif;
+	background: #fe9;
+	outline:1px solid #fff; 
+	padding: 1px 2px;
 	margin-right: 5px;
 	/*	display:none; - uncomment to hide the "new" message */
 }
 .childrenNew{
-	color: #f50;
+	color: #e90;
 	font-size:87%;
-	outline:1px solid #f96;
 	font-weight:bold;
-	/*border:1px solid #f50;*/
-	background: #fff;
-	padding: 0 3px;
+	padding: 1px 2px;
 	margin: 5px;
-	/*	display:none; - uncomment to hide the "new" message */
+	/*	display:none; - uncomment to hide the message associated with parents of new messages*/
 }
-.childrenNewThread{
-		outline:none;
-	}
+#messNavHolder{
+	float:none;
+	display:block;
+	line-height: 2em;
+	height:100%;
+	overflow:hidden;
+	padding:2px 0;
+	margin:.3em 0;
+	clear:both;
+}
+.jumpToNew{
+	padding:2px;
+}
+.jumpToNew a {
+	border:1px solid #ccc;
+	padding:3px;
+	padding-left:18px;
+	background: #eee url(../images/silk/arrow_down.png) center left no-repeat;
+}
 .topicIcon{
-	display:none; /*	comment to show blue or orange speech balloons by topics in Forum list view */
+/*	display:none; 	comment to hide blue or orange speech balloons by topics in Forum list view */
 }
 /* PART 2 - TOPIC/THREAD VIEWS*/
 .messagePending{
-	background: #cd5;
-	color: #790;
-	padding: 0 3px;
+	background: #bf9;
+	font: .84em/1em verdana, arial,sans-serif;
+	color: #000;
+	outline:1px solid #fff; 
+	padding: 1px 2px;
 	margin-right: 5px;
 }
 .messageDenied{
-	color: #e77;
-	background: #fee;
-	padding: 0 3px;
+	color: #000;
+	font: .84em/1em verdana, arial,sans-serif;
+	background: #f9a;
+	outline:1px solid #fff; 	
+	padding: 1px 2px;
 	margin-right: 5px;
 }
 .markAsReadIcon{
 	cursor:pointer;
 	margin-left:.5em;
-	background: #fff url(../images/12-em-check.png) center left no-repeat
+	background: #fff url(../images/silk/email.png) center left no-repeat
+}
+.markAsReadIcon:hover{
+	background: #fff url(../images/silk/email_open.png) center left no-repeat
 }
 .messagesFlat,.messagesThreaded{
 	width: 98% !important;
 	margin: 1em 0 !important;
-	border-spacing: .5em;
+/*	border-spacing: .5em;*/
 }
 .messagesFlat  tbody tr div,.messagesThreaded tbody tr div{
-	border: none !important;
+	border: none
 }
 .messagesFlat tbody tr td div.hierItemBlock,.messagesThreaded tbody tr td div.hierItemBlock{
 	padding: 0 0 0 .5em !important;
@@ -175,12 +197,15 @@
 }
 .otherActions{
 	/*parent of all links in the "other actions" link list*/
-	padding: 0;
+	padding: 0 !important;
 	color:#ccc;
 	text-align: left;
 	white-space: nowrap;
 	font-size: .87em;
 }
+.otherActions a{
+	
+	}
 .allMessages .messageTitle .firstChild{
 	/*first post in a thread in topic listing (no body)*/
 	border-left: 1px solid #cd5;
@@ -414,4 +439,24 @@ table.discTria:hover{
 }
 .messageMetadata span.md{
 	border-bottom:1px solid #ccc;
+}
+
+.lastRevise{
+	margin:.3em 0;
+	padding:.3em 0;		
+}
+form{margin-bottom:0;}
+
+.messageCommentWrap{
+	border:1px solid  #ddd !important;
+	background: #ffd;
+	padding:3px 5px;
+	margin-bottom:10px
+}
+.messageCommentMD{
+	font-size:.9em;
+	text-decoration: underline;
+	margin-bottom:3px
+}
+.messageCommentBody{
 }
