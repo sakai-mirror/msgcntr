@@ -8,15 +8,23 @@ import java.util.Map;
 
 import org.sakaiproject.api.app.messageforums.DiscussionForum;
 import org.sakaiproject.api.app.messageforums.Topic;
+import org.sakaiproject.api.app.messageforums.DiscussionTopic;
 import org.sakaiproject.api.app.messageforums.entity.ForumTopicEntityProvider;
 import org.sakaiproject.api.app.messageforums.entity.ForumMessageEntityProvider;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.entitybroker.entityprovider.CoreEntityProvider;
+import org.sakaiproject.entitybroker.entityprovider.extension.TemplateMap;
+import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
+import org.sakaiproject.entitybroker.entityprovider.search.Search;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.AutoRegisterEntityProvider;
 import org.sakaiproject.entitybroker.entityprovider.capabilities.PropertyProvideable;
+import org.sakaiproject.entitybroker.entityprovider.capabilities.RedirectDefinable;
+import org.sakaiproject.entitybroker.entityprovider.capabilities.RESTful;
+import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
+import org.sakaiproject.entitybroker.EntityReference;
 
-public class ForumTopicEntityProviderImpl implements ForumTopicEntityProvider,
-    AutoRegisterEntityProvider, PropertyProvideable {
+public class ForumTopicEntityProviderImpl extends AbstractEntityProvider implements ForumTopicEntityProvider, CoreEntityProvider,
+        PropertyProvideable, RESTful, RedirectDefinable,AutoRegisterEntityProvider {
 
   private DiscussionForumManager forumManager;
 
@@ -122,4 +130,86 @@ public class ForumTopicEntityProviderImpl implements ForumTopicEntityProvider,
   public void setForumManager(DiscussionForumManager forumManager) {
     this.forumManager = forumManager;
   }
+
+
+    public String createEntity(EntityReference entityReference, Object entity, Map<String, Object> stringObjectMap) {
+        String id = entityReference.getId();
+        DiscussionForum discussionForum = forumManager.getForumById(Long.valueOf(id));
+        return forumManager.createTopic(discussionForum).getId()+"";
+    }
+
+    public Object getSampleEntity() {
+        return null;
+    }
+
+    public void updateEntity(EntityReference entityReference, Object entity, Map<String, Object> stringObjectMap) {
+
+        String id = entityReference.getId();
+        if (id == null) {
+            throw new IllegalArgumentException("The reference must include an id for updates (id is currently null)");
+        }
+        String userReference = developerHelperService.getCurrentUserReference();
+        if (userReference == null) {
+            throw new SecurityException("anonymous user cannot update topic: " + entityReference);
+        }
+        DiscussionTopic topic = forumManager.getTopicById(Long.getLong(id));
+        if (id == null) {
+            throw new IllegalArgumentException("No topic found to update for the given reference: " + entityReference);
+        }
+
+        DiscussionTopic updatedTopic  = (DiscussionTopic) entity;
+        String siteId = developerHelperService.getCurrentLocationId();
+        String userId = developerHelperService.getCurrentUserId();
+        boolean allowed = false;
+        String location = "/site/" + siteId;
+
+        if (forumManager.isInstructor(userId, siteId) || userId.equals(topic.getCreatedBy())) {
+            allowed = true;
+        }
+        if (!allowed) {
+            throw new SecurityException("Current user ("+userReference+") cannot update topic in location ("+location+")");
+        }
+
+        developerHelperService.copyBean(topic, updatedTopic, 0, new String[] {"id",}, true);
+        forumManager.saveTopic(topic);
+
+    }
+
+    public Object getEntity(EntityReference entityReference) {
+        String id = entityReference.getId();
+        DiscussionTopic topic  = forumManager.getTopicById(Long.valueOf(id));
+        if (topic == null) {
+            throw new IllegalArgumentException("No topic found for the given reference: " + entityReference);
+        }
+        return topic;
+    }
+
+    public void deleteEntity(EntityReference entityReference, Map<String, Object> stringObjectMap) {
+        String id = entityReference.getId();
+        if (id == null) {
+            throw new IllegalArgumentException("The reference must include an id for deletes (id is currently null)");
+        }
+
+        DiscussionTopic topic  = forumManager.getTopicById(Long.valueOf(id));
+        if (topic == null) {
+            throw new IllegalArgumentException("No topic found for the given reference: " + entityReference);
+        }
+        forumManager.deleteTopic(topic);
+    }
+
+    public List<?> getEntities(EntityReference entityReference, Search search) {
+        String forumId = entityReference.getId();
+        return forumManager.getTopicsByIdWithMessages(new Long(forumId));
+    }
+
+    public String[] getHandledOutputFormats() {
+        return new String[] {Formats.XML, Formats.JSON};
+    }
+
+    public String[] getHandledInputFormats() {
+        return new String[] {Formats.XML, Formats.JSON, Formats.HTML};
+    }
+    public TemplateMap[] defineURLMappings() {
+        return new TemplateMap[0];
+    }
 }
