@@ -12,6 +12,24 @@
 		<h:form id="dfCompose">
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
+			<script type="text/javascript">
+				$(document).ready(function() {
+					$('#openLinkBlock').hide();
+					jQuery('.toggle').click(function(e) { 
+						$('#replytomessage').toggle('slow');
+						$('.toggleParent').toggle();					
+						 resizeFrame('grow')
+				});
+				$('#countme').click(function(e){
+					$('#counttotal').text ((countStuff()));
+					msgupdatecounts = $('.msg-updatecount').text();
+					$('#countmetitle').text(msgupdatecounts);
+				});					
+				});
+			</script>
+
+
+
 			<h3><h:outputText value="#{msgs.cdfm_tool_bar_message}" /></h3>
 			<table class="topicBloc topicBlocLone specialLink">
 				<tr>
@@ -73,8 +91,36 @@
 				
 
 			<h:outputText value="#{msgs.cdfm_message}" />
+			<a  id="countme" href="#" style="margin-left:3em"><img src="/library/image/silk/table_add.png" /> <span id="countmetitle"><h:outputText value="#{msgs.cdfm_message_count}" /></span></a>
+			<span  id="counttotal" class="highlight"> </span>
+			<h:outputText value="#{msgs.cdfm_message_count_update}" styleClass="msg-updatecount skip"/>		
+
 			<sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
-		
+			<script language="javascript" type="text/javascript">
+			 function countStuff() 
+			 {
+				var textInfo
+					var textareas = document.getElementsByTagName("textarea");
+					var rteId = textareas.item(0).id;
+					var oEditor = FCKeditorAPI.GetInstance(rteId) ;
+					var oDOM = oEditor.EditorDocument ;
+					if ( document.all ) // If Internet Explorer.
+					{
+						 charCount = oDOM.body.innerText.length ;
+						 wordCount=oDOM.body.innerText.split(" ").length;
+					}
+					else // If Gecko.
+					{
+						var r = oDOM.createRange();	
+						r.selectNodeContents(oDOM.body);
+						charCount = r.toString().length;
+						wordCount = r.toString().split(" ").length;
+					}
+					msgupdatecounts = $('.msg-updatecount').text();
+					textInfo = "(" + wordCount + ")";
+					return textInfo;
+				}
+			</script>
 			<%--********************* Attachment *********************--%>
 			<h4>
 				<h:outputText value="#{msgs.cdfm_att}" />

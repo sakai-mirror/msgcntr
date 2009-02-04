@@ -8,26 +8,14 @@
 	<jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messagecenter.bundle.Messages"/>
 </jsp:useBean>
 <f:view>
+	<script type="text/javascript" src="/library/js/jquery.js"></script>
+	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>      
+	<script type="text/javascript" src="/sakai-messageforums-tool/js/jquery.charcounter.js"> </script>
 	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/permissions_header.js"/>
 	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
 	<sakai:view title="#{msgs.cdfm_discussion_topic_settings}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 		<!--jsp/dfReviseTopicSettingsAttach.jsp-->
 		<h:form id="revise">
-			<script type="text/javascript" src="/library/js/jquery.js"></script>
-			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>      
-			<script type="text/javascript" src="/sakai-messageforums-tool/js/jquery.charcounter.js"> </script>
-			
-			  <script type="text/javascript">
-            $(document).ready(function(){
-				jQuery.noConflict();
-				var charRemFormat = $('.charRemFormat').text();
-				$(".forum_shortDescriptionClass").charCounter(255, {
-					container: ".charsRemaining",
-					format: charRemFormat
-				 });
-			 });				 
-        </script>
-	
 			<sakai:tool_bar_message value="#{msgs.cdfm_discussion_topic_settings}" />
 				<div class="instruction">
 					<h:outputText id="instruction"  value="#{msgs.cdfm_settings_instruction}"/>
@@ -292,5 +280,15 @@
 			</div>
 			
 		</h:form>
+			  <script type="text/javascript">
+            $(document).ready(function(){
+				var charRemFormat = $('.charRemFormat').text();
+				$(".forum_shortDescriptionClass").charCounter(255, {
+					container: ".charsRemaining",
+					format: charRemFormat
+				 });
+			 });				 
+        </script>
+		
 	</sakai:view>
 </f:view>

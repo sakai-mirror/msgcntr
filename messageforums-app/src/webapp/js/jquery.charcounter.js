@@ -19,9 +19,8 @@
 			classname: "charcounter",
 			format: "(%1 characters remaining)",
 			pulse: true,
-			delay: 0,
+			delay: 0
 		}, settings);
-		
 		var p, timeout;
 		
 		function count(el, container) {
@@ -40,7 +39,6 @@
 					container.html(settings.format.replace(/%1/, (max - el.val().length)));
 				}, settings.delay);
 			} else {
-				$(container).removeClass ('highlight');
 				container.html(settings.format.replace(/%1/, (max - el.val().length)));
 			}
 		};
@@ -51,12 +49,10 @@
 				p = null;
 			};
 			el.animate({ opacity: 0.1 }, 100, function () {
-				$(this).addClass ('highlight');
 				$(this).animate({ opacity: 1.0 }, 100);
 			});
 			if (again) {
 				p = window.setTimeout(function () { pulse(el) }, 200);
-
 			};
 		};
 		
