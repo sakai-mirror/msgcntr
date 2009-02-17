@@ -36,16 +36,71 @@ public interface PermissionLevelManager {
 	public PermissionLevel getPermissionLevelByName(String name);
 	public String getPermissionLevelType(PermissionLevel level);  
 	public PermissionLevel createPermissionLevel(String name, String typeUuid, PermissionsMask mask);
+	
+	/**
+	 * 
+	 * @return the PermissionLevel representing the "Owner" level. If no level
+	 * exists in MFR_PERMISSION_LEVEL_T, returns a default owner permission level.
+	 * @throws IllegalStateException if no "Owner" type exists 
+	 */
 	public PermissionLevel getDefaultOwnerPermissionLevel();
+	
+	/**
+	 * 
+	 * @return the PermissionLevel representing the "Author" level. If no level
+	 * exists in MFR_PERMISSION_LEVEL_T, returns a default Author permission level.
+	 * @throws IllegalStateException if no "Author" type exists
+	 */
 	public PermissionLevel getDefaultAuthorPermissionLevel();
+	
+	/**
+	 * 
+	 * @return the PermissionLevel representing the "NoneditingAuthor" level. If no level
+	 * exists in MFR_PERMISSION_LEVEL_T, returns a default Nonediting Author permission level.
+	 * @throws IllegalStateException if no "NoneditingAuthor" type exists
+	 */
 	public PermissionLevel getDefaultNoneditingAuthorPermissionLevel();
+	
+	/**
+	 * 
+	 * @return the PermissionLevel representing the "Reviewer" level. If no level
+	 * exists in MFR_PERMISSION_LEVEL_T, returns a default owner permission level.
+	 * @throws IllegalStateException if no "Reviewer" type exists
+	 */
 	public PermissionLevel getDefaultReviewerPermissionLevel();
+	
+	/**
+	 * 
+	 * @return the PermissionLevel representing the "Contributor" level. If no level
+	 * exists in MFR_PERMISSION_LEVEL_T, returns a default Contributor permission level.
+	 * @throws IllegalStateException if no "Contributor" type exists
+	 */
 	public PermissionLevel getDefaultContributorPermissionLevel();
+	
+	/**
+	 * 
+	 * @return the PermissionLevel representing the "None" level. If no level
+	 * exists in MFR_PERMISSION_LEVEL_T, returns a default None permission level.
+	 * @throws IllegalStateException if no "None" type exists
+	 */
 	public PermissionLevel getDefaultNonePermissionLevel();
+	
+	/**
+	 * 
+	 * @return a list of the default (non-custom) permission levels available
+	 */
+	public List<PermissionLevel> getDefaultPermissionLevels();
+	
     public DBMembershipItem createDBMembershipItem(String name, String permissionLevelName, Integer type);
     public void saveDBMembershipItem(DBMembershipItem item);
     public void savePermissionLevel(PermissionLevel level);
+    
+    /**
+     * 
+     * @return a non-null list of the names for the non-custom permissions
+     */
     public  List getOrderedPermissionLevelNames(); 
+    
     public Boolean getCustomPermissionByName(String customPermissionName, PermissionLevel permissionLevel);
     public List getCustomPermissions();
   	public List getAllMembershipItemsForForumsForSite(final Long areaId);

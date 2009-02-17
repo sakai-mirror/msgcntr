@@ -21,6 +21,7 @@
 package org.sakaiproject.component.app.messageforums;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,7 +63,7 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 	private MessageForumsTypeManager typeManager;
 	private AreaManager areaManager;
 	
-	private Map defaultPermissionsMap;
+	private Map<String, PermissionLevel> defaultPermissionsMap;
 	
 	private static final String QUERY_BY_TYPE_UUID = "findPermissionLevelByTypeUuid";
 	private static final String QUERY_ORDERED_LEVEL_NAMES = "findOrderedPermissionLevelNames";
@@ -71,54 +72,24 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 	private static final String QUERY_BY_TOPIC_IDS_ALL_TOPIC_MEMBERSHIP = "findAllMembershipItemsForTopicsForSite";
 	private static final String QUERY_BY_AREA_ID_ALL_MEMBERSHIP =	"findAllMembershipItemsForSite";
 	
-	
+	private Boolean autoDdl;
 			
 	public void init(){
-    LOG.info("init()");
-    
-    try {
-       loadInitialDefaultPermissionLevel();
-    }
-    catch (Exception e) {
-       LOG.warn("Error loading initial default permissions", e);
-    }
-    
-    /** test creation of permission mask and author level
-    PermissionsMask mask = new PermissionsMask();
-    mask.put(PermissionLevel.NEW_FORUM, Boolean.TRUE); 
-    mask.put(PermissionLevel.NEW_TOPIC, Boolean.TRUE);
-    mask.put(PermissionLevel.NEW_RESPONSE, Boolean.TRUE);
-    mask.put(PermissionLevel.RESPONSE_TO_RESPONSE, Boolean.TRUE);
-    mask.put(PermissionLevel.MOVE_POSTING, Boolean.TRUE);
-    mask.put(PermissionLevel.CHANGE_SETTINGS, Boolean.TRUE);
-    mask.put(PermissionLevel.POST_GRADES, Boolean.TRUE);
-    mask.put(PermissionLevel.READ, Boolean.TRUE);
-    mask.put(PermissionLevel.MARK_AS_READ, Boolean.TRUE);
-    mask.put(PermissionLevel.MODERATE_POSTINGS, Boolean.TRUE);
-    mask.put(PermissionLevel.DELETE_OWN, Boolean.TRUE);
-    mask.put(PermissionLevel.DELETE_ANY, Boolean.TRUE);
-    mask.put(PermissionLevel.REVISE_OWN, Boolean.TRUE);
-    mask.put(PermissionLevel.REVISE_ANY, Boolean.TRUE);
-    DBMembershipItem membershipItem = createDBMembershipItem("jlannan", DBMembershipItemImpl.TYPE_USER);
-    PermissionLevel level = createPermissionLevel("Author", typeManager.getAuthorLevelType(), mask);    
-    Area area = areaManager.createArea(typeManager.getPrivateMessageAreaType());
-    
-    membershipItem.setPermissionLevel(level);
-    
-    // save DBMembershiptItem here to get an id so we can add to the set
-    saveDBMembershipItem(membershipItem);
-    area.addMembershipItem(membershipItem);
-           
-    area.setName("test");
-    area.setHidden(Boolean.FALSE);
-    area.setEnabled(Boolean.TRUE);
-    area.setLocked(Boolean.FALSE);
-    //area.addPermissionLevel(level);
-    areaManager.saveArea(area); 
-    
-    List l = getOrderedPermissionLevelNames();
-    **/
-    
+		LOG.info("init()");
+		try {
+
+			// add the default permission level and type data, if necessary
+			if (autoDdl != null && autoDdl) {
+				loadDefaultTypeAndPermissionLevelData();
+			}
+
+			// for performance, load the default permission level information now
+			// to make it reusable
+			initializePermissionLevelData();
+		} catch ( Exception ex ) {
+			LOG.error("PermissionsLevelManager - a problem occurred loading default permission level data ",ex);
+		}
+
 	}
 	
 	public PermissionLevel getPermissionLevelByName(String name){
@@ -149,21 +120,25 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		}
 	}
 	
-  public  List getOrderedPermissionLevelNames(){
-						
+	public  List getOrderedPermissionLevelNames(){
+
 		if (LOG.isDebugEnabled()){
 			LOG.debug("getOrderedPermissionLevelNames executing");
 		}
-		
-		HibernateCallback hcb = new HibernateCallback() {
-      public Object doInHibernate(Session session) throws HibernateException, SQLException {
-          Query q = session.getNamedQuery(QUERY_ORDERED_LEVEL_NAMES);                      
-          return q.list();
-      }
-    };
-					
-    return (List) getHibernateTemplate().execute(hcb);
-  }	
+
+		List<String> levelNames = new ArrayList<String>();
+
+		List<PermissionLevel> levels = getDefaultPermissionLevels();
+		if (levels != null && !levels.isEmpty()) {
+			for (PermissionLevel level : levels) {
+				levelNames.add(level.getName());
+			}
+			
+			Collections.sort(levelNames);
+		}
+
+		return levelNames;
+	}	
 	
 	public String getPermissionLevelType(PermissionLevel level){
 		
@@ -336,30 +311,17 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 
 	  if(level == null)
 	  {    
-		  PermissionsMask mask = new PermissionsMask();                
-		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(true)); 
-		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(true));
-		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(true));
-		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(true));
-		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(true));
-		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(true));
-		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(true));
-		  mask.put(PermissionLevel.READ, new Boolean(true));
-		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
-		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(true));
-		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(true));
-		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
-		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(true));
-		  
-		  PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_OWNER, typeUuid, mask);
-		  
-		  savePermissionLevel(permLevel);
-		  
-		  return permLevel;
+
+		  LOG.warn("No permission level data exists for the Owner level in the MFR_PERMISSION_LEVEL_T table. " +
+				  "If you have autoDdl=false, look at mfr_m2-m3_mysq_conversion.sql or mfr_m2-m3_oracle_conversion.sql" +
+		          "to insert the missing permission level data. Default owner permissions will be used.");
+
+		  // return the default owner permission
+		  PermissionsMask mask = getDefaultOwnerPermissionsMask();
+		  level = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_OWNER, typeUuid, mask);
 	  }
-	  else
-		  return level;
+		  
+	  return level;
   }
 
   public PermissionLevel getDefaultAuthorPermissionLevel(){
@@ -377,30 +339,16 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 
 	  if(level == null)
 	  {
+		  LOG.warn("No permission level data exists for the Author level in the MFR_PERMISSION_LEVEL_T table. " +
+				  "If you have autoDdl=false, look at mfr_m2-m3_mysq_conversion.sql or mfr_m2-m3_oracle_conversion.sql" +
+		          "to insert the missing permission level data. Default Author permission settings will be used.");
 
-		  PermissionsMask mask = new PermissionsMask();                
-		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(true)); 
-		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(true));
-		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(true));
-		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(true));
-		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(true));
-		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(true));
-		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(true));
-		  mask.put(PermissionLevel.READ, new Boolean(true));
-		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
-		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(true));
-		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
-		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(true));
-		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
-
-		  PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_AUTHOR, typeUuid, mask);
-		  savePermissionLevel(permLevel);
-		  
-		  return permLevel;
+		  // return the default author permission
+		  PermissionsMask mask = getDefaultAuthorPermissionsMask();
+		  level = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_AUTHOR, typeUuid, mask);
 	  }
-	  else
-		  return level;
+
+	  return level;
   }
 
   public PermissionLevel getDefaultNoneditingAuthorPermissionLevel(){
@@ -418,30 +366,17 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 
 	  if(level == null)
 	  {
-		  PermissionsMask mask = new PermissionsMask();                
-		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(true)); 
-		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(true));
-		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(true));
-		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(true));
-		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(false));
-		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(true));
-		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(true));
-		  mask.put(PermissionLevel.READ, new Boolean(true));
-		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
-		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
-		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(true));
-		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  LOG.warn("No permission level data exists for the NoneditingAuthor level in the MFR_PERMISSION_LEVEL_T table. " +
+		  		"If you have autoDdl=false, look at mfr_m2-m3_mysq_conversion.sql or mfr_m2-m3_oracle_conversion.sql" +
+		  		"to insert the missing default permission level data. Default NoneditingAuthor permission settings will be used.");
+		  
+		  // return the default nonediting author permission
+		  PermissionsMask mask = getDefaultNoneditingAuthorPermissionsMask();
+		  level = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONEDITING_AUTHOR, typeUuid, mask);
 
-		  PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONEDITING_AUTHOR, typeUuid, mask);
-		  
-		  savePermissionLevel(permLevel);
-		  
-		  return permLevel;
 	  }
-	  else
-		  return level;
+	  
+	  return level;
   }
 
   public PermissionLevel getDefaultReviewerPermissionLevel(){
@@ -459,31 +394,17 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 
 	  if(level == null)
 	  {
-		  PermissionsMask mask = new PermissionsMask();                
-		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(false)); 
-		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(false));
-		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(false));
-		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(false));
-		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(false));
-		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(false));
-		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(false));
-		  mask.put(PermissionLevel.READ, new Boolean(true));
-		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
-		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
-		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
-		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  LOG.warn("No permission level data exists for the Reviewer level in the MFR_PERMISSION_LEVEL_T table. " +
+		  		"If you have autoDdl=false, look at mfr_m2-m3_mysq_conversion.sql or mfr_m2-m3_oracle_conversion.sql" +
+		  		"to insert the missing permission level data. Default Reviewer permissions will be used.");
+		  
+		  // return the default reviewer permission
+		  PermissionsMask mask = getDefaultReviewerPermissionsMask();
+		  level = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_REVIEWER, typeUuid, mask);
 
-		  PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_REVIEWER, typeUuid, mask);
-		  
-		  savePermissionLevel(permLevel);
-		  
-		  return permLevel;
 	  }
-	  else
-		  return level;
-
+	  
+	  return level;
   }
 
   public PermissionLevel getDefaultContributorPermissionLevel(){
@@ -501,30 +422,17 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 
 	  if(level == null)
 	  {
-		  PermissionsMask mask = new PermissionsMask();                
-		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(false)); 
-		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(false));
-		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(true));
-		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(true));
-		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(false));
-		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(false));
-		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(false));
-		  mask.put(PermissionLevel.READ, new Boolean(true));
-		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
-		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
-		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
-		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  LOG.warn("No permission level data exists for the Contributor level in the MFR_PERMISSION_LEVEL_T table. " +
+		  		"If you have autoDdl=false, look at mfr_m2-m3_mysq_conversion.sql or mfr_m2-m3_oracle_conversion.sql" +
+		  		"to insert the missing permission level data. Default Contributor permissions will be used.");
 		  
-		  PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_CONTRIBUTOR, typeUuid, mask);
-		  
-		  savePermissionLevel(permLevel);
-		  
-		  return permLevel;
+		  // return the default contributor permission
+		  PermissionsMask mask = getDefaultContributorPermissionsMask();
+		  level = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_CONTRIBUTOR, typeUuid, mask);
+
 	  }
-	  else
-		  return level;	
+
+	  return level;	
   }
 
   public PermissionLevel getDefaultNonePermissionLevel(){
@@ -542,56 +450,59 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 
 	  if(level == null)
 	  {    
-		  PermissionsMask mask = new PermissionsMask();                
-		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(false)); 
-		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(false));
-		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(false));
-		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(false));
-		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(false));
-		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(false));
-		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(false));
-		  mask.put(PermissionLevel.READ, new Boolean(false));
-		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(false));
-		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
-		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
-		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
-		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  LOG.warn("No permission level data exists for the None level in the MFR_PERMISSION_LEVEL_T table. " +
+		  		"If you have autoDdl=false, look at mfr_m2-m3_mysq_conversion.sql or mfr_m2-m3_oracle_conversion.sql" +
+		  		"to insert the missing permission level data. Default None permissions will be used.");
+		  
+		// return the default None permission
+		  PermissionsMask mask = getDefaultNonePermissionsMask();
+		  level = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONE, typeUuid, mask);
 
-		  PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONE, typeUuid, mask);
-		  
-		  savePermissionLevel(permLevel);
-		  
-		  return permLevel;
 	  }
-	  else
-		  return level;
+	
+	  return level;
   }
   	
-	private PermissionLevel getDefaultPermissionLevel(final String typeUuid){
-		
-		if (typeUuid == null) {      
-      throw new IllegalArgumentException("Null Argument");
-		}
-		
-		if (LOG.isDebugEnabled()){
-			LOG.debug("getDefaultPermissionLevel executing with typeUuid: " + typeUuid);
-		}
-		
-		if(defaultPermissionsMap != null && defaultPermissionsMap.get(typeUuid) != null)
-			return ((PermissionLevel)defaultPermissionsMap.get(typeUuid)).clone();
-		
-		HibernateCallback hcb = new HibernateCallback() {
-      public Object doInHibernate(Session session) throws HibernateException, SQLException {
-          Query q = session.getNamedQuery(QUERY_BY_TYPE_UUID);
-          q.setParameter("typeUuid", typeUuid);            
-          return q.uniqueResult();
-      }
-    };
-					
-    PermissionLevel returnedLevel = (PermissionLevel) getHibernateTemplate().execute(hcb);
-    
-    return returnedLevel;
+  /**
+   * 
+   * @param typeUuid
+   * @return the PermissionLevel for the given typeUuid. Returns null if no
+   * PermissionLevel found.
+   */
+  private PermissionLevel getDefaultPermissionLevel(final String typeUuid){
+
+	  if (typeUuid == null) {      
+		  throw new IllegalArgumentException("Null Argument");
+	  }
+
+	  if (LOG.isDebugEnabled()){
+		  LOG.debug("getDefaultPermissionLevel executing with typeUuid: " + typeUuid);
+	  }
+
+	  PermissionLevel level = null;
+
+	  if(defaultPermissionsMap != null && defaultPermissionsMap.containsKey(typeUuid)) {
+		  // check to see if it is already in the map that was created at startup
+		  level =  ((PermissionLevel)defaultPermissionsMap.get(typeUuid)).clone();
+		  if (LOG.isDebugEnabled()) LOG.debug("got Default PermissionLevel from defaultPermissionsMap as " + level);
+	  
+	  } else {
+		  // retrieve it from the table
+		  HibernateCallback hcb = new HibernateCallback() {
+			  public Object doInHibernate(Session session) throws HibernateException, SQLException {
+				  Query q = session.getNamedQuery(QUERY_BY_TYPE_UUID);
+				  q.setParameter("typeUuid", typeUuid);            
+
+				  return q.uniqueResult();
+			  }
+		  };
+
+		  level = (PermissionLevel) getHibernateTemplate().execute(hcb);
+		  if (LOG.isDebugEnabled()) LOG.debug("Returned Permission Level from query was "+level);
+	  }
+
+	  return level;
+
   }	
 	
 	public Boolean getCustomPermissionByName(String customPermName, PermissionLevel permissionLevel) {
@@ -769,7 +680,7 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 			return new ArrayList();
 	}
 	
-	private void loadInitialDefaultPermissionLevel()
+	private void initializePermissionLevelData()
 	{
 		if (LOG.isDebugEnabled()){
 			LOG.debug("loadInitialDefaultPermissionLevel executing");
@@ -783,6 +694,64 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 		defaultPermissionsMap.put(typeManager.getContributorLevelType(), getDefaultContributorPermissionLevel());
 		defaultPermissionsMap.put(typeManager.getReviewerLevelType(), getDefaultReviewerPermissionLevel());
 		defaultPermissionsMap.put(typeManager.getNoneLevelType(), getDefaultNonePermissionLevel());	
+	}
+	
+	private void loadDefaultTypeAndPermissionLevelData() {
+		try {
+			// first, call the methods that will load type data if it is missing
+			String ownerType = typeManager.getOwnerLevelType();
+			String authorType = typeManager.getAuthorLevelType();
+			String contributorType = typeManager.getContributorLevelType();
+			String reviewerType = typeManager.getReviewerLevelType();
+			String noneditingAuthorType = typeManager.getNoneditingAuthorLevelType();
+			String noneType = typeManager.getNoneLevelType();
+
+			// now let's check to see if we need to add the default permission level
+			// data
+			if (getDefaultPermissionLevel(ownerType) == null) {
+				PermissionsMask mask = getDefaultOwnerPermissionsMask();
+				PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_OWNER, ownerType, mask);
+
+				savePermissionLevel(permLevel);
+			}
+
+			if (getDefaultPermissionLevel(authorType) == null) {
+				PermissionsMask mask = getDefaultAuthorPermissionsMask();
+				PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_AUTHOR, authorType, mask);
+
+				savePermissionLevel(permLevel);
+			}
+
+			if (getDefaultPermissionLevel(contributorType) == null) {
+				PermissionsMask mask = getDefaultContributorPermissionsMask();
+				PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_CONTRIBUTOR, contributorType, mask);
+
+				savePermissionLevel(permLevel);
+			}
+
+			if (getDefaultPermissionLevel(reviewerType) == null) {
+				PermissionsMask mask = getDefaultReviewerPermissionsMask();
+				PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_REVIEWER, reviewerType, mask);
+
+				savePermissionLevel(permLevel);
+			}
+
+			if (getDefaultPermissionLevel(noneditingAuthorType) == null) {
+				PermissionsMask mask = getDefaultNoneditingAuthorPermissionsMask();
+				PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONEDITING_AUTHOR, noneditingAuthorType, mask);
+
+				savePermissionLevel(permLevel);
+			}
+
+			if (getDefaultPermissionLevel(noneType) == null) {
+				PermissionsMask mask = getDefaultNonePermissionsMask();
+				PermissionLevel permLevel = createPermissionLevel(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONE, noneType, mask);
+
+				savePermissionLevel(permLevel);
+			}
+		} catch (Exception e) {
+			LOG.warn("Error loading initial default types and/or permissions", e);
+		}
 	}
 
 	public void deleteMembershipItems(Set membershipSet)
@@ -803,4 +772,147 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 			getHibernateTemplate().deleteAll(permissionLevels);
 		}
 	}
-}
+	
+	private PermissionsMask getDefaultOwnerPermissionsMask() {
+		PermissionsMask mask = new PermissionsMask();                
+		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(true)); 
+		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(true));
+		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(true));
+		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(true));
+		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(true));
+		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(true));
+		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(true));
+		  mask.put(PermissionLevel.READ, new Boolean(true));
+		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
+		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(true));
+		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(true));
+		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(true));
+		  
+		  return mask;
+	}
+	
+	private PermissionsMask getDefaultAuthorPermissionsMask() {
+		PermissionsMask mask = new PermissionsMask();                
+		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(true)); 
+		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(true));
+		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(true));
+		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(true));
+		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(true));
+		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(true));
+		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(true));
+		  mask.put(PermissionLevel.READ, new Boolean(true));
+		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
+		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(true));
+		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
+		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(true));
+		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  
+		  return mask;
+	}
+	
+	private PermissionsMask getDefaultContributorPermissionsMask() {
+		PermissionsMask mask = new PermissionsMask();                
+		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(false)); 
+		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(false));
+		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(true));
+		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(true));
+		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(false));
+		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(false));
+		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(false));
+		  mask.put(PermissionLevel.READ, new Boolean(true));
+		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
+		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
+		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  
+		  return mask;
+	}
+	
+	private PermissionsMask getDefaultNoneditingAuthorPermissionsMask() {
+		PermissionsMask mask = new PermissionsMask();                
+		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(true)); 
+		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(true));
+		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(true));
+		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(true));
+		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(false));
+		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(true));
+		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(true));
+		  mask.put(PermissionLevel.READ, new Boolean(true));
+		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
+		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
+		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(true));
+		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  
+		  return mask;
+	}
+	
+	private PermissionsMask getDefaultNonePermissionsMask() {
+		  PermissionsMask mask = new PermissionsMask();                
+		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(false)); 
+		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(false));
+		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(false));
+		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(false));
+		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(false));
+		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(false));
+		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(false));
+		  mask.put(PermissionLevel.READ, new Boolean(false));
+		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(false));
+		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
+		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  
+		  return mask;
+	}
+	
+	private PermissionsMask getDefaultReviewerPermissionsMask() {
+		PermissionsMask mask = new PermissionsMask();                
+		  mask.put(PermissionLevel.NEW_FORUM, new Boolean(false)); 
+		  mask.put(PermissionLevel.NEW_TOPIC, new Boolean(false));
+		  mask.put(PermissionLevel.NEW_RESPONSE, new Boolean(false));
+		  mask.put(PermissionLevel.NEW_RESPONSE_TO_RESPONSE, new Boolean(false));
+		  mask.put(PermissionLevel.MOVE_POSTING, new Boolean(false));
+		  mask.put(PermissionLevel.CHANGE_SETTINGS,new Boolean(false));
+		  mask.put(PermissionLevel.POST_TO_GRADEBOOK, new Boolean(false));
+		  mask.put(PermissionLevel.READ, new Boolean(true));
+		  mask.put(PermissionLevel.MARK_AS_READ,new Boolean(true));
+		  mask.put(PermissionLevel.MODERATE_POSTINGS, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.DELETE_ANY, new Boolean(false));
+		  mask.put(PermissionLevel.REVISE_OWN, new Boolean(false));
+		  mask.put(PermissionLevel.REVISE_ANY, new Boolean(false));
+		  
+		  return mask;
+	}
+	
+	public void setAutoDdl(Boolean autoDdl) {
+		this.autoDdl = autoDdl;
+	}
+	
+	public List<PermissionLevel> getDefaultPermissionLevels() {
+		// first, check for the levels in the map. if map is null,
+		// return the default permission level data
+		List<PermissionLevel> defaultLevels = new ArrayList<PermissionLevel>();
+		if (defaultPermissionsMap != null && !defaultPermissionsMap.isEmpty()) {
+			defaultLevels.addAll(defaultPermissionsMap.values());
+		} else {
+			if (LOG.isDebugEnabled()) LOG.debug("Default permissions map was null!! Loading defaults to return from getDefaultPermissionLevels");
+			defaultLevels.add(getDefaultOwnerPermissionLevel());
+			defaultLevels.add(getDefaultAuthorPermissionLevel());
+			defaultLevels.add(getDefaultContributorPermissionLevel());
+			defaultLevels.add(getDefaultNoneditingAuthorPermissionLevel());
+			defaultLevels.add(getDefaultNonePermissionLevel());
+			defaultLevels.add(getDefaultReviewerPermissionLevel());
+		}
+		
+		return defaultLevels;
+	}
+ }
