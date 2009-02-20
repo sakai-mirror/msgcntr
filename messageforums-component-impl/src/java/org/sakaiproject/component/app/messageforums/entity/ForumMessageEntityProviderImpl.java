@@ -144,7 +144,7 @@ public class ForumMessageEntityProviderImpl extends AbstractEntityProvider imple
         if (userReference == null) {
             throw new SecurityException("anonymous user cannot update forum: " + entityReference);
         }
-        Message  message = forumManager.getMessageById(Long.valueOf(id));
+        Message  message = forumManager.getMessageById(new Long(id));
         if (id == null) {
             throw new IllegalArgumentException("No Message found to update for the given reference: " + entityReference);
         }
@@ -171,7 +171,7 @@ public class ForumMessageEntityProviderImpl extends AbstractEntityProvider imple
     public Object getEntity(EntityReference entityReference) {
 
         String id = entityReference.getId();
-        Message message  = forumManager.getMessageById(Long.valueOf(id));
+        Message message  = forumManager.getMessageById(new Long(id));
         if (message == null) {
             throw new IllegalArgumentException("No Message found for the given reference: " + entityReference);
         }
@@ -185,7 +185,7 @@ public class ForumMessageEntityProviderImpl extends AbstractEntityProvider imple
             throw new IllegalArgumentException("The reference must include an id for deletes (id is currently null)");
         }
 
-        Message message  = forumManager.getMessageById(Long.valueOf(id));
+        Message message  = forumManager.getMessageById(new Long(id));
         if (message == null) {
             throw new IllegalArgumentException("No message found for the given reference: " + entityReference);
         }

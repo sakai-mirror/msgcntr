@@ -6,14 +6,14 @@ import org.sakaiproject.api.app.messageforums.entity.ForumTopicEntityProvider;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.entitybroker.EntityReference;
 import org.sakaiproject.entitybroker.util.AbstractEntityProvider;
-import org.sakaiproject.entitybroker.entityprovider.capabilities.PropertyProvideable;
-import org.sakaiproject.entitybroker.entityprovider.capabilities.RESTful;
-import org.sakaiproject.entitybroker.entityprovider.capabilities.RedirectDefinable;
-import org.sakaiproject.entitybroker.entityprovider.capabilities.AutoRegisterEntityProvider;
+import org.sakaiproject.entitybroker.entityprovider.capabilities.*;
 import org.sakaiproject.entitybroker.entityprovider.search.Search;
 import org.sakaiproject.entitybroker.entityprovider.extension.Formats;
 import org.sakaiproject.entitybroker.entityprovider.extension.TemplateMap;
+import org.sakaiproject.entitybroker.entityprovider.extension.RequestStorage;
 import org.sakaiproject.entitybroker.entityprovider.CoreEntityProvider;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 import java.text.DateFormat;
@@ -24,12 +24,19 @@ import java.util.Map;
 
 
 public class ForumEntityProviderImpl extends AbstractEntityProvider implements ForumEntityProvider, CoreEntityProvider,
-        PropertyProvideable, RESTful, RedirectDefinable, AutoRegisterEntityProvider {
+        RequestStorable, RESTful, RedirectDefinable {
 
     private DiscussionForumManager forumManager;
+    private static final Log log = LogFactory.getLog(ForumEntityProviderImpl.class);
 
     public String getEntityPrefix() {
         return ENTITY_PREFIX;
+    }
+
+    RequestStorage requestStorage = null;
+
+    public void setRequestStorage(RequestStorage requestStorage) {
+       this.requestStorage = requestStorage;
     }
 
     public boolean entityExists(String id) {
@@ -132,7 +139,7 @@ public class ForumEntityProviderImpl extends AbstractEntityProvider implements F
         if (userReference == null) {
             throw new SecurityException("anonymous user cannot update forum: " + entityReference);
         }
-        DiscussionForum  discussionForum = forumManager.getForumById(Long.getLong(id));
+        DiscussionForum  discussionForum = forumManager.getForumById(new Long(id));
         if (id == null) {
             throw new IllegalArgumentException("No forum found to update for the given reference: " + entityReference);
         }
@@ -157,7 +164,7 @@ public class ForumEntityProviderImpl extends AbstractEntityProvider implements F
     public Object getEntity(EntityReference entityReference) {
 
         String id = entityReference.getId();
-        DiscussionForum disccusionForum  = forumManager.getForumById(Long.valueOf(id));
+        DiscussionForum disccusionForum  = forumManager.getForumById(new Long(id));
         if (disccusionForum == null) {
             throw new IllegalArgumentException("No Forum found for the given reference: " + entityReference);
         }
@@ -172,7 +179,7 @@ public class ForumEntityProviderImpl extends AbstractEntityProvider implements F
             throw new IllegalArgumentException("The reference must include an id for deletes (id is currently null)");
         }
 
-        DiscussionForum disccusionForum  = forumManager.getForumById(Long.valueOf(id));
+        DiscussionForum disccusionForum  = forumManager.getForumById(new Long(id));
         if (disccusionForum == null) {
             throw new IllegalArgumentException("No forum found for the given reference: " + entityReference);
         }
@@ -180,9 +187,9 @@ public class ForumEntityProviderImpl extends AbstractEntityProvider implements F
     }
 
     public List<?> getEntities(EntityReference entityReference, Search search) {
-
-        String contextId = developerHelperService.getCurrentLocationId();
-        return forumManager.getDiscussionForumsByContextId(contextId);
+        if(log.isDebugEnabled()) log.debug("getEntities()");
+        List forums = forumManager.getDiscussionForumsWithTopics();        
+        return forums;
 
     }
 

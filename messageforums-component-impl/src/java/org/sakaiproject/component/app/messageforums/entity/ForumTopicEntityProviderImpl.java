@@ -134,7 +134,7 @@ public class ForumTopicEntityProviderImpl extends AbstractEntityProvider impleme
 
     public String createEntity(EntityReference entityReference, Object entity, Map<String, Object> stringObjectMap) {
         String id = entityReference.getId();
-        DiscussionForum discussionForum = forumManager.getForumById(Long.valueOf(id));
+        DiscussionForum discussionForum = forumManager.getForumById(new Long(id));
         return forumManager.createTopic(discussionForum).getId()+"";
     }
 
@@ -152,7 +152,7 @@ public class ForumTopicEntityProviderImpl extends AbstractEntityProvider impleme
         if (userReference == null) {
             throw new SecurityException("anonymous user cannot update topic: " + entityReference);
         }
-        DiscussionTopic topic = forumManager.getTopicById(Long.getLong(id));
+        DiscussionTopic topic = forumManager.getTopicById(new Long(id));
         if (id == null) {
             throw new IllegalArgumentException("No topic found to update for the given reference: " + entityReference);
         }
@@ -177,7 +177,7 @@ public class ForumTopicEntityProviderImpl extends AbstractEntityProvider impleme
 
     public Object getEntity(EntityReference entityReference) {
         String id = entityReference.getId();
-        DiscussionTopic topic  = forumManager.getTopicById(Long.valueOf(id));
+        DiscussionTopic topic  = forumManager.getTopicById(new Long(id));
         if (topic == null) {
             throw new IllegalArgumentException("No topic found for the given reference: " + entityReference);
         }
@@ -190,7 +190,7 @@ public class ForumTopicEntityProviderImpl extends AbstractEntityProvider impleme
             throw new IllegalArgumentException("The reference must include an id for deletes (id is currently null)");
         }
 
-        DiscussionTopic topic  = forumManager.getTopicById(Long.valueOf(id));
+        DiscussionTopic topic  = forumManager.getTopicById(new Long(id));
         if (topic == null) {
             throw new IllegalArgumentException("No topic found for the given reference: " + entityReference);
         }
