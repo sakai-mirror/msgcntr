@@ -1,6 +1,7 @@
 package org.sakaiproject.component.app.messageforums.entity;
 
 import org.sakaiproject.api.app.messageforums.DiscussionForum;
+import org.sakaiproject.api.app.messageforums.DiscussionForumService;
 import org.sakaiproject.api.app.messageforums.entity.ForumEntityProvider;
 import org.sakaiproject.api.app.messageforums.entity.ForumTopicEntityProvider;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
@@ -17,16 +18,14 @@ import org.apache.commons.logging.LogFactory;
 
 
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class ForumEntityProviderImpl extends AbstractEntityProvider implements ForumEntityProvider, CoreEntityProvider,
         RequestStorable, RESTful, RedirectDefinable {
 
     private DiscussionForumManager forumManager;
+
     private static final Log log = LogFactory.getLog(ForumEntityProviderImpl.class);
 
     public String getEntityPrefix() {
@@ -121,17 +120,24 @@ public class ForumEntityProviderImpl extends AbstractEntityProvider implements F
         this.forumManager = forumManager;
     }
 
-    public String createEntity(EntityReference entityReference, Object entity, Map<String, Object> stringObjectMap) {
-        return forumManager.createForum().getId()+"";
+    public String createEntity(EntityReference entityReference, Object entity, Map<String, Object> params) {
+
+        String title = (String)params.get("title") ;
+        DiscussionForum discussionForum =  forumManager.createForum();
+        discussionForum.setTitle(title);
+        forumManager.saveForum(discussionForum);
+        return discussionForum.getId()+"";
     }
 
     public Object getSampleEntity() {        
          return forumManager.createForum();
     }
 
-    public void updateEntity(EntityReference entityReference, Object entity, Map<String, Object> stringObjectMap) {
+    public void updateEntity(EntityReference entityReference, Object entity, Map<String, Object> param) {
 
         String id = entityReference.getId();
+        String title = (String) param.get("title");
+
         if (id == null) {
             throw new IllegalArgumentException("The reference must include an id for updates (id is currently null)");
         }
@@ -145,6 +151,11 @@ public class ForumEntityProviderImpl extends AbstractEntityProvider implements F
         }
 
         DiscussionForum updatedDisscussionForum  = (DiscussionForum) entity;
+
+        updatedDisscussionForum.setTitle(title);
+        updatedDisscussionForum.setModified(new Date());
+        updatedDisscussionForum.setModifiedBy(developerHelperService.getUserRefFromUserId(developerHelperService.getCurrentUserId()));
+
         String siteId = developerHelperService.getCurrentLocationId();
         boolean allowed = false;
         String location = "/site/" + siteId;
@@ -156,7 +167,7 @@ public class ForumEntityProviderImpl extends AbstractEntityProvider implements F
             throw new SecurityException("Current user ("+userReference+") cannot update forums in location ("+location+")");
         }
 
-        developerHelperService.copyBean(discussionForum, updatedDisscussionForum, 0, new String[] {"id","uuId"}, true);
+        developerHelperService.copyBean(discussionForum, updatedDisscussionForum, 0, new String[] {"title"}, true);
         forumManager.saveForum(discussionForum);
 
     }
@@ -172,7 +183,7 @@ public class ForumEntityProviderImpl extends AbstractEntityProvider implements F
         return disccusionForum;
     }
 
-    public void deleteEntity(EntityReference entityReference, Map<String, Object> stringObjectMap) {
+    public void deleteEntity(EntityReference entityReference, Map<String, Object> param) {
 
         String id = entityReference.getId();
         if (id == null) {
@@ -188,7 +199,9 @@ public class ForumEntityProviderImpl extends AbstractEntityProvider implements F
 
     public List<?> getEntities(EntityReference entityReference, Search search) {
         if(log.isDebugEnabled()) log.debug("getEntities()");
-        List forums = forumManager.getDiscussionForumsWithTopics();        
+        List forums = forumManager.getDiscussionForumsWithTopics();
+        if(log.isDebugEnabled()) log.debug("getEntities"+ forums.size());
+       
         return forums;
 
     }

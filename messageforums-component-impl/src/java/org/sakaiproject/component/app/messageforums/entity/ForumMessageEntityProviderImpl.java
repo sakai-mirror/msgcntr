@@ -121,11 +121,18 @@ public class ForumMessageEntityProviderImpl extends AbstractEntityProvider imple
         this.forumManager = forumManager;
     }
 
-    public String createEntity(EntityReference entityReference, Object entity, Map<String, Object> stringObjectMap) {
+    public String createEntity(EntityReference entityReference, Object entity, Map<String, Object> param) {
+
+        String messageBody = (String)param.get("message");
+        String title = (String)param.get("title");
 
         Message message = (Message)entity;
         message.setCreated(new Date());
         message.setCreatedBy(developerHelperService.getCurrentUserId());
+        message.setBody(messageBody);
+
+        message.setTitle(title);
+        
         forumManager.saveMessage(message);
         return message.getId()+"";
     }
@@ -134,7 +141,7 @@ public class ForumMessageEntityProviderImpl extends AbstractEntityProvider imple
         return null;
     }
 
-    public void updateEntity(EntityReference entityReference, Object entity, Map<String, Object> stringObjectMap) {
+    public void updateEntity(EntityReference entityReference, Object entity, Map<String, Object> param) {
 
         String id = entityReference.getId();
         if (id == null) {
@@ -152,6 +159,11 @@ public class ForumMessageEntityProviderImpl extends AbstractEntityProvider imple
         Message updatedMessage = (Message) entity;
         String siteId = developerHelperService.getCurrentLocationId();
         String userId = developerHelperService.getCurrentUserId();
+        String title = (String) param.get("title");
+        String messageBody = (String) param.get(message);
+
+        updatedMessage.setTitle(title);
+        updatedMessage.setBody(messageBody);
 
         boolean allowed = false;
         String location = "/site/" + siteId;
@@ -163,7 +175,7 @@ public class ForumMessageEntityProviderImpl extends AbstractEntityProvider imple
             throw new SecurityException("Current user ("+userReference+") cannot update message in location ("+location+")");
         }
 
-        developerHelperService.copyBean(message, updatedMessage, 0, new String[] {"id"}, true);
+        developerHelperService.copyBean(message, updatedMessage, 0, new String[] {"id","title","body"}, true);
         forumManager.saveMessage(message);
 
     }
@@ -178,7 +190,7 @@ public class ForumMessageEntityProviderImpl extends AbstractEntityProvider imple
         return message;
     }
 
-    public void deleteEntity(EntityReference entityReference, Map<String, Object> stringObjectMap) {
+    public void deleteEntity(EntityReference entityReference, Map<String, Object> param) {
 
         String id = entityReference.getId();
         if (id == null) {
