@@ -24,33 +24,33 @@ import java.util.List;
 
 
 public interface MessageForumsForumManager {
- 
+
 	public List getReceivedUuidByContextId(final List siteList);
-	
+
     public List searchTopicMessages(Long topicId, String searchText);
-    
+
      public List getTopicsByIdWithMessages(final Long forumId);
-  
+
     public List getTopicsByIdWithMessagesAndAttachments(final Long forumId);
-    
+
     public List getTopicsByIdWithMessagesMembershipAndAttachments(final Long forumId);
-  
+
     public Topic getTopicByIdWithMessages(final Long topicId);
-    
+
     public Topic getTopicWithAttachmentsById(final Long topicId);
-          
+
     public Topic getTopicByIdWithMessagesAndAttachments(final Long topicId);
-     
+
     public BaseForum getForumByIdWithTopics(final Long forumId);
-  
+
     public List getForumByTypeAndContext(final String typeUuid);
-    
+
     public List getForumByTypeAndContextWithTopicsAllAttachments(final String typeUuid);
-    
+
     public List getForumByTypeAndContext(final String typeUuid, final String contextId);
-      
+
     public Topic getTopicByIdWithAttachments(final Long topicId);
-    
+
     /**
      * Retrieve a given forum for the current user
      */
@@ -62,19 +62,19 @@ public interface MessageForumsForumManager {
      * @return discussion forum
      */
     public DiscussionForum createDiscussionForum();
-    
+
     /**
-     * create private forum 
+     * create private forum
      * @param title of forum
      * @return private forum
      */
     public PrivateForum createPrivateForum(String title);
-    
+
     /**
      * save private forum
      * @param forum to save
      */
-    public void savePrivateForum(PrivateForum forum);         
+    public void savePrivateForum(PrivateForum forum);
 
     /**
      * Save a discussion forum
@@ -93,23 +93,23 @@ public interface MessageForumsForumManager {
      */
     public void saveDiscussionForumTopic(DiscussionTopic topic);
     public void saveDiscussionForumTopic(DiscussionTopic topic, boolean parentForumDraftStatus);
-    
+
     /**
      * Create and save an empty private discussion forum topic
      */
-    public PrivateTopic createPrivateForumTopic(String title, boolean forumIsParent, boolean topicIsMutable, String userId, Long parentId);    
+    public PrivateTopic createPrivateForumTopic(String title, boolean forumIsParent, boolean topicIsMutable, String userId, Long parentId);
 
     /**
      * Save a discussion forum topic
      */
     public void savePrivateForumTopic(PrivateTopic topic);
-    
+
     /**
      * Delete a private forum topic
      */
     public void deletePrivateForumTopic(PrivateTopic topic);
-    
-    
+
+
     /**
      * Create and save an empty open discussion forum topic
      */
@@ -136,7 +136,7 @@ public interface MessageForumsForumManager {
     public void deleteOpenForumTopic(OpenTopic topic);
 
     /**
-     * Returns a given number of messages if available in the time 
+     * Returns a given number of messages if available in the time
      * provided
      * @param numberMessages the number of messages to retrieve
      * @param numberDaysInPast the number days to look back
@@ -144,7 +144,7 @@ public interface MessageForumsForumManager {
     public List getRecentPrivateMessages(int numberMessages, int numberDaysInPast);
 
     /**
-     * Returns a given number of discussion forum messages if available in 
+     * Returns a given number of discussion forum messages if available in
      * the time provided
      * @param numberMessages the number of forum messages to retrieve
      * @param numberDaysInPast the number days to look back
@@ -152,38 +152,38 @@ public interface MessageForumsForumManager {
     public List getRecentDiscussionForumMessages(int numberMessages, int numberDaysInPast);
 
     /**
-     * Returns a given number of open forum messages if available in 
+     * Returns a given number of open forum messages if available in
      * the time provided
      * @param numberMessages the number of forum messages to retrieve
      * @param numberDaysInPast the number days to look back
      */
     public List getRecentOpenForumMessages(int numberMessages, int numberDaysInPast);
-    
+
     public Topic getTopicById(boolean open, Long topicId);
     public Topic getTopicByUuid(String uuid);
-    
+
     /**
      * Returns all moderated topics in the site
      * @param areaId
      * @return
      */
     public List getModeratedTopicsInSite(String contextId);
-    
+
     /**
      * @return
      */
     public ActorPermissions createDefaultActorPermissions();
-    
+
     public PrivateForum getPrivateForumByOwnerArea(final String owner, final Area area);
 
     public PrivateForum getPrivateForumByOwnerAreaNull(final String owner);
-    
+
     public PrivateForum getPrivateForumByOwnerAreaWithAllTopics(final String owner, final Area area);
-    
+
     public PrivateForum getPrivateForumByOwnerAreaNullWithAllTopics(final String owner);
-    
+
     public List getForumByTypeAndContextWithTopicsMembership(final String typeUuid, final String contextId);
-    
+
     /**
 	 * Returns # moderated topics that the current user has moderate
 	 * perm for, given the user's memberships and contextid
@@ -192,11 +192,20 @@ public interface MessageForumsForumManager {
 	 * @return
 	 */
 	public int getNumModTopicCurrentUserHasModPermFor(final List membershipItems);
-	
+
 	/**
 	 * Returns forum with topics, topic attachments, and topic messages
 	 * @param forumId
 	 * @return
 	 */
 	public BaseForum getForumByIdWithTopicsAttachmentsAndMessages(final Long forumId);
+
+	/**
+	 *
+	 * @param typeUuid
+	 * @param contextId
+	 * @return all forums of the given type in the given context with all topics,
+	 * messages, and attachments populated
+	 */
+	public List getForumByTypeAndContextWithTopicsAllAttachments(final String typeUuid, final String contextId);
 }

@@ -99,7 +99,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   private Map courseMemberMap = null;
   private boolean usingHelper = false; // just a flag until moved to database from helper
   private ContentHostingService contentHostingService;
-  
+
   public static final int MAX_NUMBER_OF_SQL_PARAMETERS_IN_LIST = 1000;
 
   public void init()
@@ -107,7 +107,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
      LOG.info("init()");
     ;
   }
-  
+
   public void setContentHostingService(ContentHostingService contentHostingService) {
 		this.contentHostingService = contentHostingService;
 	}
@@ -144,7 +144,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     return forumManager.getTopicsByIdWithMessagesAndAttachments(forumId);
   }
-  
+
   public List getTopicsByIdWithMessagesMembershipAndAttachments(final Long forumId)
   {
     if (LOG.isDebugEnabled())
@@ -163,7 +163,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     return forumManager.getTopicByIdWithMessages(topicId);
   }
-  
+
   public Topic getTopicWithAttachmentsById(final Long topicId)
   {
     if (LOG.isDebugEnabled())
@@ -182,7 +182,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     return forumManager.getTopicByIdWithMessagesAndAttachments(topicId);
   }
-  
+
   public List getModeratedTopicsInSite()
   {
 	  if (LOG.isDebugEnabled())
@@ -327,7 +327,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getDiscussionForumArea()
    */
   public Area getDiscussionForumArea()
@@ -343,7 +343,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getMessageById(java.lang.Long)
    */
   public Message getMessageById(Long id)
@@ -361,13 +361,13 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveMessage(org.sakaiproject.api.app.messageforums.Message)
    */
   public void saveMessage(Message message) {
 	  saveMessage(message, true);
   }
-  
+
   public void saveMessage(Message message, boolean logEvent)
   {
     if (LOG.isDebugEnabled())
@@ -383,7 +383,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#deleteMessage(org.sakaiproject.api.app.messageforums.Message)
    */
   public void deleteMessage(Message message)
@@ -397,7 +397,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getTotalNoMessages(org.sakaiproject.api.app.messageforums.Topic)
    */
   public int getTotalNoMessages(Topic topic)
@@ -412,7 +412,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     return messageManager.findMessageCountByTopicId(topic.getId());
   }
-  
+
   /*
    * (non-Javadoc)
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getTotalViewableMessagesWhenMod(org.sakaiproject.api.app.messageforums.Topic)
@@ -432,7 +432,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getUnreadNoMessages(org.sakaiproject.api.app.messageforums.Topic)
    */
   public int getUnreadNoMessages(Topic topic)
@@ -447,10 +447,10 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     return messageManager.findUnreadMessageCountByTopicId(topic.getId());
   }
-  
+
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getUnreadApprovedNoMessages(org.sakaiproject.api.app.messageforums.Topic)
    */
   public int getNumUnreadViewableMessagesWhenMod(Topic topic)
@@ -465,7 +465,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     return messageManager.findUnreadViewableMessageCountByTopicId(topic.getId());
   }
-  
+
   /*
    * (non-Javadoc)
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#approveAllPendingMessages(java.lang.Long)
@@ -491,8 +491,8 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 		  }
 	  }
   }
-  
-  
+
+
   /*
    * (non-Javadoc)
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getTotalNoPendingMessages()
@@ -504,7 +504,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getDiscussionForums()
    */
   public List getDiscussionForums()
@@ -518,23 +518,23 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
         .getDiscussionForumType());
     // return getDiscussionForumArea().getDiscussionForums();
   }
-  
+
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getDiscussionForumsByContextId()
    */
   public List getDiscussionForumsByContextId(String contextId)
   {
     LOG.debug("getDiscussionForumsByContextId(String contextId)");
-    
+
     return forumManager.getForumByTypeAndContext(typeManager
         .getDiscussionForumType(), contextId);
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getForumById(java.lang.Long)
    */
   public DiscussionForum getForumById(Long forumId)
@@ -561,7 +561,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getMessagesByTopicId(java.lang.Long)
    */
   public List getMessagesByTopicId(Long topicId)
@@ -575,7 +575,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getTopicById(java.lang.Long)
    */
   public DiscussionTopic getTopicById(Long topicId)
@@ -596,7 +596,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     return (DiscussionForum) forumManager.getForumByIdWithTopics(forumId);
   }
-  
+
   public DiscussionForum getForumByIdWithTopicsAttachmentsAndMessages(Long forumId) {
 	  if (LOG.isDebugEnabled()) { LOG.debug("getForumByIdWithTopicsAttachmentsAndMessages(Long " + forumId + ")"); }
 	  return (DiscussionForum) forumManager.getForumByIdWithTopicsAttachmentsAndMessages(forumId);
@@ -613,7 +613,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#hasNextTopic(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public boolean hasNextTopic(DiscussionTopic topic)
@@ -655,7 +655,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#hasPreviousTopic(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public boolean hasPreviousTopic(DiscussionTopic topic)
@@ -696,7 +696,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getNextTopic(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public DiscussionTopic getNextTopic(DiscussionTopic topic)
@@ -752,7 +752,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getPreviousTopic(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public DiscussionTopic getPreviousTopic(DiscussionTopic topic)
@@ -800,7 +800,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#isInstructor()
    */
   public boolean isInstructor()
@@ -816,7 +816,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /**
    * Check if the given user has site.upd access
-   * 
+   *
    * @param user
    * @return
    */
@@ -834,7 +834,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /**
    * Check if the given user has site.upd access
-   * 
+   *
    * @param user
    * @param siteId
    * @return
@@ -857,7 +857,15 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   private String getContextSiteId()
   {
     LOG.debug("getContextSiteId()");
-    return ("/site/" + ToolManager.getCurrentPlacement().getContext());
+    return "/site/" + getCurrentContext();
+  }
+
+  /**
+   *
+   * @return the current context without the "/site/" prefix
+   */
+  private String getCurrentContext() {
+      return ToolManager.getCurrentPlacement().getContext();
   }
 
   /**
@@ -875,7 +883,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#createForum()
    */
   public DiscussionForum createForum()
@@ -886,7 +894,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#deleteForum(org.sakaiproject.api.app.messageforums.DiscussionForum)
    */
   public void deleteForum(DiscussionForum forum)
@@ -900,7 +908,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#createTopic(org.sakaiproject.api.app.messageforums.DiscussionForum)
    */
   public DiscussionTopic createTopic(DiscussionForum forum)
@@ -919,7 +927,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveForum(org.sakaiproject.api.app.messageforums.DiscussionForum)
    */
   public void saveForum(DiscussionForum forum)
@@ -928,12 +936,22 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     {
       LOG.debug("saveForum(DiscussionForum" + forum + ")");
     }
-    saveForum(forum, false);
+    saveForum(forum, false, getCurrentContext());
+  }
+
+  public void saveForum(String contextId, DiscussionForum forum) {
+      if (LOG.isDebugEnabled()) LOG.debug("saveForum(String contextId, DiscussionForum forum)");
+
+      if (contextId == null || forum == null) {
+          throw new IllegalArgumentException("Null contextId or forum passed to saveForum. contextId:" + contextId);
+      }
+
+      saveForum(forum, forum.getDraft(), contextId);
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveForumAsDraft(org.sakaiproject.api.app.messageforums.DiscussionForum)
    */
   public void saveForumAsDraft(DiscussionForum forum)
@@ -942,10 +960,10 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     {
       LOG.debug("saveForumAsDraft(DiscussionForum" + forum + ")");
     }
-    saveForum(forum, true);
+    saveForum(forum, true, getCurrentContext());
   }
 
-  private void saveForum(DiscussionForum forum, boolean draft)
+  private void saveForum(DiscussionForum forum, boolean draft, String contextId)
   {
     if (LOG.isDebugEnabled())
     {
@@ -992,13 +1010,15 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 //        forum.getActorPermissions().addAccesssor(user);
 //      }
 //    }
-    
-    
+
+
     forumManager.saveDiscussionForum(forum, draft);
 
     if (saveArea)
     {
-      Area area = getDiscussionForumArea();
+      //Area area = getDiscussionForumArea();
+      String dfType = typeManager.getDiscussionForumType();
+      Area area = areaManager.getAreaByContextIdAndTypeId(contextId, dfType);
       forum.setArea(area);
       forum.setSortIndex(new Integer(0));
       area.addDiscussionForum(forum);
@@ -1008,7 +1028,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveTopic(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public void saveTopic(DiscussionTopic topic)
@@ -1022,7 +1042,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveTopicAsDraft(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public void saveTopicAsDraft(DiscussionTopic topic)
@@ -1050,7 +1070,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
       forumManager.saveDiscussionForum(forum, forum.getDraft().booleanValue());
       //sak-5146 forumManager.saveDiscussionForum(forum);
     }
-    
+
     if (topic.getId() == null) {
         EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_FORUMS_TOPIC_ADD, getEventMessage(topic), false));
     } else {
@@ -1061,7 +1081,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#deleteTopic(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public void deleteTopic(DiscussionTopic topic)
@@ -1075,7 +1095,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getDefaultControlPermissions()
    */
   public List getDefaultControlPermissions()
@@ -1097,7 +1117,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getAreaControlPermissions()
    */
   public List getAreaControlPermissions()
@@ -1124,7 +1144,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getAreaMessagePermissions()
    */
   public List getAreaMessagePermissions()
@@ -1151,7 +1171,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getDefaultMessagePermissions()
    */
   public List getDefaultMessagePermissions()
@@ -1172,7 +1192,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveDefaultMessagePermissions(java.util.List)
    */
   public void saveAreaMessagePermissions(List messagePermissions)
@@ -1198,7 +1218,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getForumControlPermissions(org.sakaiproject.api.app.messageforums.DiscussionForum)
    */
   public List getForumControlPermissions(DiscussionForum forum)
@@ -1229,7 +1249,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getForumMessagePermissions(org.sakaiproject.api.app.messageforums.DiscussionForum)
    */
   public List getForumMessagePermissions(DiscussionForum forum)
@@ -1261,7 +1281,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getTopicControlPermissions(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public List getTopicControlPermissions(DiscussionTopic topic)
@@ -1291,7 +1311,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getTopicMessagePermissions(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public List getTopicMessagePermissions(DiscussionTopic topic)
@@ -1321,7 +1341,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveDefaultControlPermissions(java.util.List)
    */
   public void saveAreaControlPermissions(List controlpermissions)
@@ -1347,7 +1367,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveForumControlPermissions(org.sakaiproject.api.app.messageforums.DiscussionForum,
    *      java.util.List)
    */
@@ -1375,7 +1395,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveForumMessagePermissions(org.sakaiproject.api.app.messageforums.DiscussionForum,
    *      java.util.List)
    */
@@ -1403,7 +1423,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveTopicControlPermissions(org.sakaiproject.api.app.messageforums.DiscussionForum,
    *      java.util.List)
    */
@@ -1430,7 +1450,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#saveTopicMessagePermissions(org.sakaiproject.api.app.messageforums.DiscussionTopic,
    *      java.util.List)
    */
@@ -1503,7 +1523,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
 
   }
-  
+
   public void markMessageReadStatusForUser(Message message, boolean readStatus, String userId)
   {
 	  if (LOG.isDebugEnabled())
@@ -1520,7 +1540,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 		  LOG.error(e.getMessage(), e);
 	  }
   }
-  
+
   /**
    * @param forum
    * @return
@@ -1537,7 +1557,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     return false;
   }
-  
+
   private boolean isRoleSwapView()
   {
   	String roleswap = (String)sessionManager.getCurrentSession().getAttribute("roleswap" + getContextSiteId());
@@ -1569,7 +1589,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     {
       LOG.debug("getTopicAccess(DiscussionTopic" + t + ")");
     }
-    //SAK-12685 If topic's permission level name is "None", then can't access 
+    //SAK-12685 If topic's permission level name is "None", then can't access
     boolean nonePermission = false;
     User user=userDirectoryService.getCurrentUser();
     String role=AuthzGroupService.getUserRole(user.getId(), getContextSiteId());
@@ -1581,8 +1601,8 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     	String permissionName = membershipItem.getPermissionLevelName();
     	if(roleName.equals(role) && permissionName.equals(PermissionLevelManager.PERMISSION_LEVEL_NAME_NONE)){
     		nonePermission = true;
-    	}    	
-    }   
+    	}
+    }
 
     if ((t.getDraft().equals(Boolean.FALSE) && !nonePermission)
     		|| isInstructor()
@@ -1673,7 +1693,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#decodeAccessorsList(java.util.List)
    */
   public List decodeAccessorsList(ArrayList accessorList)
@@ -1691,7 +1711,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#decodeContributorsList(java.util.List)
    */
   public List decodeContributorsList(ArrayList contributorList)
@@ -1709,7 +1729,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getContributorsList(org.sakaiproject.api.app.messageforums.DiscussionForum)
    */
   public List getContributorsList(DiscussionForum forum)
@@ -1741,7 +1761,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getAccessorsList(org.sakaiproject.api.app.messageforums.DiscussionForum)
    */
   public List getAccessorsList(DiscussionForum forum)
@@ -1860,7 +1880,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getAllCourseMembers()
    */
   public Map getAllCourseMembers()
@@ -1887,7 +1907,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getContributorsList(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public List getContributorsList(DiscussionTopic topic, DiscussionForum forum)
@@ -1955,7 +1975,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager#getAccessorsList(org.sakaiproject.api.app.messageforums.DiscussionTopic)
    */
   public List getAccessorsList(DiscussionTopic topic, DiscussionForum forum)
@@ -1999,10 +2019,10 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   public DBMembershipItem getDBMember(Set originalSet, String name,
       Integer type)
   {
-      	
+
     DBMembershipItem membershipItem = null;
     DBMembershipItem membershipItemIter;
-    
+
     if (originalSet != null){
       Iterator iter = originalSet.iterator();
       while (iter.hasNext())
@@ -2016,36 +2036,36 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
         }
       }
     }
-    
-    if (membershipItem == null || membershipItem.getPermissionLevel() == null){    	
+
+    if (membershipItem == null || membershipItem.getPermissionLevel() == null){
     	PermissionLevel level = null;
     	//for groups awareness
     	if (type.equals(DBMembershipItem.TYPE_ROLE) || type.equals(DBMembershipItem.TYPE_GROUP))
-      { 
-    		
+      {
+
     		String levelName = null;
-    		
+
     		if (membershipItem != null){
     			/** use level from stored item */
     			levelName = membershipItem.getPermissionLevelName();
     		}
-    		else{    	
+    		else{
     			/** get level from config file */
     			levelName = ServerConfigurationService.getString(MC_DEFAULT
               + name);
-    			    			
-    			
+
+
     		}
-      	        	
+
         if (levelName != null && levelName.trim().length() > 0)
         {
           level = permissionLevelManager.getPermissionLevelByName(levelName);
-        } 
+        }
         else{
         	Collection siteIds = new Vector();
-        	siteIds.add(getContextSiteId());        	
+        	siteIds.add(getContextSiteId());
         	if (AuthzGroupService.getAllowedFunctions(name, siteIds)
-        			.contains(SiteService.SECURE_UPDATE_SITE)){        			        	        	
+        			.contains(SiteService.SECURE_UPDATE_SITE)){
         		level = permissionLevelManager.getDefaultOwnerPermissionLevel();
         	}
         	else if(type.equals(DBMembershipItem.TYPE_GROUP))
@@ -2055,7 +2075,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
         	else{
         		level = permissionLevelManager.getDefaultContributorPermissionLevel();
         	}
-        	
+
         }
       }
     	PermissionLevel noneLevel = permissionLevelManager.getDefaultNonePermissionLevel();
@@ -2063,11 +2083,11 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
       membershipItem.setName(name);
       membershipItem.setPermissionLevelName((level == null) ? noneLevel.getName() : level.getName() );
       membershipItem.setType(type);
-      membershipItem.setPermissionLevel((level == null) ? noneLevel : level);      
-    }        
+      membershipItem.setPermissionLevel((level == null) ? noneLevel : level);
+    }
     return membershipItem;
   }
-  
+
 //Attachment
   public Attachment createDFAttachment(String attachId, String name)
   {
@@ -2122,20 +2142,29 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
         .getDiscussionForumType());
 	}
 
+	public List getDiscussionForumsWithTopics(String contextId) {
+	    if (LOG.isDebugEnabled()) LOG.debug("getDiscussionForumsWithTopics(String contextId)");
+	    if (contextId == null) {
+	        throw new IllegalArgumentException("Null contextId passed to getDiscussionForumsWithTopics");
+	    }
+	    String dfType = typeManager.getDiscussionForumType();
+	    return forumManager.getForumByTypeAndContextWithTopicsAllAttachments(dfType, contextId);
+	}
+
 	public Map getReadStatusForMessagesWithId(List msgIds, String userId)
 	{
 		LOG.debug("getDiscussionForumsWithTopics()");
 		if (userId == null) {
 			LOG.debug("empty map returns b/c no userId passed to getReadStatusForMessagesWithId");
-			return new HashMap(); 
+			return new HashMap();
 		}
-		
+
 		Map msgIdStatusMap = new HashMap();
 		if (msgIds == null || msgIds.size() == 0) {
 			LOG.debug("empty map returns b/c no msgIds passed to getReadStatusForMessagesWithId");
 			return msgIdStatusMap;
 		}
-		
+
 		if (msgIds.size() < MAX_NUMBER_OF_SQL_PARAMETERS_IN_LIST) {
 			return messageManager.getReadStatusForMessagesWithId(msgIds, userId);
 		} else {
@@ -2155,7 +2184,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 				begIndex = endIndex;
 			}
 		}
-		
+
 		return msgIdStatusMap;
 	}
 
@@ -2165,12 +2194,12 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     return forumManager.getForumByTypeAndContextWithTopicsMembership(typeManager
         .getDiscussionForumType(), contextId);
 	}
-	
+
 	public List getPendingMsgsInTopic(Long topicId)
 	{
 		return messageManager.getPendingMsgsInTopic(topicId);
 	}
-	
+
 	public int getNumModTopicsWithModPermission(List membershipList)
 	{
 		return forumManager.getNumModTopicCurrentUserHasModPermFor(membershipList);
@@ -2179,14 +2208,14 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     private String getEventMessage(Object object) {
     	String eventMessagePrefix = "";
     	final String toolId = ToolManager.getCurrentTool().getId();
-    	
+
     		if (toolId.equals(DiscussionForumService.MESSAGE_CENTER_ID))
     			eventMessagePrefix = "/messagesAndForums";
     		else if (toolId.equals(DiscussionForumService.MESSAGES_TOOL_ID))
     			eventMessagePrefix = "/messages";
     		else
     			eventMessagePrefix = "/forums";
-    	
+
     	return eventMessagePrefix + getContextSiteId() + "/" + object.toString() + "/" + sessionManager.getCurrentSessionUserId();
     }
 
@@ -2197,7 +2226,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     public String getContextForForumById(Long forumId) {
       return getForumById(forumId).getArea().getContextId();
     }
-    
+
     public String getContextForMessageById(Long messageId) {
       return getMessageById(messageId).getTopic().getOpenForum().getArea().getContextId();
     }
@@ -2205,5 +2234,5 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     public String ForumIdForMessage(Long messageId) {
       return getMessageById(messageId).getTopic().getOpenForum().getId().toString();
     }
-    
+
 }

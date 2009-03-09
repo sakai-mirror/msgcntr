@@ -82,40 +82,40 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
     private static final String QUERY_FOR_PRIVATE_TOPICS = "findPrivateTopicsByForumId";
 
     private static final String QUERY_RECEIVED_UUID_BY_CONTEXT_ID = "findReceivedUuidByContextId";
-    
+
     private static final String QUERY_BY_FORUM_OWNER = "findPrivateForumByOwner";
-    
+
     private static final String QUERY_BY_FORUM_OWNER_AREA = "findPrivateForumByOwnerArea";
-    
+
     private static final String QUERY_BY_FORUM_OWNER_AREA_WITH_TOPICS = "findPrivateForumByOwnerAreaWithTopics";
 
     private static final String QUERY_BY_FORUM_OWNER_AREA_NULL = "findPrivateForumByOwnerAreaNull";
 
     private static final String QUERY_BY_FORUM_OWNER_AREA_NULL_WITH_ALL_TOPICS = "findPrivateForumByOwnerAreaNullWithAllTopics";
-    
+
     private static final String QUERY_BY_FORUM_ID = "findForumById";
-    
-    private static final String QUERY_BY_FORUM_ID_WITH_ATTACHMENTS = "findForumByIdWithAttachments";    
+
+    private static final String QUERY_BY_FORUM_ID_WITH_ATTACHMENTS = "findForumByIdWithAttachments";
 
     private static final String QUERY_BY_FORUM_UUID = "findForumByUuid";
-    
+
     private static final String QUERY_BY_TYPE_AND_CONTEXT = "findForumByTypeAndContext";
     private static final String QUERY_BY_FORUM_ID_AND_TOPICS = "findForumByIdWithTopics";
     private static final String QUERY_BY_TYPE_AND_CONTEXT_WITH_ALL_INFO = "findForumByTypeAndContextWithAllInfo";
     private static final String QUERY_BY_TYPE_AND_CONTEXT_WITH_ALL_TOPICS_MEMBERSHIP = "findForumByTypeAndContextWithTopicsMemberhips";
 
-           
-    private static final String QUERY_TOPIC_WITH_MESSAGES_AND_ATTACHMENTS = "findTopicByIdWithMessagesAndAttachments";        
-    private static final String QUERY_TOPIC_WITH_MESSAGES = "findTopicByIdWithMessages";  
-    private static final String QUERY_TOPIC_WITH_ATTACHMENTS = "findTopicWithAttachmentsById"; 
-        
+
+    private static final String QUERY_TOPIC_WITH_MESSAGES_AND_ATTACHMENTS = "findTopicByIdWithMessagesAndAttachments";
+    private static final String QUERY_TOPIC_WITH_MESSAGES = "findTopicByIdWithMessages";
+    private static final String QUERY_TOPIC_WITH_ATTACHMENTS = "findTopicWithAttachmentsById";
+
     private static final String QUERY_TOPICS_WITH_MESSAGES_FOR_FORUM = "findTopicsWithMessagesForForum";
     private static final String QUERY_TOPICS_WITH_MESSAGES_AND_ATTACHMENTS_FOR_FORUM = "findTopicsWithMessagesAndAttachmentsForForum";
     private static final String QUERY_TOPICS_WITH_MSGS_AND_ATTACHMENTS_AND_MEMBERSHIPS_FOR_FORUM = "findTopicsWithMessagesMembershipAndAttachmentsForForum";
-            
+
     private static final String QUERY_BY_TOPIC_ID = "findTopicById";
     private static final String QUERY_OPEN_BY_TOPIC_AND_PARENT = "findOpenTopicAndParentById";
-    private static final String QUERY_PRIVATE_BY_TOPIC_AND_PARENT = "findPrivateTopicAndParentById";    
+    private static final String QUERY_PRIVATE_BY_TOPIC_AND_PARENT = "findPrivateTopicAndParentById";
 
     private static final String QUERY_BY_TOPIC_UUID = "findTopicByUuid";
 
@@ -123,14 +123,14 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
     private static final String QUERY_PF_SUR_KEY_BY_TOPIC = "findPFTopicSurKeyByTopicId";
 
     private static final String QUERY_BY_TOPIC_ID_MESSAGES_ATTACHMENTS = "findTopicByIdWithAttachments";
-    
+
     private static final String QUERY_GET_ALL_MOD_TOPICS_IN_SITE = "findAllModeratedTopicsForSite";
     private static final String QUERY_GET_NUM_MOD_TOPICS_WITH_MOD_PERM = "findNumModeratedTopicsForSiteByUserByMembership";
-    
+
     private static final String QUERY_GET_FORUM_BY_ID_WITH_TOPICS_AND_ATT_AND_MSGS = "findForumByIdWithTopicsAndAttachmentsAndMessages";
-    
+
     //public static Comparator FORUM_CREATED_DATE_COMPARATOR;
-    
+
     /** Sorts the forums by the sort index and if the same index then order by the creation date */
     public static Comparator FORUM_SORT_INDEX_CREATED_DATE_COMPARATOR_DESC;
 
@@ -143,10 +143,10 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
     public MessageForumsForumManagerImpl() {}
 
     private EventTrackingService eventTrackingService;
-    
+
     static {
     	FORUM_SORT_INDEX_CREATED_DATE_COMPARATOR_DESC = new Comparator()
-      {                                        
+      {
         public int compare(Object forum, Object otherForum)
         {
           if (forum != null && otherForum != null
@@ -163,7 +163,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
           return -1;
         }
       };
-      
+
       // remove 5.0 specific code
       //FORUM_SORT_INDEX_CREATED_DATE_COMPARATOR_DESC = Collections.reverseOrder(FORUM_CREATED_DATE_COMPARATOR);
     }
@@ -204,37 +204,37 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
     public SessionManager getSessionManager() {
         return sessionManager;
     }
-    
+
     public void initializeTopicsForForum(BaseForum forum){
-      
+
       getHibernateTemplate().initialize(forum);
       getHibernateTemplate().initialize(forum.getTopicsSet());
     }
-    
+
     public List getTopicsByIdWithMessages(final Long forumId){
       if (forumId == null) {
         throw new IllegalArgumentException("Null Argument");
-      }   
-      
+      }
+
       HibernateCallback hcb = new HibernateCallback() {
         public Object doInHibernate(Session session) throws HibernateException, SQLException {
             Query q = session.getNamedQuery(QUERY_TOPICS_WITH_MESSAGES_FOR_FORUM);
-            q.setParameter("id", forumId, Hibernate.LONG);            
+            q.setParameter("id", forumId, Hibernate.LONG);
             return q.list();
         }
     };
 
     Topic tempTopic = null;
-    Set resultSet = new HashSet();      
+    Set resultSet = new HashSet();
     List temp = (ArrayList) getHibernateTemplate().execute(hcb);
     for (Iterator i = temp.iterator(); i.hasNext();)
     {
-      Object[] results = (Object[]) i.next();        
-          
+      Object[] results = (Object[]) i.next();
+
       if (results != null) {
         if (results[0] instanceof Topic) {
           tempTopic = (Topic)results[0];
-          tempTopic.setBaseForum((BaseForum)results[1]);            
+          tempTopic.setBaseForum((BaseForum)results[1]);
         } else {
           tempTopic = (Topic)results[1];
           tempTopic.setBaseForum((BaseForum)results[0]);
@@ -244,31 +244,31 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
     }
     return Util.setToList(resultSet);
   }
-    
+
     public List getTopicsByIdWithMessagesAndAttachments(final Long forumId){
       if (forumId == null) {
         throw new IllegalArgumentException("Null Argument");
-      }   
-      
+      }
+
       HibernateCallback hcb = new HibernateCallback() {
         public Object doInHibernate(Session session) throws HibernateException, SQLException {
             Query q = session.getNamedQuery(QUERY_TOPICS_WITH_MESSAGES_AND_ATTACHMENTS_FOR_FORUM);
-            q.setParameter("id", forumId, Hibernate.LONG);            
+            q.setParameter("id", forumId, Hibernate.LONG);
             return q.list();
         }
     };
 
     Topic tempTopic = null;
-    Set resultSet = new HashSet();      
+    Set resultSet = new HashSet();
     List temp = (ArrayList) getHibernateTemplate().execute(hcb);
     for (Iterator i = temp.iterator(); i.hasNext();)
     {
-      Object[] results = (Object[]) i.next();        
-          
+      Object[] results = (Object[]) i.next();
+
       if (results != null) {
         if (results[0] instanceof Topic) {
           tempTopic = (Topic)results[0];
-          tempTopic.setBaseForum((BaseForum)results[1]);            
+          tempTopic.setBaseForum((BaseForum)results[1]);
         } else {
           tempTopic = (Topic)results[1];
           tempTopic.setBaseForum((BaseForum)results[0]);
@@ -276,33 +276,33 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         resultSet.add(tempTopic);
       }
     }
-    return Util.setToList(resultSet);    
+    return Util.setToList(resultSet);
   }
-  
+
   public List getTopicsByIdWithMessagesMembershipAndAttachments(final Long forumId) {
       if (forumId == null) {
         throw new IllegalArgumentException("Null Argument");
-      }   
-      
+      }
+
       HibernateCallback hcb = new HibernateCallback() {
         public Object doInHibernate(Session session) throws HibernateException, SQLException {
             Query q = session.getNamedQuery(QUERY_TOPICS_WITH_MSGS_AND_ATTACHMENTS_AND_MEMBERSHIPS_FOR_FORUM);
-            q.setParameter("id", forumId, Hibernate.LONG);            
+            q.setParameter("id", forumId, Hibernate.LONG);
             return q.list();
         }
     };
 
     Topic tempTopic = null;
-    Set resultSet = new HashSet();      
+    Set resultSet = new HashSet();
     List temp = (ArrayList) getHibernateTemplate().execute(hcb);
     for (Iterator i = temp.iterator(); i.hasNext();)
     {
-      Object[] results = (Object[]) i.next();        
-          
+      Object[] results = (Object[]) i.next();
+
       if (results != null) {
         if (results[0] instanceof Topic) {
           tempTopic = (Topic)results[0];
-          tempTopic.setBaseForum((BaseForum)results[1]);            
+          tempTopic.setBaseForum((BaseForum)results[1]);
         } else {
           tempTopic = (Topic)results[1];
           tempTopic.setBaseForum((BaseForum)results[0]);
@@ -310,13 +310,13 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         resultSet.add(tempTopic);
       }
     }
-    return Util.setToList(resultSet);    
+    return Util.setToList(resultSet);
   }
-    
+
   public List getReceivedUuidByContextId(final List siteList) {
       if (siteList == null) {
           throw new IllegalArgumentException("Null Argument");
-      }      
+      }
 
      HibernateCallback hcb = new HibernateCallback() {
           public Object doInHibernate(Session session) throws HibernateException, SQLException {
@@ -328,89 +328,89 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
       };
 
       return (List) getHibernateTemplate().execute(hcb);
-	  
+
   }
 
     public Topic getTopicByIdWithMessagesAndAttachments(final Long topicId) {
 
       if (topicId == null) {
           throw new IllegalArgumentException("Null Argument");
-      }      
+      }
 
      HibernateCallback hcb = new HibernateCallback() {
           public Object doInHibernate(Session session) throws HibernateException, SQLException {
               Query q = session.getNamedQuery(QUERY_TOPIC_WITH_MESSAGES_AND_ATTACHMENTS);
-              q.setParameter("id", topicId, Hibernate.LONG);              
+              q.setParameter("id", topicId, Hibernate.LONG);
               return q.uniqueResult();
           }
       };
-     
+
 
       return (Topic) getHibernateTemplate().execute(hcb);
     }
-    
+
     public Topic getTopicByIdWithMessages(final Long topicId) {
 
       if (topicId == null) {
           throw new IllegalArgumentException("Null Argument");
-      }      
+      }
 
      HibernateCallback hcb = new HibernateCallback() {
           public Object doInHibernate(Session session) throws HibernateException, SQLException {
               Query q = session.getNamedQuery(QUERY_TOPIC_WITH_MESSAGES);
-              q.setParameter("id", topicId, Hibernate.LONG);              
+              q.setParameter("id", topicId, Hibernate.LONG);
               return q.uniqueResult();
           }
       };
-      
+
       return (Topic) getHibernateTemplate().execute(hcb);
     }
-    
+
     public Topic getTopicWithAttachmentsById(final Long topicId) {
 
         if (topicId == null) {
             throw new IllegalArgumentException("Null Argument");
-        }      
+        }
 
        HibernateCallback hcb = new HibernateCallback() {
             public Object doInHibernate(Session session) throws HibernateException, SQLException {
                 Query q = session.getNamedQuery(QUERY_TOPIC_WITH_ATTACHMENTS);
-                q.setParameter("id", topicId, Hibernate.LONG);              
+                q.setParameter("id", topicId, Hibernate.LONG);
                 return q.uniqueResult();
             }
         };
-        
+
         return (Topic) getHibernateTemplate().execute(hcb);
       }
-            
+
     public BaseForum getForumByIdWithTopics(final Long forumId) {
 
       if (forumId == null) {
           throw new IllegalArgumentException("Null Argument");
-      }      
+      }
 
      HibernateCallback hcb = new HibernateCallback() {
           public Object doInHibernate(Session session) throws HibernateException, SQLException {
               Query q = session.getNamedQuery(QUERY_BY_FORUM_ID_AND_TOPICS);
-              q.setParameter("id", forumId, Hibernate.LONG);              
+              q.setParameter("id", forumId, Hibernate.LONG);
               return q.uniqueResult();
           }
       };
-      
+
       BaseForum bForum = (BaseForum) getHibernateTemplate().execute(hcb);
-      
+
       if (bForum != null){
         getHibernateTemplate().initialize(bForum.getAttachmentsSet());
       }
-      
-      return bForum;      
+
+      return bForum;
     }
-    
+
     public List getForumByTypeAndContext(final String typeUuid) {
 
       if (typeUuid == null) {
           throw new IllegalArgumentException("Null Argument");
-      }      
+      }
 
      HibernateCallback hcb = new HibernateCallback() {
           public Object doInHibernate(Session session) throws HibernateException, SQLException {
@@ -424,15 +424,15 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
       BaseForum tempForum = null;
       Set resultSet = new HashSet();
       List temp = (ArrayList) getHibernateTemplate().execute(hcb);
-            
+
       for (Iterator i = temp.iterator(); i.hasNext();)
       {
-        Object[] results = (Object[]) i.next();        
-            
+        Object[] results = (Object[]) i.next();
+
         if (results != null) {
           if (results[0] instanceof BaseForum) {
             tempForum = (BaseForum)results[0];
-            tempForum.setArea((Area)results[1]);            
+            tempForum.setArea((Area)results[1]);
           } else {
             tempForum = (BaseForum)results[1];
             tempForum.setArea((Area)results[0]);
@@ -440,26 +440,26 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
           resultSet.add(tempForum);
         }
       }
-      
+
       List resultList = Util.setToList(resultSet);
       Collections.sort(resultList, FORUM_SORT_INDEX_CREATED_DATE_COMPARATOR_DESC);
-      
+
       // Now that the list is sorted, lets index the forums
       int sort_index = 1;
       for(Iterator i = resultList.iterator(); i.hasNext(); ) {
          tempForum = (BaseForum)i.next();
-         
+
          tempForum.setSortIndex(new Integer(sort_index++));
       }
-      
-      return resultList;      
+
+      return resultList;
     }
-    
+
     public List getForumByTypeAndContext(final String typeUuid, final String contextId) {
 
         if (typeUuid == null || contextId == null) {
             throw new IllegalArgumentException("Null Argument");
-        }      
+        }
 
        HibernateCallback hcb = new HibernateCallback() {
             public Object doInHibernate(Session session) throws HibernateException, SQLException {
@@ -473,15 +473,15 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         BaseForum tempForum = null;
         Set resultSet = new HashSet();
         List temp = (ArrayList) getHibernateTemplate().execute(hcb);
-              
+
         for (Iterator i = temp.iterator(); i.hasNext();)
         {
-          Object[] results = (Object[]) i.next();        
-              
+          Object[] results = (Object[]) i.next();
+
           if (results != null) {
             if (results[0] instanceof BaseForum) {
               tempForum = (BaseForum)results[0];
-              tempForum.setArea((Area)results[1]);            
+              tempForum.setArea((Area)results[1]);
             } else {
               tempForum = (BaseForum)results[1];
               tempForum.setArea((Area)results[0]);
@@ -489,7 +489,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
             resultSet.add(tempForum);
           }
         }
-        
+
         List resultList = Util.setToList(resultSet);
         Collections.sort(resultList, FORUM_SORT_INDEX_CREATED_DATE_COMPARATOR_DESC);
 
@@ -497,11 +497,11 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         int sort_index = 1;
         for(Iterator i = resultList.iterator(); i.hasNext(); ) {
            tempForum = (BaseForum)i.next();
-           
+
            tempForum.setSortIndex(new Integer(sort_index++));
         }
-        
-        return resultList;      
+
+        return resultList;
       }
 
     public Topic getTopicByIdWithAttachments(final Long topicId) {
@@ -543,7 +543,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         return (PrivateForum) getHibernateTemplate().execute(hcb);
     }
 
-    
+
     public PrivateForum getPrivateForumByOwnerArea(final String owner, final Area area) {
 
       if (owner == null || area == null) {
@@ -582,15 +582,15 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
       return (PrivateForum) getHibernateTemplate().execute(hcb);
     }
-    
+
     public BaseForum getForumByIdWithAttachments(final Long forumId) {
-      
+
       if (forumId == null) {
           throw new IllegalArgumentException("Null Argument");
       }
 
       LOG.debug("getForumByIdWithAttachments executing with forumId: " + forumId);
-                  
+
       HibernateCallback hcb = new HibernateCallback() {
         public Object doInHibernate(Session session) throws HibernateException, SQLException {
             Query q = session.getNamedQuery(QUERY_BY_FORUM_ID_WITH_ATTACHMENTS);
@@ -689,7 +689,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
         return (Topic) getHibernateTemplate().execute(hcb);
     }
-    
+
     public List getModeratedTopicsInSite(final String contextId) {
 
         if (contextId == null) {
@@ -705,18 +705,18 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
                 return q.list();
             }
         };
-        
+
         Topic tempTopic = null;
-        Set resultSet = new HashSet();      
+        Set resultSet = new HashSet();
         List temp = (ArrayList) getHibernateTemplate().execute(hcb);
         for (Iterator i = temp.iterator(); i.hasNext();)
         {
-          Object[] results = (Object[]) i.next();        
-              
+          Object[] results = (Object[]) i.next();
+
           if (results != null) {
             if (results[0] instanceof Topic) {
               tempTopic = (Topic)results[0];
-              tempTopic.setBaseForum((BaseForum)results[1]);            
+              tempTopic.setBaseForum((BaseForum)results[1]);
             } else {
               tempTopic = (Topic)results[1];
               tempTopic.setBaseForum((BaseForum)results[0]);
@@ -734,7 +734,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         forum.setCreatedBy(getCurrentUser());
         forum.setLocked(Boolean.FALSE);
         forum.setDraft(Boolean.FALSE);
-        forum.setTypeUuid(typeManager.getDiscussionForumType());                  
+        forum.setTypeUuid(typeManager.getDiscussionForumType());
         forum.setActorPermissions(createDefaultActorPermissions());
         forum.setModerated(Boolean.FALSE);
         LOG.debug("createDiscussionForum executed");
@@ -743,28 +743,28 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
     public ActorPermissions createDefaultActorPermissions()
     {
-      ActorPermissions actorPermissions = new ActorPermissionsImpl();      
+      ActorPermissions actorPermissions = new ActorPermissionsImpl();
       MessageForumsUser nonSpecifiedUser = new MessageForumsUserImpl();
       nonSpecifiedUser.setUserId(typeManager.getNotSpecifiedType());
       nonSpecifiedUser.setUuid(typeManager.getNotSpecifiedType());
       nonSpecifiedUser.setTypeUuid(typeManager.getNotSpecifiedType());
-                  
-      actorPermissions.addAccesssor(nonSpecifiedUser);      
+
+      actorPermissions.addAccesssor(nonSpecifiedUser);
       actorPermissions.addContributor(nonSpecifiedUser);
       actorPermissions.addModerator(nonSpecifiedUser);
        return actorPermissions;
     }
-    
+
     /**
      * @see org.sakaiproject.api.app.messageforums.MessageForumsForumManager#createPrivateForum(java.lang.String)
      */
     public PrivateForum createPrivateForum(String title) {
         /** set all non-null properties in case hibernate flushes session before explicit save */
-        PrivateForum forum = new PrivateForumImpl();        
+        PrivateForum forum = new PrivateForumImpl();
         forum.setTitle(title);
         forum.setUuid(idManager.createUuid());
         forum.setAutoForwardEmail("");
-        forum.setOwner(getCurrentUser());        
+        forum.setOwner(getCurrentUser());
         forum.setUuid(getNextUuid());
         forum.setCreated(new Date());
         forum.setCreatedBy(getCurrentUser());
@@ -810,8 +810,8 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
     public void saveDiscussionForum(DiscussionForum forum, boolean draft) {
     	saveDiscussionForum(forum, draft, false);
     }
-    
-    public void saveDiscussionForum(DiscussionForum forum, boolean draft, boolean logEvent) { 
+
+    public void saveDiscussionForum(DiscussionForum forum, boolean draft, boolean logEvent) {
         boolean isNew = forum.getId() == null;
 
         if (forum.getSortIndex() == null) {
@@ -826,15 +826,15 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         forum.setDraft(new Boolean(draft));
         forum.setModified(new Date());
         forum.setModifiedBy(getCurrentUser());
-        
+
         // If the topics were not loaded then there is no need to redo the sort index
         //     thus if it's a hibernate persistentset and initialized
         if( forum.getTopicsSet() != null &&
-              ((forum.getTopicsSet() instanceof PersistentSet && 
+              ((forum.getTopicsSet() instanceof PersistentSet &&
               ((PersistentSet)forum.getTopicsSet()).wasInitialized()) || !(forum.getTopicsSet() instanceof PersistentSet) )) {
            List topics = forum.getTopics();
            boolean someTopicHasZeroSortIndex = false;
-           
+
            for(Iterator i = topics.iterator(); i.hasNext(); ) {
               DiscussionTopic topic = (DiscussionTopic)i.next();
               if(topic.getSortIndex().intValue() == 0) {
@@ -849,7 +849,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
               }
            }
         }
-        
+
         getHibernateTemplate().saveOrUpdate(forum);
 
         if (logEvent) {
@@ -862,7 +862,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
         LOG.debug("saveDiscussionForum executed with forumId: " + forum.getId() + ":: draft: " + draft);
     }
-    
+
     public DiscussionTopic createDiscussionForumTopic(DiscussionForum forum) {
         DiscussionTopic topic = new DiscussionTopicImpl();
         topic.setUuid(getNextUuid());
@@ -876,9 +876,9 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         LOG.debug("createDiscussionForumTopic executed");
         return topic;
     }
-    
-    
-    public void saveDiscussionForumTopic(DiscussionTopic topic) {	
+
+
+    public void saveDiscussionForumTopic(DiscussionTopic topic) {
     	saveDiscussionForumTopic(topic, false);
     }
 
@@ -896,25 +896,25 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         }
         topic.setModified(new Date());
         topic.setModifiedBy(getCurrentUser());
-        
+
         if (topic.getModerated() == null) {
         	topic.setModerated(Boolean.FALSE);
         }
-        
+
         if (topic.getId() == null) {
-            
-          DiscussionForum discussionForum = 
+
+          DiscussionForum discussionForum =
             (DiscussionForum) getForumByIdWithTopics(topic.getBaseForum().getId());
           discussionForum.addTopic(topic);
-                                  
+
           if(topic.getDraft().equals(Boolean.TRUE))
-          {        	  
+          {
 	  	    saveDiscussionForum(discussionForum, discussionForum.getDraft().booleanValue());
           }
           else
             saveDiscussionForum(discussionForum, parentForumDraftStatus, false);
           //sak-5146 saveDiscussionForum(discussionForum, parentForumDraftStatus);
-            
+
         } else {
             getHibernateTemplate().saveOrUpdate(topic);
         }
@@ -939,7 +939,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         /** set all non-null properties in case hibernate flushes session before explicit save */
         PrivateTopic topic = new PrivateTopicImpl();
         topic.setTitle(title);
-        topic.setUuid(getNextUuid());        
+        topic.setUuid(getNextUuid());
         topic.setCreated(new Date());
         topic.setCreatedBy(getCurrentUser());
         topic.setUserId(userId);
@@ -1005,7 +1005,12 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
             e.printStackTrace();
             LOG.error("could not evict forum: " + forum.getId(), e);
         }
-        Area area = getAreaByContextIdAndTypeId(typeManager.getDiscussionForumType());
+
+        // re-retrieve the forum with the area populated so we don't have to
+        // rely on "current context"
+        forum = (DiscussionForum)getForumById(true, id);
+        //Area area = getAreaByContextIdAndTypeId(typeManager.getDiscussionForumType());
+        Area area = forum.getArea();
         area.removeDiscussionForum(forum);
         getHibernateTemplate().saveOrUpdate(area);
         //getHibernateTemplate().delete(forum);
@@ -1025,7 +1030,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
         return (Area) getHibernateTemplate().execute(hcb);
     }
-    
+
     /**
      * Delete a discussion forum topic
      */
@@ -1038,7 +1043,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
             e.printStackTrace();
             LOG.error("could not evict topic: " + topic.getId(), e);
         }
-        
+
         Topic finder = getTopicById(true, topic.getId());
         BaseForum forum = finder.getBaseForum();
         forum.removeTopic(topic);
@@ -1067,7 +1072,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
     /**
      * Returns a given number of messages if available in the time provided
-     * 
+     *
      * @param numberMessages
      *            the number of messages to retrieve
      * @param numberDaysInPast
@@ -1081,7 +1086,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
     /**
      * Returns a given number of discussion forum messages if available in the
      * time provided
-     * 
+     *
      * @param numberMessages
      *            the number of forum messages to retrieve
      * @param numberDaysInPast
@@ -1095,7 +1100,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
     /**
      * Returns a given number of open forum messages if available in the time
      * provided
-     * 
+     *
      * @param numberMessages
      *            the number of forum messages to retrieve
      * @param numberDaysInPast
@@ -1122,10 +1127,10 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
             }
         };
 
-        return ((Boolean) getHibernateTemplate().execute(hcb)).booleanValue();                
+        return ((Boolean) getHibernateTemplate().execute(hcb)).booleanValue();
     }
-    
-    
+
+
     public List searchTopicMessages(final Long topicId, final String searchText) {
         if (topicId == null) {
             throw new IllegalArgumentException("Null Argument");
@@ -1145,9 +1150,9 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         return (List) getHibernateTemplate().execute(hcb);
     }
 
-    
+
     // helpers
-    
+
     /**
      * ContextId is present site id for now.
      */
@@ -1174,16 +1179,16 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 	private boolean isToolInSite(Site thisSite, String toolId) {
 		final Collection toolsInSite = thisSite.getTools(toolId);
 
-		return ! toolsInSite.isEmpty();		
+		return ! toolsInSite.isEmpty();
 	}
 
    private String getEventMessage(Object object) {
 	   return getEventMessage(object, getContextId());
     }
-    
+
     private String getEventMessage(Object object, String context) {
     	String eventMessagePrefix = "";
-    	
+
     	try {
     		// TODO: How to determine what prefix to put on event message
     		if (isToolInSite(SiteService.getSite(context), DiscussionForumService.MESSAGE_CENTER_ID))
@@ -1195,24 +1200,31 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
     	}
     	catch (IdUnusedException e) {
     		LOG.debug("IdUnusedException attempting to get site with id: " + context);
-    		
+
     		eventMessagePrefix = "/messages&forums/";
     	}
-    	
-    	return eventMessagePrefix + context + "/" + object.toString() + "/" + getCurrentUser(); 
+
+    	return eventMessagePrefix + context + "/" + object.toString() + "/" + getCurrentUser();
     }
 
-		public List getForumByTypeAndContextWithTopicsAllAttachments(final String typeUuid)
+    public List getForumByTypeAndContextWithTopicsAllAttachments(final String typeUuid)
+    {
+        return getForumByTypeAndContextWithTopicsAllAttachments(typeUuid, getContextId());
+    }
+
+		public List getForumByTypeAndContextWithTopicsAllAttachments(final String typeUuid, final String contextId)
 		{
-			if (typeUuid == null) {
-				throw new IllegalArgumentException("Null Argument");
-			}      
+			if (typeUuid == null || contextId == null) {
+				throw new IllegalArgumentException("Null typeUuid or contextId passed " +
+						"to getForumByTypeAndContextWithTopicsAllAttachments. typeUuid:" +
+						typeUuid + " contextId:" + contextId);
+			}
 
 			HibernateCallback hcb = new HibernateCallback() {
 				public Object doInHibernate(Session session) throws HibernateException, SQLException {
 					Query q = session.getNamedQuery(QUERY_BY_TYPE_AND_CONTEXT_WITH_ALL_INFO);
 					q.setParameter("typeUuid", typeUuid, Hibernate.STRING);
-					q.setParameter("contextId", getContextId(), Hibernate.STRING);
+					q.setParameter("contextId", contextId, Hibernate.STRING);
 					return q.list();
 				}
 			};
@@ -1223,12 +1235,12 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
 			for (Iterator i = temp.iterator(); i.hasNext();)
 			{
-				Object[] results = (Object[]) i.next();        
+				Object[] results = (Object[]) i.next();
 
 				if (results != null) {
 					if (results[0] instanceof BaseForum) {
 						tempForum = (BaseForum)results[0];
-						tempForum.setArea((Area)results[1]);            
+						tempForum.setArea((Area)results[1]);
 					} else {
 						tempForum = (BaseForum)results[1];
 						tempForum.setArea((Area)results[0]);
@@ -1248,14 +1260,14 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 				tempForum.setSortIndex(new Integer(sort_index++));
 			}
 
-			return resultList;      
+			return resultList;
 		}
-		
+
 		public List getForumByTypeAndContextWithTopicsMembership(final String typeUuid, final String contextId)
 		{
 			if (typeUuid == null || contextId == null) {
 				throw new IllegalArgumentException("Null Argument");
-			}      
+			}
 
 			HibernateCallback hcb = new HibernateCallback() {
 				public Object doInHibernate(Session session) throws HibernateException, SQLException {
@@ -1272,12 +1284,12 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
 			for (Iterator i = temp.iterator(); i.hasNext();)
 			{
-				Object[] results = (Object[]) i.next();        
+				Object[] results = (Object[]) i.next();
 
 				if (results != null) {
 					if (results[0] instanceof BaseForum) {
 						tempForum = (BaseForum)results[0];
-						tempForum.setArea((Area)results[1]);            
+						tempForum.setArea((Area)results[1]);
 					} else {
 						tempForum = (BaseForum)results[1];
 						tempForum.setArea((Area)results[0]);
@@ -1297,7 +1309,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 				tempForum.setSortIndex(new Integer(sort_index++));
 			}
 
-			return resultList;      
+			return resultList;
 		}
 
 
@@ -1340,7 +1352,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
 			return (PrivateForum) getHibernateTemplate().execute(hcb);
 		}
-	
+
 		public int getNumModTopicCurrentUserHasModPermFor(final List membershipList)
 		{
 			if (membershipList == null) {
@@ -1362,27 +1374,27 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 
 	        return ((Integer) getHibernateTemplate().execute(hcb)).intValue();
 		}
-		
+
 		public BaseForum getForumByIdWithTopicsAttachmentsAndMessages(final Long forumId)
 		{
 			if (forumId == null) {
 				throw new IllegalArgumentException("Null Argument");
-			}      
+			}
 
 			HibernateCallback hcb = new HibernateCallback() {
 				public Object doInHibernate(Session session) throws HibernateException, SQLException {
 					Query q = session.getNamedQuery(QUERY_GET_FORUM_BY_ID_WITH_TOPICS_AND_ATT_AND_MSGS);
-					q.setParameter("id", forumId, Hibernate.LONG); 
+					q.setParameter("id", forumId, Hibernate.LONG);
 					return q.uniqueResult();
 		          }
 		      };
-		      
+
 		      BaseForum bForum = (BaseForum) getHibernateTemplate().execute(hcb);
-		      
+
 		      if (bForum != null){
 		        getHibernateTemplate().initialize(bForum.getAttachmentsSet());
 		      }
-		      
-		      return bForum;      
+
+		      return bForum;
 		}
 }

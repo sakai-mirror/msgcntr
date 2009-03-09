@@ -43,35 +43,35 @@ import org.sakaiproject.authz.api.Role;
 public interface DiscussionForumManager
 {
   public List searchTopicMessages(Long topicId, String searchText);
-    
+
   public Topic getTopicByIdWithAttachments(Long topicId);
- 
+
   public DiscussionForum getForumByIdWithTopics(Long forumId);
-  
+
   public List getTopicsByIdWithMessages(final Long forumId);
-  
+
   public List getTopicsByIdWithMessagesAndAttachments(final Long forumId);
-  
+
   public List getTopicsByIdWithMessagesMembershipAndAttachments(final Long forumId);
-  
+
   public Topic getTopicByIdWithMessages(final Long topicId);
-  
+
   public Topic getTopicWithAttachmentsById(final Long topicId);
-  
+
   public Topic getTopicByIdWithMessagesAndAttachments(final Long topicId);
-  
+
   /**
    * Returns all moderated topics in site
    * @param areaId
    * @return
    */
   public List getModeratedTopicsInSite();
-   
 
-  
+
+
   /**
    * Retrieve discussion forum area
-   * 
+   *
    * @return
    */
   Area getDiscussionForumArea();
@@ -106,13 +106,13 @@ public interface DiscussionForumManager
    * @return
    */
   int getTotalViewableMessagesWhenMod(Topic topic);
-  
+
   /**
    * @param topic
    * @return
    */
   int getUnreadNoMessages(Topic topic);
-  
+
   /**
    * When topic is moderated and the user does not have the moderate
    * perm, only count approved messages and messages authored by user
@@ -120,26 +120,26 @@ public interface DiscussionForumManager
    * @return
    */
   int getNumUnreadViewableMessagesWhenMod(Topic topic);
-  
+
   /**
    * Mark all pending messages in a give topic as "Approved"
    * Used when a moderated topic is changed to not moderated
    * @param topicId
    */
   public void approveAllPendingMessages(Long topicId);
-  
+
   /**
    * Returns pending msgs in site according to user's memberships
    * @return
    */
   List getPendingMsgsInSiteByMembership(List membershipList);
-  
+
   /**
-   * 
+   *
    * @return
    */
   public List getDiscussionForums();
-  
+
   /**
    * @return
    */
@@ -149,7 +149,7 @@ public interface DiscussionForumManager
    * @return
    */
   public List getDiscussionForumsByContextId(String contextId);
-  
+
   /**
    * @param topicId
    * @return
@@ -201,9 +201,9 @@ public interface DiscussionForumManager
    * @return
    */
   public boolean isInstructor();
-  
+
   /**
-   * Tests if the user has instructor privileges to the site 
+   * Tests if the user has instructor privileges to the site
    * @param userId
    * @param siteId
    * @return true, only if user has site.upd
@@ -228,14 +228,21 @@ public interface DiscussionForumManager
   public DiscussionTopic createTopic(DiscussionForum forum);
 
   /**
+   * Save a forum. If this is a new forum, assumes current context is available.
    * @param forum
    */
   public void saveForum(DiscussionForum forum);
-  
-  
+
+  /**
+   * Saves the given forum object. If forum is new, will be saved in the given contextId
+   * @param contextId
+   * @param forum
+   */
+  public void saveForum(String contextId, DiscussionForum forum);
+
   /**
    * @param forum
-   * @param object 
+   * @param object
    */
   public void saveForumAsDraft(DiscussionForum forum);
 
@@ -270,7 +277,7 @@ public interface DiscussionForumManager
    */
   public List getAreaMessagePermissions();
 
-  
+
   /**
    * @param forum
    * @return
@@ -343,7 +350,7 @@ public interface DiscussionForumManager
    * @param readStatus TODO
    */
   public void markMessageAs(Message message, boolean readStatus);
-  
+
   /**
    * Mark the read status for a given message for a given user
    * @param message
@@ -352,7 +359,7 @@ public interface DiscussionForumManager
    */
   public void markMessageReadStatusForUser(Message message, boolean readStatus, String userId);
 
-   
+
   /**
    * @param accessorList
    * @return
@@ -370,8 +377,8 @@ public interface DiscussionForumManager
    * @return
    */
   public List getContributorsList(DiscussionForum forum);
-  
-  
+
+
   /**
    * @param forum
    * @return
@@ -385,46 +392,46 @@ public interface DiscussionForumManager
 
   /**
    * @param topic
-   * @param forum 
+   * @param forum
    * @return
    */
   public List getAccessorsList(DiscussionTopic topic, DiscussionForum forum);
 
   /**
    * @param topic
-   * @param forum 
+   * @param forum
    * @return
    */
-  public List getContributorsList(DiscussionTopic topic, DiscussionForum forum); 
-  
+  public List getContributorsList(DiscussionTopic topic, DiscussionForum forum);
+
   /**
-   * 
+   *
    */
   public void setCourseMemberMapToNull();
 
   public DBMembershipItem getAreaDBMember(Set originalSet, String name, Integer type);
 
   public DBMembershipItem getDBMember(Set originalSet, String name, Integer type);
-  
+
   /**
-   * 
+   *
    * @param attachId
    * @param name
    * @return
    */
   public Attachment createDFAttachment(String attachId, String name);
-  
+
   public Map getReadStatusForMessagesWithId(List msgIds, String userId);
-  
+
   public List getDiscussionForumsWithTopicsMembershipNoAttachments(String contextId);
-  
+
   /**
    * Returns all pending msgs in the given topic
    * @param topicId
    * @return
    */
   public List getPendingMsgsInTopic(Long topicId);
-  
+
   /**
    * Returns num moderated topics in the current site that the current user
    * has moderate permission for, given the user's memberships
@@ -433,7 +440,7 @@ public interface DiscussionForumManager
    * @return
    */
   public int getNumModTopicsWithModPermission(List membershipList);
-  
+
   /**
    * Returns forum with topics, topic attachments, and topic messages
    * @param forumId
@@ -447,14 +454,14 @@ public interface DiscussionForumManager
    * @return context (siteId)
    */
   public String getContextForTopicById(Long topicId);
-  
+
   /**
    * Returns the context (siteId) for a given forum
    * @param forumId
    * @return context (siteId)
    */
   public String getContextForForumById(Long forumId);
-  
+
   /**
    * Returns the context (siteId) for a given message
    * @param messageId
@@ -468,7 +475,7 @@ public interface DiscussionForumManager
    * @return forumId
    */
   public String ForumIdForMessage(Long messageId);
-  
+
   /**
    *
    * @param topic
@@ -476,7 +483,7 @@ public interface DiscussionForumManager
    * in role swap view this will always be false
    */
   public boolean isTopicOwner(DiscussionTopic topic);
- 	  	 
+
   /**
    *
    * @param forum
@@ -484,4 +491,12 @@ public interface DiscussionForumManager
    * in role swap view this will always be false
    */
   public boolean isForumOwner(DiscussionForum forum);
+
+  /**
+   *
+   * @param contextId
+   * @return all discussion forums in the given context with attachments, topics,
+   * and messages populated
+   */
+  public List getDiscussionForumsWithTopics(String contextId);
 }
