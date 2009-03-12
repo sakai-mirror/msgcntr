@@ -2801,6 +2801,7 @@ public class DiscussionForumTool
 
   public String processDfMsgPost()
   {
+	LOG.debug("processDfMsgPost()");
     Message dMsg = constructMessage();
 
     if(selectedTopic == null)
@@ -2829,7 +2830,7 @@ public class DiscussionForumTool
 
     // refresh page with unread status     
     selectedTopic = getDecoratedTopic(selectedTopic.getTopic());
-    
+    sendEmailNotification(dMsg,new DiscussionMessageBean(dMsg, messageManager));
     return ALL_MESSAGES;
   }
 
@@ -3815,6 +3816,8 @@ public class DiscussionForumTool
     selectedTopic.insertMessage(new DiscussionMessageBean(dMsg, messageManager));
     selectedTopic.getTopic().addMessage(dMsg);
 
+    //notify watchers
+    sendEmailNotification(dMsg,selectedThreadHead);
     this.composeBody = null;
     this.composeLabel = null;
     this.composeTitle = null;
