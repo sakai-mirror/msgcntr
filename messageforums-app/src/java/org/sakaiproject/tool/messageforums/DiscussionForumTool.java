@@ -2742,7 +2742,7 @@ public class DiscussionForumTool
     	return gotoMain();
     }
     forumManager.saveMessage(dMsg);
-    DiscussionTopic dSelectedTopic = (DiscussionTopic) forumManager.getTopicByIdWithMessages(selectedTopic.getTopic().getId());
+    DiscussionTopic dSelectedTopic = (DiscussionTopic) forumManager.getTopicWithAttachmentsById(selectedTopic.getTopic().getId());
     setSelectedForumForCurrentTopic(dSelectedTopic);
     selectedTopic.setTopic(dSelectedTopic);
     selectedTopic.getTopic().setBaseForum(selectedForum.getForum());
