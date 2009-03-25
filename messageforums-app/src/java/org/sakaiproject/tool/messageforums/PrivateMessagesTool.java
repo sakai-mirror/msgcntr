@@ -91,6 +91,8 @@ import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.util.Validator;
 import org.sakaiproject.util.ResourceLoader;
 
+import org.sakaiproject.component.cover.ServerConfigurationService;
+
 public class PrivateMessagesTool
 {
   
@@ -237,6 +239,8 @@ public class PrivateMessagesTool
   private String selectedLabel="Normal" ;   //defautl set
   private List totalComposeToList;
   private List totalComposeToListRecipients;
+//enable or disable ability to send messsage as private or public
+  private boolean enableSendOptions = false;
   
   //Delete items - Checkbox display and selection - Multiple delete
   private List selectedDeleteItems;
@@ -304,6 +308,7 @@ public class PrivateMessagesTool
   public static final String SORT_ATTACHMENT_DESC = "attachment_desc";
   
   private boolean selectedComposedlistequalCurrentuser=false;
+
   
   
   /** sort member */
@@ -4408,20 +4413,30 @@ private   int   getNum(char letter,   String   a)
 	
 	private String getEventMessage(Object object) {
 	  	String eventMessagePrefix = "";
-	  	final String toolId = ToolManager.getCurrentTool().getId();
+        final String toolId = ToolManager.getCurrentTool().getId();
 		  	
-		if (toolId.equals(DiscussionForumService.MESSAGE_CENTER_ID))
-			eventMessagePrefix = "/messages&Forums/site/";
-		else if (toolId.equals(DiscussionForumService.MESSAGES_TOOL_ID))
-			eventMessagePrefix = "/messages/site/";
-		else
-			eventMessagePrefix = "/forums/site/";
+        if (toolId.equals(DiscussionForumService.MESSAGE_CENTER_ID))
+            eventMessagePrefix = "/messages&Forums/site/";
+        else if (toolId.equals(DiscussionForumService.MESSAGES_TOOL_ID))
+            eventMessagePrefix = "/messages/site/";
+        else
+            eventMessagePrefix = "/forums/site/";
 	  	
-	  	return eventMessagePrefix + ToolManager.getCurrentPlacement().getContext() + 
-	  				"/" + object.toString() + "/" + SessionManager.getCurrentSessionUserId();
-	}
+        return eventMessagePrefix + ToolManager.getCurrentPlacement().getContext() +
+                "/" + object.toString() + "/" + SessionManager.getCurrentSessionUserId();
+    }
 
-	public void setContentHostingService(ContentHostingService contentHostingService) {
-		this.contentHostingService = contentHostingService;
-	}
+    public void setContentHostingService(ContentHostingService contentHostingService) {
+        this.contentHostingService = contentHostingService;
+    }
+
+
+    public boolean isEnableSendOptions() {
+
+        if (ServerConfigurationService.getString("messages.enableSendOptions").equals("true")){
+            return true;
+        }
+        return enableSendOptions;
+    }
+
 }

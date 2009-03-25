@@ -51,12 +51,12 @@
 				</h:panelGroup>
 		
 	
-			 <h:panelGroup styleClass="shorttext" rendered= "#{PrivateMessagesTool.dispSendEmailOut}">
+			 <h:panelGroup styleClass="shorttext" rendered= "#{PrivateMessagesTool.dispSendEmailOut && PrivateMessagesTool.enableSendOptions}">
 					<h:outputLabel><h:outputText value="#{msgs.pvt_send_cc}"/></h:outputLabel>
 			  </h:panelGroup>
 			   
-			  
-			  <h:panelGroup styleClass="checkbox" style="white-space: nowrap;" rendered= "#{PrivateMessagesTool.dispSendEmailOut}">
+
+			  <h:panelGroup styleClass="checkbox" style="white-space: nowrap;" rendered= "#{PrivateMessagesTool.dispSendEmailOut && PrivateMessagesTool.enableSendOptions}">
 			  <h:selectBooleanCheckbox value="#{PrivateMessagesTool.booleanEmailOut}" id="send_email_out" >
 			  </h:selectBooleanCheckbox>
 		   <h:outputLabel for="send_email_out"><h:outputText value="#{msgs.pvt_send_as_email}"/></h:outputLabel>
