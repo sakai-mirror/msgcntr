@@ -1,0 +1,56 @@
+{
+  "createdTime": {
+    "display": "Apr 1, 2009 7:15 pm",
+    "time": 1238627734718
+  },
+  "description": "<br\/>",
+  "iconFullUrl": null,
+  "iconUrl": null,
+  "iconUrlFull": null,
+  "id": "3a6909f4-6a9b-48c7-a3d7-3800d6f78b25",
+  "infoUrl": null,
+  "infoUrlFull": null,
+  "joinerRole": "Student",
+  "lastModified": 1238627737470,
+  "maintainRole": "Instructor",
+  "modifiedTime": {
+    "display": "Apr 1, 2009 7:15 pm",
+    "time": 1238627737470
+  },
+  "owner": "admin",
+  "props": {
+    "sections_student_switching_allowed": "false",
+    "term": "Spring 2009",
+    "contact-name": "Sakai Administrator",
+    "sections_externally_maintained": "true",
+    "sections_student_registration_allowed": "false",
+    "term_eid": "Spring 2009"
+  },
+  "providerGroupId": "SMPL101 Spring 2009+Discussion 1 SMPL101 Spring 2009+Discussion 2 SMPL101 Spring 2009",
+  "reference": "\/site\/3a6909f4-6a9b-48c7-a3d7-3800d6f78b25",
+  "shortDescription": null,
+  "siteOwner": {
+    "userDisplayName": "Sakai Administrator",
+    "userEntityURL": "\/direct\/user\/admin",
+    "userId": "admin"
+  },
+  "skin": null,
+  "title": "SMPL101 Spring 2009",
+  "type": "course",
+  "url": "http:\/\/nightly2.sakaiproject.org:8087\/sakai-entitybroker-direct\/site\/3a6909f4-6a9b-48c7-a3d7-3800d6f78b25",
+  "userRoles": [
+    "Student",
+    "Instructor",
+    "Teaching Assistant"
+  ],
+  "activeEdit": false,
+  "customPageOrdered": false,
+  "empty": false,
+  "joinable": true,
+  "pubView": true,
+  "published": true,
+  "entityReference": "\/site\/3a6909f4-6a9b-48c7-a3d7-3800d6f78b25",
+  "entityURL": "http:\/\/nightly2.sakaiproject.org:8087\/direct\/site\/3a6909f4-6a9b-48c7-a3d7-3800d6f78b25",
+  "entityId": "3a6909f4-6a9b-48c7-a3d7-3800d6f78b25",
+  "entityTitle": "SMPL101 Spring 2009"
+}
