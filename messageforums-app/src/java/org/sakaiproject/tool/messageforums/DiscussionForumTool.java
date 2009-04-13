@@ -2896,6 +2896,19 @@ public class DiscussionForumTool
     return aMsg;
   }
   
+  private void setupForum() {
+	  if(selectedForum == null)  {
+		  DiscussionForum forum = forumManager.createForum();
+		  forum.setModerated(areaManager.getDiscusionArea().getModerated()); // default to template setting
+		  selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
+		  if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
+		  {
+			  selectedForum.setReadFullDesciption(true);
+		  }
+		  setNewForumBeanAssign();
+	  }
+  }
+ 
   /**
    * Prevents users from trying to delete the topic they are currently creating
    * @return
@@ -2915,13 +2928,18 @@ public class DiscussionForumTool
 	  
 	  return topicInDb != null;
   }
-  
+
   /**
    * Prevents users from trying to delete the forum they are currently creating
    * @return
    */
   public boolean isDisplayForumDeleteOption()
   {
+	  //If you have more than two tab/windows open, when you create one forum in one tab/window, go back to another one, "selectedForum" will be null. See SAK-13780 for detail.
+	  if(selectedForum == null)  {
+		  setupForum();
+		  return false;
+	  }
 	  OpenForum forum = selectedForum.getForum();
 	  if (forum == null || forum.getId() == null)
 		  return false;
@@ -5408,7 +5426,7 @@ public class DiscussionForumTool
     	{
     		membershipItems = uiPermissionsManager.getTopicItemsSet(selectedTopic.getTopic());
     	}
-    	if (membershipItems == null || membershipItems.size() == 0
+    	if ((membershipItems == null || membershipItems.size() == 0)
 					&& (selectedForum != null && selectedForum.getForum() != null)
 					&& uiPermissionsManager != null)
 			{
