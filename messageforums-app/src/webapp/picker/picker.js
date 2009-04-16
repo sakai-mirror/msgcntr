@@ -47,7 +47,7 @@ function initData(){
 
     $(".listItems").empty();
 
-    $.getJSON("/library/picker/demo_site_membership.json", function(data){
+    $.getJSON("picker/demo_site_membership.json", function(data){
         $.each(data.membership_collection, function(i,item){
             //console.log(item.userDisplayName + " "+item.userEid);
             $(".listItems").append("<li id=id"+i+" tabIndex=' -1'>" +item.userDisplayName+"("+item.userEid+")</li>");
@@ -65,7 +65,7 @@ function initData(){
 function initRoles(){
 
     $(".roleListItems").empty();
-    $.getJSON("/library/picker/demo_site.json", function(data){
+    $.getJSON("picker/demo_site.json", function(data){
         $.each(data.userRoles, function(i,item){
             console.log(item);
             $(".roleListItems").append("<li id=roleId"+i+" tabIndex=' -1'>" +item +"</li>");
@@ -86,7 +86,7 @@ function initRoles(){
 function initGroups(){
 
     $(".groupListItems").empty();
-    $.getJSON("/library/picker/site.json", function(data){
+    $.getJSON("picker/site.json", function(data){
         //var  groupList = data.providerGroupId.split("+");
         $.each(data.siteGroups, function(i,item){
             console.log(item.title);
@@ -109,7 +109,7 @@ function initGroups(){
 function filterByRole(roleVal){
 
     $(".listItems").empty();
-    $.getJSON("/library/picker/demo_site_membership.json", function(data){
+    $.getJSON("picker/demo_site_membership.json", function(data){
         $.each(data.membership_collection, function(i,item){
             //console.log(item.userDisplayName + " "+item.userEid);
             if(item.memberRole == roleVal){
