@@ -8,16 +8,39 @@
 <!-- <h4>compose.jsp</h4> -->
 <f:view>
     <sakai:view title="#{msgs.pvt_pvtcompose}">
+
+
+
         <!--Y:\msgcntr\messageforums-app\src\webapp\jsp\compose.jsp-->
         <h:form id="compose">
             <script type="text/javascript" src="/library/js/jquery.js"></script>
-             <sakai:script contextBase="/sakai-messageforums-tool" path="/picker/jqModal.js"/>
+
             <script type="text/javascript">
                 $(document).ready(function() {
-                      $('#ex2').jqm({ajax: 'ajax.html', trigger: 'a.ex2trigger'});
+                    $('.ex2trigger').click(function(){
+                        //$("#ex2").empty();
+
+                        $('#ex2').jqmShow();
+                    });
+
+                    $.ajax({
+                        type: "GET",
+                        url: "picker/picker.html",
+                        dataType: "html",
+                        success: function(html){
+                            $("#ex2").append(html);
+                        initPicker();
+                        initData();
+                        initRoles();
+                        initGroups();
+                        initNodes();
+                        }
+                    });
+
+
                 });
             </script>
-           
+
             <sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
             <!-- compose.jsp -->
             <div class="breadCrumb specialLink">
@@ -33,19 +56,26 @@
                     <h:outputText value="#{msgs.pvt_compose1}" />
                 </h3>
             </div>
-			
+
+
+            <f:verbatim>
+                <div class="jqmWindow" id="ex2" style="display:none">
+                </div>
+            </f:verbatim>
             <sakai:tool_bar_message value="#{msgs.pvt_pvtcompose}" />
- 			
+
             <div class="instruction">
                 <h:outputText value="#{msgs.cdfm_required}"/> <h:outputText value="#{msgs.pvt_star}" styleClass="reqStarInline" />
             </div>
-			  
+
             <h:outputLink rendered="#{PrivateMessagesTool.renderPrivacyAlert}" value="#{PrivateMessagesTool.privacyAlertUrl}" target="_blank" >
                 <sakai:instruction_message value="#{PrivateMessagesTool.privacyAlert}"/>
             </h:outputLink>
-		  
+
             <h:messages styleClass="alertMessage" id="errorMessages" />
-		  
+
+            <f:verbatim><a href="#" class="ex2trigger">picker</a> </f:verbatim>
+
             <h:panelGrid styleClass="jsfFormTable" columns="2" summary="layout">
                 <h:panelGroup styleClass="shorttext required">
                     <h:outputText value="#{msgs.pvt_star}" styleClass="reqStar"/>
@@ -56,26 +86,27 @@
                         <f:selectItems value="#{PrivateMessagesTool.totalComposeToList}"/>
                     </h:selectManyListbox>
                 </h:panelGroup>
-		
-	
+
+
                 <h:panelGroup styleClass="shorttext" rendered= "#{PrivateMessagesTool.dispSendEmailOut && PrivateMessagesTool.enableSendOptions}">
                     <h:outputLabel><h:outputText value="#{msgs.pvt_send_cc}"/></h:outputLabel>
                 </h:panelGroup>
-			   
+
+
 
                 <h:panelGroup styleClass="checkbox" style="white-space: nowrap;" rendered= "#{PrivateMessagesTool.dispSendEmailOut && PrivateMessagesTool.enableSendOptions}">
                     <h:selectBooleanCheckbox value="#{PrivateMessagesTool.booleanEmailOut}" id="send_email_out" >
                     </h:selectBooleanCheckbox>
                     <h:outputLabel for="send_email_out"><h:outputText value="#{msgs.pvt_send_as_email}"/></h:outputLabel>
                 </h:panelGroup>
-	
+
                 <h:outputLabel for="viewlist"><h:outputText value="#{msgs.pvt_label}" /></h:outputLabel>
                 <h:selectOneListbox size="1" id="viewlist" value="#{PrivateMessagesTool.selectedLabel}">
                     <f:selectItem itemValue="#{msgs.pvt_priority_normal}" itemLabel="#{msgs.pvt_priority_normal}"/>
                     <f:selectItem itemValue="#{msgs.pvt_priority_low}" itemLabel="#{msgs.pvt_priority_low}"/>
                     <f:selectItem itemValue="#{msgs.pvt_priority_high}" itemLabel="#{msgs.pvt_priority_high}"/>
                 </h:selectOneListbox>
-				
+
                 <h:panelGroup styleClass="shorttext required">
                     <h:outputText value="#{msgs.pvt_star}" styleClass="reqStar"/>
                     <h:outputLabel for="subject"><h:outputText value="#{msgs.pvt_subject}" /></h:outputLabel>
@@ -84,19 +115,19 @@
                     <h:inputText value="#{PrivateMessagesTool.composeSubject}" id="subject" size="45" />
                 </h:panelGroup>
             </h:panelGrid>
-		  
+
             <h4><h:outputText value="#{msgs.pvt_message}" /></h4>
             <sakai:rich_text_area value="#{PrivateMessagesTool.composeBody}" rows="17" columns="70"/>
 
-<%--********************* Attachment *********************--%>	
+<%--********************* Attachment *********************--%>
             <h4>
                 <h:outputText value="#{msgs.pvt_att}"/>
             </h4>
-	        
+
             <sakai:doc_section>
                 <h:outputText value="#{msgs.pvt_noatt}" rendered="#{empty PrivateMessagesTool.attachments}"/>
             </sakai:doc_section>
-	        
+
             <sakai:doc_section>
                 <sakai:button_bar>
                     <sakai:button_bar_item action="#{PrivateMessagesTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_redirect}"
@@ -122,7 +153,7 @@
 
                 </h:column>
                 <h:column>
-							
+
                     <h:commandLink action="#{PrivateMessagesTool.processDeleteAttach}"
                                    immediate="true"
                                    onfocus="document.forms[0].onsubmit();"
@@ -131,7 +162,7 @@
                         <%--							<f:param value="#{eachAttach.attachmentId}" name="dfmsg_current_attach"/>--%>
                         <f:param value="#{eachAttach.attachment.attachmentId}" name="pvmsg_current_attach"/>
                     </h:commandLink>
-									
+
                 </h:column>
                 <h:column rendered="#{!empty PrivateMessagesTool.attachments}">
                     <f:facet name="header">
@@ -160,7 +191,7 @@
 						</h:column>
 						--%>
             </h:dataTable>
-		   			
+
             <sakai:button_bar>
                 <sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgSend}" value="#{msgs.pvt_send}" accesskey="s"  styleClass="active" />
                 <%--<sakai:button_bar_item action="#{PrivateMessagesTool.processPvtMsgSaveDraft}" value="#{msgs.pvt_savedraft}" />--%>
@@ -168,12 +199,8 @@
             </sakai:button_bar>
         </h:form>
 
-        <f:verbatim>
-            <div class="jqmWindow" id="ex2">
-                Please wait...
-            </div>
-        </f:verbatim>
-	     
+
+
     </sakai:view>
-</f:view> 
+</f:view>
 
