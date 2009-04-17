@@ -1,4 +1,17 @@
+var siteMembership;
+var siteMembershipUrl = "/direct/membership/site/";
+var siteInfo;
+var siteInfoUrl = "/direct/site/";
+//var siteId;
 
+
+//evil hack
+function getSiteId(){
+  var url = parent.location.href;
+  var temp = new Array();
+  temp = url.split("/");
+  return temp[5];
+}
 
 function initNodes(){
 
@@ -45,11 +58,13 @@ function initNodes(){
 
 function initData(){
 
+    var jsonUrl = siteMembershipUrl+getSiteId()+".json";
+    if(console)console.log(jsonUrl);
     $(".listItems").empty();
 
-    $.getJSON("picker/demo_site_membership.json", function(data){
+    $.getJSON(jsonUrl, function(data){
         $.each(data.membership_collection, function(i,item){
-            //console.log(item.userDisplayName + " "+item.userEid);
+            if(console)console.log(item.userDisplayName + " "+item.userEid);
             $(".listItems").append("<li id=id"+i+" tabIndex=' -1'>" +item.userDisplayName+"("+item.userEid+")</li>");
             $("#id"+i).click( function() {
                 singleAddListItem(this,true) ;
@@ -64,8 +79,10 @@ function initData(){
 
 function initRoles(){
 
+    var siteJsonUrl =  siteInfoUrl+getSiteId()+".json?includeGroup=true";
+
     $(".roleListItems").empty();
-    $.getJSON("picker/demo_site.json", function(data){
+    $.getJSON(siteJsonUrl, function(data){
         $.each(data.userRoles, function(i,item){
             console.log(item);
             $(".roleListItems").append("<li id=roleId"+i+" tabIndex=' -1'>" +item +"</li>");
@@ -85,9 +102,12 @@ function initRoles(){
 
 function initGroups(){
 
+    var siteJsonUrl =  siteInfoUrl+getSiteId()+".json?includeGroup=true";
+
     $(".groupListItems").empty();
-    $.getJSON("picker/site.json", function(data){
+    $.getJSON(siteJsonUrl, function(data){
         //var  groupList = data.providerGroupId.split("+");
+        if(data.siteGroups!=null) {
         $.each(data.siteGroups, function(i,item){
             console.log(item.title);
             $(".groupListItems").append("<li id="+item.id+" tabIndex=' -1'>" +item.title +"</li>");
@@ -101,6 +121,9 @@ function initGroups(){
             });
         });
 
+
+        };
+
     });
 } ;
 
@@ -108,8 +131,10 @@ function initGroups(){
 
 function filterByRole(roleVal){
 
+    var jsonUrl = siteMembershipUrl+getSiteId()+".json";
+
     $(".listItems").empty();
-    $.getJSON("picker/demo_site_membership.json", function(data){
+    $.getJSON(jsonUrl, function(data){
         $.each(data.membership_collection, function(i,item){
             //console.log(item.userDisplayName + " "+item.userEid);
             if(item.memberRole == roleVal){
@@ -385,7 +410,8 @@ function debugOut(string) {
 
 
 function saveCollection() {
-    alert("Doesn't do anything in this prototype. Add your own Add Receipients function here!")
+    if(console)console.log("closing overlay.. add Id to dropdown");
+    $('#ex2').jqmHide();
 }
 
 

@@ -74,7 +74,7 @@
 
             <h:messages styleClass="alertMessage" id="errorMessages" />
 
-            <f:verbatim><a href="#" class="ex2trigger">picker</a> </f:verbatim>
+
 
             <h:panelGrid styleClass="jsfFormTable" columns="2" summary="layout">
                 <h:panelGroup styleClass="shorttext required">
@@ -82,10 +82,22 @@
                     <h:outputLabel for="list1"><h:outputText value="#{msgs.pvt_to}"/></h:outputLabel>
                 </h:panelGroup>
                 <h:panelGroup styleClass="shorttext">
-                    <h:selectManyListbox id="list1" value="#{PrivateMessagesTool.selectedComposeToList}" size="5" style="width: 20em;">
+                    <h:selectManyListbox id="list1" value="#{PrivateMessagesTool.selectedComposeToList}" size="1" style="width: 20em;">
                         <f:selectItems value="#{PrivateMessagesTool.totalComposeToList}"/>
                     </h:selectManyListbox>
                 </h:panelGroup>
+
+                  <h:panelGroup styleClass="shorttext">
+
+                </h:panelGroup>
+
+
+                <h:panelGroup styleClass="shorttext" style="width: 40em;">
+                     <h:outputLink  styleClass="ex2trigger" value="#">
+                         <h:outputText value="Pick receipient" />
+                     </h:outputLink>
+               </h:panelGroup>
+
 
 
                 <h:panelGroup styleClass="shorttext" rendered= "#{PrivateMessagesTool.dispSendEmailOut && PrivateMessagesTool.enableSendOptions}">
