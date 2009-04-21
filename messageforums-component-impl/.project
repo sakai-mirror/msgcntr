@@ -4,7 +4,6 @@
   <projects>
     <project>sakai-common-manager-api</project>
     <project>sakai-common-type-api</project>
-    <project>sakai-gradebook-service</project>
     <project>sakai-gradebook-service-api</project>
     <project>sakai-messageforums-api</project>
     <project>sakai-messageforums-hbm</project>
