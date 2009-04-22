@@ -65,7 +65,7 @@ function initData(){
     $.getJSON(jsonUrl, function(data){
         $.each(data.membership_collection, function(i,item){
             if(console)console.log(item.userDisplayName + " "+item.userEid);
-            $(".listItems").append("<li id=id"+i+" tabIndex=' -1'>" +item.userDisplayName+"("+item.userEid+")</li>");
+            $(".listItems").append("<li id=id"+i+" tabIndex=' -1'>" +item.userDisplayName+"("+item.userEmail+")</li>");
             $("#id"+i).click( function() {
                 singleAddListItem(this,true) ;
             });
@@ -411,6 +411,7 @@ function debugOut(string) {
 
 function saveCollection() {
     if(console)console.log("closing overlay.. add Id to dropdown");
+    removeAllRows();
     $('#ex2').jqmHide();
 }
 
