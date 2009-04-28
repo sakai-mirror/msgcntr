@@ -82,7 +82,7 @@
                     <h:outputLabel for="list1"><h:outputText value="#{msgs.pvt_to}"/></h:outputLabel>
                 </h:panelGroup>
                 <h:panelGroup styleClass="shorttext">
-                    <h:selectManyListbox id="list1" value="#{PrivateMessagesTool.selectedComposeToList}" size="1" style="width: 20em;">
+                    <h:selectManyListbox styleClass="recipients" id="list1" value="#{PrivateMessagesTool.selectedComposeToList}" size="1" style="width: 20em;">
                         <f:selectItems value="#{PrivateMessagesTool.totalComposeToList}"/>
                     </h:selectManyListbox>
                 </h:panelGroup>

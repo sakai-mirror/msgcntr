@@ -2,6 +2,8 @@ var siteMembership;
 var siteMembershipUrl = "/direct/membership/site/";
 var siteInfo;
 var siteInfoUrl = "/direct/site/";
+
+var selectedUserId = new Array();
 //var siteId;
 
 
@@ -65,7 +67,7 @@ function initData(){
     $.getJSON(jsonUrl, function(data){
         $.each(data.membership_collection, function(i,item){
             if(console)console.log(item.userDisplayName + " "+item.userEid);
-            $(".listItems").append("<li id=id"+i+" tabIndex=' -1'>" +item.userDisplayName+"("+item.userEmail+")</li>");
+            $(".listItems").append("<li title="+item.userId+" id=id"+i+" tabIndex=' -1'>" +item.userDisplayName+"("+item.userEmail+")</li>");
             $("#id"+i).click( function() {
                 singleAddListItem(this,true) ;
             });
@@ -286,12 +288,13 @@ function highlightRow(rowElm) {
 }
 
 function setFocus(elm) {
-    focusElm = elm;
-    setTimeout("focusElm.focus();",0);  // gFocusItem must be a global
+    //focusElm = elm;
+    //setTimeout("focusElm.focus();",0);  // gFocusItem must be a global
     return false;
 }
 
 function keyAddListItem(item) {
+    if(console)console.log("keyAddListItem()");
     if ( $(item).attr('class') != "dim" ) {
         removePlaceholder();
         clearHighlight();
@@ -308,22 +311,23 @@ function keyAddListItem(item) {
 
 
 function singleAddListItem(item,highlight) {
-
-
+    if(console)console.log("singleAddListItem() ");
     if ( $(item).attr('class') != "dim" ) {
+
         removePlaceholder();
         clearHighlight();
         addListItem(item);
-        setFocus($(item));
+        //setFocus($(item));
         scrollBottom("collection-scroller");
         if (highlight) $('#collection li:last').addClass('highlight');
-        $('#source-scroller').focus();
+        //$('#source-scroller').focus();
         currCollectionRow = $('#collection li:last');
     }
     setCounter();
 }
 
 function addListItem(item) {
+    if(console)console.log("addListItem()" + $(item).attr("title"));
     var newItem = $(item).clone(true);
     $(newItem).attr('name',$(item).attr('id'));
     $(newItem).attr('id','');
@@ -332,12 +336,16 @@ function addListItem(item) {
         removeListItem(this) ;
     });
 
+    selectedUserId.push($(item).attr("title"));
+    if(console)console.log("selected items "+selectedUserId);
+
     $(newItem).appendTo('#collection ul');
     $(item).addClass("dim");
     $(item).attr("disabled","disabled");
 }
 
 function removeListItem(item) {
+   // if(console)console.log("removeListItem()");
     $('#' + $(item).attr('name')).removeClass('dim');
     $('#' + $(item).attr('name')).attr("disabled","");
     $(item).remove();
@@ -410,10 +418,22 @@ function debugOut(string) {
 
 
 function saveCollection() {
+    /*
     if(console)console.log("closing overlay.. add Id to dropdown");
+     $('#selectedUsers li').each(function() {
+       //if(console)console.log($(this).attr("title"));
+    });
+      */
+    $('#compose\\:list1').empty();
+    for(var i =0;i<selectedUserId.length;i++){
+      $('#compose\\:list1').append("<option value="+selectedUserId[i]+">"+selectedUserId[i]+"</option>");
+    };
+
     removeAllRows();
+    selectedUserId.length = 0;
     $('#ex2').jqmHide();
-}
+};
+
 
 
 
