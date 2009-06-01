@@ -3389,6 +3389,7 @@ public class DiscussionForumTool
 		  setErrorMessage(getResourceBundleString(STATE_INCONSISTENT));
 		  return null;
 	  }
+	  functionClick = 0;
 		
   	if(selectedTopic == null)
   	{
@@ -3565,6 +3566,7 @@ public class DiscussionForumTool
 		setErrorMessage(getResourceBundleString(STATE_INCONSISTENT));
 		return null;
 	}
+	functionClick = 0;
   	if(selectedTopic == null)
   	{
   		LOG.debug("selectedTopic is null in processDfMsgRevisedPost");
@@ -3946,7 +3948,8 @@ public class DiscussionForumTool
 			setErrorMessage(getResourceBundleString(STATE_INCONSISTENT));
 			return null;
 		}
-	  
+	
+	  functionClick = 0;
   	if(selectedTopic == null)
   	{ 
   		LOG.debug("selectedTopic is null in processDfMsgDeleteConfirmYes");
@@ -4881,6 +4884,7 @@ public class DiscussionForumTool
 			setErrorMessage(getResourceBundleString(STATE_INCONSISTENT));
 			return null;
 		}
+	  functionClick = 0;
 
   	if(selectedTopic == null)
   	{ 
