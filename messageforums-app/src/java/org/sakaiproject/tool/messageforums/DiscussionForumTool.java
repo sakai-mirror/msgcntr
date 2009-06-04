@@ -133,7 +133,8 @@ public class DiscussionForumTool
   
   private static final String PERMISSION_MODE_TEMPLATE = "template";
   private static final String PERMISSION_MODE_FORUM = "forum";
-  private static final String PERMISSION_MODE_TOPIC = "topic";
+  private static final String PERMISSION_MODE_TOPIC = "topic";  
+  private static final String STATE_INCONSISTENT = "cdfm_state_inconsistent";
 
   private DiscussionForumBean selectedForum;
   private DiscussionTopicBean selectedTopic;
@@ -300,6 +301,9 @@ public class DiscussionForumTool
   
   private int forumClickCount = 0;
   private int topicClickCount = 0;
+  
+  private int selectedMessageCount = 0;
+  private int functionClick = 0;
 
   private boolean grade_too_large_make_sure = false;
   
@@ -1757,6 +1761,8 @@ public class DiscussionForumTool
   public String processActionDisplayThread()
   {
 	    LOG.debug("processActionDisplayThread()");
+	    
+	    selectedMessageCount ++;
 
 	    threadAnchorMessageId = null;
 	    String threadId = getExternalParameterByKey(MESSAGE_ID);
@@ -1834,6 +1840,8 @@ public class DiscussionForumTool
   public String processActionDisplayMessage()
   {
     LOG.debug("processActionDisplayMessage()");
+
+   selectedMessageCount ++;
 
     String messageId = getExternalParameterByKey(MESSAGE_ID);
     String topicId = getExternalParameterByKey(TOPIC_ID);
@@ -3034,6 +3042,8 @@ public class DiscussionForumTool
   
   public String processDfMsgReplyMsg()
   {
+	  selectedMessageCount  = 0;
+	  functionClick ++;
     if(selectedMessage.getMessage().getTitle() != null && !selectedMessage.getMessage().getTitle().startsWith(getResourceBundleString(MSG_REPLY_PREFIX)))
 	  this.composeTitle = getResourceBundleString(MSG_REPLY_PREFIX) + " " + selectedMessage.getMessage().getTitle() + " ";
     else
@@ -3044,6 +3054,8 @@ public class DiscussionForumTool
 
   public String processDfMsgReplyThread()
   {
+	  selectedMessageCount  = 0;
+	  functionClick ++;
   	if(selectedTopic == null)
   	{
   		LOG.debug("selectedTopic is null in processDfMsgReplyThread");
@@ -3088,6 +3100,8 @@ public class DiscussionForumTool
   
   public String processDfMsgGrdFromThread()
   {
+	  selectedMessageCount = 0;
+	  functionClick ++;
 	  String messageId = getExternalParameterByKey(MESSAGE_ID);
 	    String topicId = getExternalParameterByKey(TOPIC_ID);
 	    if (messageId == null)
@@ -3230,6 +3244,9 @@ public class DiscussionForumTool
 
   public String processDfMsgRvs()
   {
+	selectedMessageCount = 0;
+	functionClick ++;
+	
     attachments.clear();
 
     composeBody = selectedMessage.getMessage().getBody();
@@ -3278,6 +3295,8 @@ public class DiscussionForumTool
    */
   public String processDfMsgDeleteConfirm()
   {
+	selectedMessageCount = 0;
+	functionClick ++;
 	  // if coming from thread view, need to set message info
   	fromPage = getExternalParameterByKey(FROMPAGE);
     if (fromPage != null) {
@@ -3291,6 +3310,11 @@ public class DiscussionForumTool
 
   public String processDfReplyMsgPost()
   {
+	  if(selectedMessageCount != 0 || functionClick != 1) {
+		  setErrorMessage(getResourceBundleString(STATE_INCONSISTENT));
+		  return null;
+	  }
+		
   	if(selectedTopic == null)
   	{
   		LOG.debug("selectedTopic is null in processDfReplyMsgPost");
@@ -3462,6 +3486,10 @@ public class DiscussionForumTool
   
   public String processDfMsgRevisedPost()
   {
+	if(selectedMessageCount != 0 || functionClick != 1) {
+		setErrorMessage(getResourceBundleString(STATE_INCONSISTENT));
+		return null;
+	}
   	if(selectedTopic == null)
   	{
   		LOG.debug("selectedTopic is null in processDfMsgRevisedPost");
@@ -3839,6 +3867,11 @@ public class DiscussionForumTool
    */
   public String processDfMsgDeleteConfirmYes()
   {
+	  if(selectedMessageCount != 1 || functionClick != 1) {
+			setErrorMessage(getResourceBundleString(STATE_INCONSISTENT));
+			return null;
+		}
+	  
   	if(selectedTopic == null)
   	{ 
   		LOG.debug("selectedTopic is null in processDfMsgDeleteConfirmYes");
@@ -4769,6 +4802,11 @@ public class DiscussionForumTool
   
   public String processDfGradeSubmit() 
   { 
+	  if(selectedMessageCount != 0 || functionClick != 1) {
+			setErrorMessage(getResourceBundleString(STATE_INCONSISTENT));
+			return null;
+		}
+
   	if(selectedTopic == null)
   	{ 
   		LOG.debug("selectedTopic is null in processDfGradeSubmit");
