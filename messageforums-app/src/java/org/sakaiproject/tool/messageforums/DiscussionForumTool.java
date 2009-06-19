@@ -91,7 +91,6 @@ import org.sakaiproject.tool.messageforums.ui.DiscussionTopicBean;
 import org.sakaiproject.tool.messageforums.ui.EmailNotificationBean;
 import org.sakaiproject.tool.messageforums.ui.PermissionBean;
 import org.sakaiproject.user.api.User;
-import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.util.FormattedText;
 import org.sakaiproject.util.ResourceLoader;
@@ -6308,6 +6307,7 @@ public class DiscussionForumTool
 	public String processActionWatch() {
 		LOG.debug("processActionWatch()");
 		User curruser = UserDirectoryService.getCurrentUser();
+		LOG.debug("got user: " + curruser.getDisplayId());
 		EmailNotification userwatchoption = emailNotificationManager.getEmailNotification(curruser.getId());
 		LOG.debug("userwatchoption = " + userwatchoption.getNotificationLevel());
 		if (watchSettingsBean == null){
@@ -6422,8 +6422,9 @@ public class DiscussionForumTool
 			}
 		}
 		
-		//now we need to filer the list
-		LOG.info("About to filter list");
+		//now we need to filer the list\
+		if (LOG.isDebugEnabled())
+			LOG.debug("About to filter list");
 		List<String> finalList = emailNotificationManager.filterUsers(userlist, currthread.getMessage().getTopic());
 		
 		List<String> useremaillist =  getUserEmailsToBeNotifiedByLevel(finalList);

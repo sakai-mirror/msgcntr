@@ -22,7 +22,6 @@ package org.sakaiproject.component.app.messageforums;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -197,7 +196,7 @@ public class EmailNotificationManagerImpl extends HibernateDaoSupport implements
 		for (int i = 0; i < allusers.size(); i++) {
 			String userId = allusers.get(i);
 			if (readUsers.contains(userId)) {
-				LOG.info("user " + userId + " has read in topic: " + topic.getId());
+				LOG.debug("user " + userId + " has read in topic: " + topic.getId());
 				ret.add(userId);
 			}
 		}
@@ -237,25 +236,23 @@ public class EmailNotificationManagerImpl extends HibernateDaoSupport implements
 
 	}
 
-	public List<String> getUserEmailsToBeNotifiedByLevel(List userlist) {
- 		List<String> emaillist = new ArrayList<String>();
-		Iterator userIter = userlist.iterator();
-		while (userIter.hasNext()) {
-			String oneuserid= (String) userIter.next();
-                       try {
-				User user = userDirectoryService.getUser(oneuserid);
+	public List<String> getUserEmailsToBeNotifiedByLevel(List<String> userlist) {
+		List<String> emaillist = new ArrayList<String>();
+		List<User> usersList = userDirectoryService.getUsers(userlist);
 
 
-                        String useremail = user.getEmail();
-                        if (useremail != null || "".equalsIgnoreCase(useremail))
-                                if (LOG.isDebugEnabled())
-                                        LOG.debug("Username = " + user.getDisplayId()
-                                                        + " , useremail : " + useremail);
-                        emaillist.add(useremail);
+		for (int i = 0; i < usersList.size(); i++) {
+			User user = usersList.get(i);
 
-                        } catch (UserNotDefinedException e) {
-                                e.printStackTrace();
-                        }
+
+			String useremail = user.getEmail();
+			if (useremail != null || "".equalsIgnoreCase(useremail))
+				if (LOG.isDebugEnabled())
+					LOG.debug("Username = " + user.getDisplayId()
+							+ " , useremail : " + useremail);
+			emaillist.add(useremail);
+
+
 		}
 
 		// find emails for each user
