@@ -21,6 +21,9 @@
 package org.sakaiproject.api.app.messageforums;
 
 import java.util.List;
+import org.sakaiproject.api.app.messageforums.Topic;
+
+
 
 public interface EmailNotificationManager {
       
@@ -41,7 +44,16 @@ public interface EmailNotificationManager {
   /**
    * get list of users who should be notified of a new posting
    * @param userId : author of the message that the new posting is replying to.
+   * @param the topic the message is in - used for permission checks
     */
   public List<String> getUsersToBeNotifiedByLevel(String notificationlevel);
 
+  /**
+   * Filter a list of notification participants 
+   * @param allusers
+   * @param topic
+   * @return
+   */
+  public List<String> filterUsers(List<String> allusers, Topic topic);
+  
 }

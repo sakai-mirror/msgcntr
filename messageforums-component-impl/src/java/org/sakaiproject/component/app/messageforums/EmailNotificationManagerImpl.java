@@ -34,11 +34,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.sakaiproject.api.app.messageforums.EmailNotification;
 import org.sakaiproject.api.app.messageforums.EmailNotificationManager;
-import org.sakaiproject.authz.api.AuthzGroup;
-import org.sakaiproject.authz.api.GroupNotDefinedException;
-import org.sakaiproject.authz.api.Member;
-import org.sakaiproject.authz.api.Role;
-import org.sakaiproject.authz.cover.AuthzGroupService;
+import org.sakaiproject.api.app.messageforums.Topic;
+import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.EmailNotificationImpl;
 import org.sakaiproject.event.api.EventTrackingService;
 import org.sakaiproject.tool.api.Placement;
@@ -73,6 +70,13 @@ public class EmailNotificationManagerImpl extends HibernateDaoSupport implements
 	public void setEventTrackingService(
 			EventTrackingService eventTrackingService) {
 		this.eventTrackingService = eventTrackingService;
+	}
+
+
+	private DiscussionForumManager discussionForumManager;
+	public void setDiscussionForumManager(
+			DiscussionForumManager discussionForumManager) {
+		this.discussionForumManager = discussionForumManager;
 	}
 
 	public EmailNotification getEmailNotification(final String userId) {
@@ -153,7 +157,7 @@ public class EmailNotificationManagerImpl extends HibernateDaoSupport implements
 		String contextid = this.getContextId();
 		int intlevel = Integer.parseInt(notificationlevel);
  		List<String> allusers = getSiteUsersByNotificationLevel(contextid, intlevel);
-		
+ 		
  		if (LOG.isDebugEnabled()){
 			LOG.debug("total count of users to be notified = " + allusers.size());
 		}
@@ -182,6 +186,23 @@ public class EmailNotificationManagerImpl extends HibernateDaoSupport implements
 	}
 	
 	*/
+
+	/**
+	 * Filter the list of notification users to remove users who don't have read permission in the topic
+	 */
+	
+	public List<String> filterUsers(List<String> allusers, Topic topic) {
+		List<String> ret = new ArrayList<String>();
+		Set<String> readUsers = discussionForumManager.getUsersAllowedForTopic(topic.getId(), true, false);
+		for (int i = 0; i < allusers.size(); i++) {
+			String userId = allusers.get(i);
+			if (readUsers.contains(userId)) {
+				LOG.info("user " + userId + " has read in topic: " + topic.getId());
+				ret.add(userId);
+			}
+		}
+		return ret;
+	}
 
 	private List<String> getSiteUsersByNotificationLevel(final String contextid,
 			final int notificationlevel) {

@@ -479,6 +479,9 @@
 		        <property name="eventTrackingService">
         		    <ref bean="org.sakaiproject.event.api.EventTrackingService"/>
 		        </property>
+		        <property name="discussionForumManager">
+		        	<ref bean="org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager"/>
+		        </property>
             </bean>           
         </property>
          <property name="transactionAttributes">

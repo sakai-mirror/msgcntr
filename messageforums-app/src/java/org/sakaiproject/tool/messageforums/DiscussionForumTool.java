@@ -30,14 +30,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
- 
+
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIData;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
- import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,10 +58,8 @@ import org.sakaiproject.api.app.messageforums.OpenForum;
 import org.sakaiproject.api.app.messageforums.PermissionLevel;
 import org.sakaiproject.api.app.messageforums.PermissionLevelManager;
 import org.sakaiproject.api.app.messageforums.PermissionsMask;
-import org.sakaiproject.api.app.messageforums.PrivateMessage;
 import org.sakaiproject.api.app.messageforums.Topic;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
-import org.sakaiproject.api.app.messageforums.ui.PrivateMessageManager;
 import org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager;
 import org.sakaiproject.authz.api.AuthzGroup;
 import org.sakaiproject.authz.api.GroupNotDefinedException;
@@ -77,8 +75,8 @@ import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.service.gradebook.shared.Assignment;
-import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.service.gradebook.shared.CommentDefinition;
+import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.Group;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.cover.SiteService;
@@ -6340,26 +6338,22 @@ public class DiscussionForumTool
 	
 	public List<String> getUserEmailsToBeNotifiedByLevel(List userlist) {
 		List<String> emaillist = new ArrayList<String>();
-		Iterator userIter = userlist.iterator();
-		while (userIter.hasNext()) {
-			String oneuserid= (String) userIter.next();
-			try {
-				User user = UserDirectoryService.getUser(oneuserid);
-				
-				
-				String useremail = user.getEmail();
-				if (useremail != null || "".equalsIgnoreCase(useremail))
-					if (LOG.isDebugEnabled())
-						LOG.debug("Username = " + user.getDisplayId()
-								+ " , useremail : " + useremail);
-				emaillist.add(useremail);
-				
-			} catch (UserNotDefinedException e) {
-				e.printStackTrace();
-			}
-		}
 		
-		// find emails for each user
+		
+		List<User> userMailList  = UserDirectoryService.getUsers(userlist);
+		for (int i = 0; i < userMailList.size(); i++) {
+			User user = userMailList.get(i); 
+
+
+			String useremail = user.getEmail();
+			if (useremail != null && !"".equalsIgnoreCase(useremail))
+				if (LOG.isDebugEnabled())
+					LOG.debug("Username = " + user.getDisplayId()
+							+ " , useremail : " + useremail);
+			emaillist.add(useremail);
+
+
+		}
 		
 		return emaillist;
 		
@@ -6428,8 +6422,12 @@ public class DiscussionForumTool
 			}
 		}
 		
+		//now we need to filer the list
+		LOG.info("About to filter list");
+		List<String> finalList = emailNotificationManager.filterUsers(userlist, currthread.getMessage().getTopic());
 		
-		List<String> useremaillist =  getUserEmailsToBeNotifiedByLevel(userlist);
+		List<String> useremaillist =  getUserEmailsToBeNotifiedByLevel(finalList);
+		
 		
 		
 		if (LOG.isDebugEnabled()){

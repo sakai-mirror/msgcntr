@@ -26,16 +26,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sakaiproject.api.app.messageforums.Area;
-import org.sakaiproject.api.app.messageforums.AreaControlPermission;
 import org.sakaiproject.api.app.messageforums.Attachment;
-import org.sakaiproject.api.app.messageforums.BaseForum;
 import org.sakaiproject.api.app.messageforums.DBMembershipItem;
 import org.sakaiproject.api.app.messageforums.DiscussionForum;
 import org.sakaiproject.api.app.messageforums.DiscussionTopic;
 import org.sakaiproject.api.app.messageforums.Message;
 import org.sakaiproject.api.app.messageforums.Topic;
-import org.sakaiproject.api.app.messageforums.PermissionsMask;
-import org.sakaiproject.authz.api.Role;
 
 /**
  * @author <a href="mailto:rshastri@iupui.edu">Rashmi Shastri</a>
@@ -489,4 +485,17 @@ public interface DiscussionForumManager
    * in role swap view this will always be false
    */
   public boolean isForumOwner(DiscussionForum forum);
+  
+  
+  /**
+  *
+  * @param topicId
+  * @param checkReadPermission - user must have read permission for topic
+  * @param checkModeratePermission - user must have moderate permission for topic
+  * @return a set of userIds for the site members who have "read" and/or "moderate" permission
+  * for the given topic. Uses the role and group permission settings for the topic
+  * to determine permission
+  */
+  public Set<String> getUsersAllowedForTopic(Long topicId, boolean checkReadPermission, boolean checkModeratePermission);
+  
 }
