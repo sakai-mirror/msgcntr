@@ -3100,8 +3100,6 @@ public class DiscussionForumTool
   
   public String processDfMsgGrdFromThread()
   {
-	  selectedMessageCount = 0;
-	  functionClick ++;
 	  String messageId = getExternalParameterByKey(MESSAGE_ID);
 	    String topicId = getExternalParameterByKey(TOPIC_ID);
 	    if (messageId == null)
@@ -3129,7 +3127,10 @@ public class DiscussionForumTool
   
   public String processDfMsgGrd()
   {
-  	if(selectedTopic == null)
+	  selectedMessageCount = 0;
+	  functionClick ++;
+
+	  if(selectedTopic == null)
   	{
   		LOG.debug("selectedTopic is null in processDfMsgGrd");
   		return gotoMain();
@@ -3480,6 +3481,8 @@ public class DiscussionForumTool
 
   public String processDfMsgRevisedCancel()
   {
+	  selectedMessageCount = 0;
+	  functionClick = 0;
 	  getThreadFromMessage();
 	  return MESSAGE_VIEW;
   }
@@ -3740,7 +3743,10 @@ public class DiscussionForumTool
 
   public String processDfReplyMsgCancel()
   {
-  	this.errorSynch = false;
+	  selectedMessageCount = 0;
+	  functionClick = 0;
+	  
+	this.errorSynch = false;
     this.composeBody = null;
     this.composeLabel = null;
     this.composeTitle = null;
@@ -3753,6 +3759,8 @@ public class DiscussionForumTool
   
   public String processDfReplyThreadCancel()
   {
+	  selectedMessageCount = 0;
+	  functionClick = 0;
 	  this.errorSynch = false;
 	    this.composeBody = null;
 	    this.composeLabel = null;
@@ -3867,7 +3875,8 @@ public class DiscussionForumTool
    */
   public String processDfMsgDeleteConfirmYes()
   {
-	  if(selectedMessageCount != 1 || functionClick != 1) {
+	  //selectedMessageCount can be 0 or 1 for single tab open. There are 2 places for deleting message. 
+	  if(selectedMessageCount > 1 || functionClick != 1) {
 			setErrorMessage(getResourceBundleString(STATE_INCONSISTENT));
 			return null;
 		}
@@ -3926,7 +3935,9 @@ public class DiscussionForumTool
 
   public String processDfMsgDeleteCancel()
   {
-    this.deleteMsg = false;
+	  selectedMessageCount = 0;
+	  functionClick = 0;
+	this.deleteMsg = false;
     this.errorSynch = false;
     
     if (!"".equals(fromPage)) {
@@ -4698,7 +4709,8 @@ public class DiscussionForumTool
   
   public String processDfGradeCancel() 
   { 
-     
+	  selectedMessageCount = 0;
+	  functionClick = 0;
     gradeNotify = false; 
     selectedAssign = DEFAULT_GB_ITEM; 
     resetGradeInfo();
