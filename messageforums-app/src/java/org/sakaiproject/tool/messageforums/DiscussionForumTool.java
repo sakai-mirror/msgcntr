@@ -2830,9 +2830,6 @@ public class DiscussionForumTool
       StringBuilder alertMsg = new StringBuilder();
       aMsg.setTitle(FormattedText.processFormattedText(getComposeTitle(), alertMsg));
       aMsg.setBody(FormattedText.processFormattedText(getComposeBody(), alertMsg));
-      int wc=wordCount(aMsg.getBody());
-            
-      aMsg.setWordCount(wc);
       
       aMsg.setAuthor(getUserNameOrEid());
       
@@ -3490,15 +3487,6 @@ public class DiscussionForumTool
 	  return MESSAGE_VIEW;
   }
 
-  public int wordCount(String text)
-  {
-  	  String w1=text.replaceAll("\\<.*?\\>","").replaceAll("\r\n"," ");
-	  //w1=w1.replaceAll("\r\n"," ");
-	  String[] op= w1.split(" ");
-	  int wordcount=op.length;  
-	  return wordcount;
-  }
-  
   
   public String processDfMsgRevisedPost()
   {
@@ -3538,7 +3526,6 @@ public class DiscussionForumTool
     }
     String currentBody = getComposeBody();
     String revisedInfo = "<p class=\"lastRevise textPanelFooter\">" + getResourceBundleString(LAST_REVISE_BY);
-    int wc=wordCount(currentBody);
 
     revisedInfo += getUserNameOrEid();
     
@@ -3558,7 +3545,6 @@ public class DiscussionForumTool
 
     dMsg.setTitle(getComposeTitle());
     dMsg.setBody(revisedInfo);
-    dMsg.setWordCount(wc);
     dMsg.setDraft(Boolean.FALSE);
     dMsg.setModified(new Date());
     
