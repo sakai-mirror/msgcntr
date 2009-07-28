@@ -160,6 +160,7 @@ CREATE TABLE `mfr_message_t` (
   `MODIFIED_BY` varchar(36) NOT NULL default '',
   `TITLE` varchar(255) NOT NULL default '',
   `BODY` text NOT NULL,
+  `WORDCOUNT` int(36) NOT NULL default '',
   `AUTHOR` varchar(255) NOT NULL default '',
   `LABEL` varchar(255) default NULL,
   `IN_REPLY_TO` bigint(20) default NULL,

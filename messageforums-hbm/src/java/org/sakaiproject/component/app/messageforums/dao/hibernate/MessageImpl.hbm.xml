@@ -38,10 +38,13 @@
       <column name="TITLE" length="255" not-null="true" index="MFR_MESSAGE_TITLE_I"/>
     </property>
     <property name="body" type="text">
-      <column name="BODY" not-null="false" />
+    	<column name="BODY" not-null="false" />
+    </property>
+    <property name="wordCount">
+    	<column name="WORDCOUNT" length="26" not-null="true" index="MFR_MESSAGE_WORDCOUNT_I" />
     </property>
     <property name="author">
-      <column name="AUTHOR" length="255" not-null="true" index="MFR_MESSAGE_AUTHOR_I" />
+    	<column name="AUTHOR" length="255" not-null="true" index="MFR_MESSAGE_AUTHOR_I" />
     </property>
     <property name="hasAttachments">
       <column name="HAS_ATTACHMENTS" not-null="true" index="MFR_MESSAGE_HAS_ATTACHMENTS_I"/>
