@@ -7,7 +7,7 @@
 </jsp:useBean>
 
 <f:view>
-	<sakai:view>
+	<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 		<script type="text/javascript">
 			// open print preview in another browser window so can size approx what actual
 			// print out will look like
@@ -16,9 +16,6 @@
 			if (window.focus) {newwindow.focus()}
 			}
 		</script>
-			<style type="text/css">
-				@import url("/sakai-messageforums-tool/css/msgcntr.css");
-			</style>
 		<h:form id="msgForum"   rendered="#{!ForumTool.selectedTopic.topic.draft || ForumTool.selectedTopic.topic.createdBy == ForumTool.userId}">
 			<!--jsp/discussionForum/message/dfAllMessages.jsp-->
 	
@@ -110,29 +107,37 @@
 					<sakai:tool_bar_item action="#{ForumTool.processActionTopicSettings}" id="topic_setting" value="#{msgs.cdfm_topic_settings}" 
 					rendered="#{ForumTool.selectedTopic.changeSettings}" /> 
 					
-					<h:outputText  value=" | " rendered="#{ForumTool.selectedTopic.changeSettings && !ForumTool.selectedForum.forum.locked == 'true' && !ForumTool.selectedTopic.topic.locked == 'true'}" />
+					<h:outputText  value=" | " rendered="#{!ForumTool.selectedTopic.markForDeletion && ForumTool.displayTopicDeleteOption}" />
+
 					<h:commandLink action="#{ForumTool.processActionDeleteTopicConfirm}" id="delete_confirm" 
 			value="#{msgs.cdfm_button_bar_delete}" accesskey="d" rendered="#{!ForumTool.selectedTopic.markForDeletion && ForumTool.displayTopicDeleteOption}">
 			<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId"/>
 			</h:commandLink>
-					
-					
-					
-					
-					
+									
+									
 					<h:outputText   value="#{ForumTool.selectedTopic.topic.shortDescription}" rendered="#{ForumTool.selectedTopic.topic.shortDescription} != ''}"  styleClass="shortDescription" />
-					<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show" 
-							rendered="#{ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null}"
-							onclick="resize();$(this).next('.hide').toggle(); $('div.toggle').slideToggle(resize);$(this).toggle();">
-						<h:graphicImage url="/images/collapse.gif" /><h:outputText value="#{msgs.cdfm_read_full_description}" />
-						<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}"   rendered="#{!empty ForumTool.selectedTopic.attachList}" />
-					</h:outputLink>
-					<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide_full_description}" style="display:none" styleClass="hide" 
-							rendered="#{ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null}"
-							onclick="resize();$(this).prev('.show').toggle(); $('div.toggle').slideToggle(resize);$(this).toggle();">
-						<h:graphicImage url="/images/expand.gif" /><h:outputText value="#{msgs.cdfm_hide_full_description}" />
-						<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}"   rendered="#{!empty ForumTool.selectedTopic.attachList}" />
-					</h:outputLink>
+					
+				
+					
+						<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_view}" styleClass="show"
+								rendered="#{!empty ForumTool.selectedTopic.attachList || ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"
+								onclick="resize();$(this).next('.hide').toggle(); $('div.toggle').slideToggle(resize);$(this).toggle();">
+								<h:graphicImage url="/images/collapse.gif"/><h:outputText value="#{msgs.cdfm_view}" />
+								<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty ForumTool.selectedTopic.attachList && ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_attach}" rendered="#{!empty ForumTool.selectedTopic.attachList}"/>
+						</h:outputLink>  
+					
+										
+					<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide}" style="display:none " styleClass="hide" 
+								rendered="#{!empty ForumTool.selectedTopic.attachList || ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"
+								onclick="resize();$(this).prev('.show').toggle(); $('div.toggle').slideToggle(resize);$(this).toggle();">
+								<h:graphicImage url="/images/expand.gif"/><h:outputText value="#{msgs.cdfm_hide}" />
+								<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty ForumTool.selectedTopic.attachList && ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_attach}" rendered="#{!empty ForumTool.selectedTopic.attachList}"/>
+						</h:outputLink>
+						
 					<f:verbatim><div class="toggle" style="display:none;padding-left:1em"></f:verbatim>
 						<mf:htmlShowArea  id="forum_fullDescription" hideBorder="true"	 value="#{ForumTool.selectedTopic.topic.extendedDescription}"/> 
 						<h:dataTable styleClass="listHier" value="#{ForumTool.selectedTopic.attachList}" var="eachAttach" rendered="#{!empty ForumTool.selectedTopic.attachList}" cellpadding="3" cellspacing="0" columnClasses="attach,bogus" summary="layout" style="font-size:.9em;width:auto;margin-left:1em">
@@ -151,7 +156,7 @@
 			</h:panelGrid>	
 			<%--<%@include file="dfViewSearchBar.jsp"%> --%>
 			<%--//designNote: need a rendered attribute here that will toggle the display of the table (if messages) or a textblock (class="instruction") if there are no messages--%> 				
-			<h:outputText value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.selectedTopic.messages}"  styleClass="messageInformation" style=""/>
+			<h:outputText value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.selectedTopic.messages}"  styleClass="instruction" style="display:block"/>
 			<mf:hierDataTable styleClass=" listHier  specialLink allMessages" id="messagesInHierDataTable" rendered="#{!empty ForumTool.selectedTopic.messages}"  value="#{ForumTool.messages}" var="message" expanded="#{ForumTool.expanded}"
 					columnClasses="attach,messageTitle,bogus,bogus" cellspacing="0" cellpadding="0" style="border:none">
 				<h:column id="_toggle">
@@ -217,9 +222,9 @@
 						</h:commandLink>
 						<%-- //designNote: icon to mark as read, does it belong here? Is it the right icon? Is this functionality desired?--%>
 						<h:outputText value="  " />
-						<h:graphicImage value="/images/12-em-check.png" rendered="#{!message.read}" style="cursor:pointer"
+						<h:graphicImage value="/images/trans.gif" rendered="#{!message.read}"
 							alt="#{msgs.cdfm_mark_as_read}" title="#{msgs.cdfm_mark_as_read}"
-							onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);"/>
+							onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);" styleClass="markAsReadIcon"/>
 					</h:panelGroup>
 					<%--  thread metadata (count) --%>
 					<%-- designNote: debug block --%>

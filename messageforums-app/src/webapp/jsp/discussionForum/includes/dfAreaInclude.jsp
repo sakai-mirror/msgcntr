@@ -39,19 +39,25 @@
 				--%>
 				<%-- the forum details --%>
 				<h:outputText value="#{forum.forum.shortDescription}" styleClass="shortDescription"/>
-				<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}"  styleClass="show"
-						rendered="#{forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null && forum.forum.extendedDescription != '<br/>'}"
-						
+				
+				<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_view}"  styleClass="show"
+						rendered="#{!empty forum.attachList || forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null && forum.forum.extendedDescription != '<br/>'}"
 						onclick="resize();$(this).next('.hide').toggle(); $('div.toggle:first', $(this).parents('table.forumHeader')).slideToggle(resize);$(this).toggle();">
-					<h:graphicImage url="/images/collapse.gif" /><h:outputText value="#{msgs.cdfm_read_full_description}" />
-					<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}"  rendered="#{!empty forum.attachList}"/>
+					<h:graphicImage url="/images/collapse.gif" /><h:outputText value="#{msgs.cdfm_view}" />
+					<h:outputText value=" #{msgs.cdfm_full_description}"  rendered="#{forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null && forum.forum.extendedDescription != '<br/>'}"/>
+					<h:outputText value=" #{msgs.cdfm_and}"  rendered="#{!empty forum.attachList && forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null && forum.forum.extendedDescription != '<br/>'}"/>
+					<h:outputText value=" #{msgs.cdfm_attach}"  rendered="#{!empty forum.attachList}"/>
 				</h:outputLink>
+				
 				<%--//designNote: these link always show up even after you  have "zeroed out" a long description because it always saves a crlf --%>
-				<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide_full_description}" style="display:none;" styleClass="hide" 
+				<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide}" style="display:none;" styleClass="hide" 
 						onclick="resize();$(this).prev('.show').toggle(); $('div.toggle:first', $(this).parents('table.forumHeader')).slideToggle(resize);$(this).toggle();">
-					<h:graphicImage url="/images/expand.gif"/> <h:outputText value="#{msgs.cdfm_hide_full_description}" />
-					<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}"  rendered="#{!empty forum.attachList}"/>
-					</h:outputLink>
+					<h:graphicImage url="/images/expand.gif"/> <h:outputText value="#{msgs.cdfm_hide}" />
+					<h:outputText value=" #{msgs.cdfm_full_description}"  rendered="#{forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null && forum.forum.extendedDescription != '<br/>'}"/>
+					<h:outputText value=" #{msgs.cdfm_and}"  rendered="#{!empty forum.attachList && forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null && forum.forum.extendedDescription != '<br/>'}"/>
+					<h:outputText value=" #{msgs.cdfm_attach}"  rendered="#{!empty forum.attachList}"/>
+				</h:outputLink>
+				
 				<f:verbatim><div class="toggle" style="display:none;padding-left:1em"></f:verbatim>
 					<mf:htmlShowArea value="#{forum.forum.extendedDescription}"  hideBorder="true" />
 					<%-- attachs --%>
@@ -76,16 +82,15 @@
 		</h:panelGrid>
 		<%-- the topic list  --%>
 		<%--//designNote: need a rendered atttrib for the folowing predicated on the existence of topics in this forum--%>
-		<h:dataTable id="topics" value="#{forum.topics}" var="topic"  width="100%"   cellspacing="0" cellpadding="0" summary="layout">
+		<h:dataTable id="topics" rendered="#{!empty forum.topics}" value="#{forum.topics}" var="topic"  width="100%"   cellspacing="0" cellpadding="0" summary="layout">
 			<h:column rendered="#{! topic.nonePermission}">
 					<h:panelGrid columns="1" summary="layout" width="100%" styleClass="specialLink topicBloc" cellpadding="0" cellspacing="0">
 						<h:panelGroup>
+							
+							<h:graphicImage url="/images/folder.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages == 0 }" styleClass="topicIcon" style="margin-right:.5em"/>
+							<h:graphicImage url="/images/folder_unread.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages > 0 }" styleClass="topicIcon" style="margin-right:.5em"/>
 							<%--//desNote: only show the new "new" message if there are no unread messages --%>
 							<h:outputText styleClass="messageNew" value=" #{msgs.cdfm_newflag}"  rendered="#{topic.unreadNoMessages > 0 }" />
-							<%--
-							<h:graphicImage url="/images/icon_new_blank.png" alt="Topic Folder" rendered="#{topic.unreadNoMessages > 0 }" style="margin-right:.5em"/>
-							<h:graphicImage url="/images/folder.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages == 0 }" style="margin-right:.5em"/>
-							<h:graphicImage url="/images/folder_unread.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages > 0 }" style="margin-right:.5em"/>--%>
 							<h:outputText styleClass="highlight title" id="draft" value="#{msgs.cdfm_draft}" rendered="#{topic.topic.draft == 'true'}"/>
 							<h:outputText id="draft_space" value="  - " rendered="#{topic.topic.draft == 'true'}" styleClass="title"/>
 							<h:graphicImage url="/images/silk/lock.png" alt="#{msgs.cdfm_forum_locked}" rendered="#{forum.locked == 'true' || topic.locked == 'true'}" style="margin-right:.5em"/>
@@ -125,18 +130,25 @@
 							--%>
 							<%--the topic details --%>
 							<h:outputText id="topic_desc" value="#{topic.topic.shortDescription}" styleClass="shortDescription" />
-							<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show"
-									rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"
+							
+							<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_view}" styleClass="show"
+									rendered="#{!empty topic.attachList || topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"
 									onclick="resize();$(this).next('.hide').toggle(); $('td div.toggle', $(this).parents('tr:first').next('tr')).slideToggle(resize);$(this).toggle();">
-									<h:graphicImage url="/images/collapse.gif"/><h:outputText value="#{msgs.cdfm_read_full_description}" />
-									<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}" rendered="#{!empty topic.attachList}"/>
+									<h:graphicImage url="/images/collapse.gif"/><h:outputText value="#{msgs.cdfm_view}" />
+									<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"/>
+									<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty topic.attachList && topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"/>
+									<h:outputText value=" #{msgs.cdfm_attach}" rendered="#{!empty topic.attachList}"/>
 							</h:outputLink>  
-							<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide_full_description}" style="display:none " styleClass="hide" 
-									rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"
+							
+							<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide}" style="display:none " styleClass="hide" 
+									rendered="#{!empty topic.attachList || topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"
 									onclick="resize();$(this).prev('.show').toggle(); $('td div.toggle', $(this).parents('tr:first').next('tr')).slideToggle(resize);$(this).toggle();">
-									<h:graphicImage url="/images/expand.gif"/><h:outputText value="#{msgs.cdfm_hide_full_description}" />
-									<h:outputText value=" #{msgs.cdfm_read_full_description_andatts}"  rendered="#{!empty topic.attachList}"/>
-							</h:outputLink>
+									<h:graphicImage url="/images/expand.gif"/><h:outputText value="#{msgs.cdfm_hide}" />
+									<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"/>
+									<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty topic.attachList && topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null && topic.topic.extendedDescription != '<br/>'}"/>
+									<h:outputText value=" #{msgs.cdfm_attach}" rendered="#{!empty topic.attachList}"/>
+							</h:outputLink> 
+							
 						</h:panelGroup>
 						<h:panelGroup>
 							<f:verbatim><div class="toggle" style="display:none;padding-left:1em"></f:verbatim>

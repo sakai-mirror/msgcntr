@@ -7,12 +7,9 @@
 </jsp:useBean>
 <f:view>
 
-<sakai:view title="#{msgs.cdfm_reply_tool_bar_message}">
+<sakai:view title="#{msgs.cdfm_reply_tool_bar_message}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 	<!--jsp/dfMessageReplyThread.jsp-->    
 	<h:form id="dfCompose">
-		<style type="text/css">
-			@import url("/sakai-messageforums-tool/css/msgcntr.css");
-		</style>
 		<script type="text/javascript" src="/library/js/jquery.js"></script>
 		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 		<h:outputText styleClass="alertMessage" value="#{msgs.cdfm_reply_deleted}" rendered="#{ForumTool.errorSynch}" />
@@ -136,7 +133,7 @@
 		<%-- //designNote: moving rendered attr from column to table to avoid childless table if empty--%>
 		<h:dataTable styleClass="attachPanel" id="attmsg"  value="#{ForumTool.attachments}" var="eachAttach"   rendered="#{!empty ForumTool.attachments}"
 			columnClasses="attach,bogus,specialLink itemAction,bogus,bogus" style="width:auto">
-			<h:column rendered="#{!empty ForumTool.attachments}">
+			<h:column>
 			    <sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
   				<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
 			</h:column>
@@ -156,13 +153,13 @@
 					<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>
 				</h:commandLink>
 			</h:column>
-			<h:column rendered="#{!empty ForumTool.attachments}">
+			<h:column>
 				<f:facet name="header">
 					<h:outputText value="#{msgs.cdfm_attsize}" />
 				</f:facet>
 				<h:outputText value="#{eachAttach.attachment.attachmentSize}"/>
 			</h:column>
-			<h:column rendered="#{!empty ForumTool.attachments}">
+			<h:column>
 				<f:facet name="header">
 					<h:outputText value="#{msgs.cdfm_atttype}" />
 				</f:facet>

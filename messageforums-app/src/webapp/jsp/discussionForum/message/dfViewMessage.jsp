@@ -7,11 +7,8 @@
 </jsp:useBean>
 
 <f:view>
-	<sakai:view>
+	<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 		<h:form id="msgForum" styleClass="specialLink">
-			<style type="text/css">
-				@import url("/sakai-messageforums-tool/css/msgcntr.css");
-			</style>
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 			<!--jsp/discussionForum/message/dfViewMessage.jsp-->
@@ -71,22 +68,22 @@
 							action="#{ForumTool.processDfComposeToggle}" 
 							onmousedown="document.forms[0].onsubmit();"
 							rendered="#{ForumTool.selectedTopic.hasExtendedDesciption}" 
-							title="#{msgs.cdfm_read_full_description}"
+							title="#{msgs.cdfm_full_description}"
 							styleClass="show">
 						<f:param value="dfViewMessage" name="redirectToProcessAction"/>
 						<f:param value="true" name="composeExpand"/>
 						<h:graphicImage url="/images/collapse.gif" />
-						<h:outputText value="#{msgs.cdfm_read_full_description}" />
+						<h:outputText value="#{msgs.cdfm_full_description}" />
 					</h:commandLink>
 					<h:commandLink immediate="true" 
 							action="#{ForumTool.processDfComposeToggle}" 
 							onmousedown="document.forms[0].onsubmit();"
 							rendered="#{ForumTool.selectedTopic.readFullDesciption}"
-							title="#{msgs.cdfm_hide_full_description}"
+							title="#{msgs.cdfm_full_description}"
 							styleClass="hide">
 						<f:param value="dfViewMessage" name="redirectToProcessAction"/>
 						<h:graphicImage url="/images/expand.gif"/>
-						<h:outputText value="#{msgs.cdfm_hide_full_description}" />
+						<h:outputText value="#{msgs.cdfm_full_description}" />
 					</h:commandLink>
 				</p>
 				<mf:htmlShowArea value="#{ForumTool.selectedTopic.topic.extendedDescription}" 

@@ -7,7 +7,7 @@
 </jsp:useBean>
 
 <f:view>
-<sakai:view>
+<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 <script language="JavaScript">
 	// open print preview in another browser window so can size approx what actual
 	// print out will look like
@@ -17,9 +17,6 @@
 	}
 </script>
 	<h:form id="msgForum" rendered="#{!ForumTool.selectedTopic.topic.draft || ForumTool.selectedTopic.topic.createdBy == ForumTool.userId}">
-		<style type="text/css">
-			@import url("/sakai-messageforums-tool/css/msgcntr.css");
-		</style>
 
 		<!--jsp/discussionForum/message/dfViewThread.jsp-->
 		<script type="text/javascript" src="/library/js/jquery.js"></script>
@@ -82,11 +79,14 @@
 			</h:panelGrid>
 
 				 <%@include file="dfViewSearchBarThread.jsp"%>
+				 
+		<h:outputText value="#{msgs.cdfm_no_unread_messages}" rendered="#{empty ForumTool.selectedThread}" styleClass="instruction" style="display:block"/>
 		
 		<%--rjlowe: Expanded View to show the message bodies, but not threaded --%>
 		<h:dataTable id="expandedMessages" value="#{ForumTool.selectedThread}" var="message" rendered="#{!ForumTool.threaded}"
    	 		styleClass="listHier messagesFlat specialLink" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
 			<h:column>
+			
 				<%@include file="dfViewThreadBodyInclude.jsp" %>
 			</h:column>
 		</h:dataTable>
@@ -101,6 +101,7 @@
 				
 		<h:inputHidden id="mainOrForumOrTopic" value="dfViewThread" />
 		<%--//designNote:  need a message if no messages (as in when there are no unread ones)  --%>
+		
 	<%
 	  	String thisId = request.getParameter("panel");
   		if (thisId == null) 
