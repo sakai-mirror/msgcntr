@@ -81,20 +81,45 @@
 					<h:outputText styleClass="highlight title" id="draft" value="#{msgs.cdfm_draft}" rendered="#{ForumTool.selectedTopic.topic.draft == 'true'}"/>
 					<h:outputText id="draft_space" value="  - " rendered="#{ForumTool.selectedTopic.topic.draft == 'true'}" styleClass="title"/>
 					<h:graphicImage url="/images/silk/lock.png" alt="#{msgs.cdfm_forum_locked}" rendered="#{ForumTool.selectedForum.forum.locked == 'true' || ForumTool.selectedTopic.topic.locked == 'true'}" style="margin-right:.5em"/>
+					
+					
+					
 					<h:outputText value="#{ForumTool.selectedTopic.topic.title}" styleClass="title"/>
+					
+					<%-- // display singular ('message') if one message --%>
+					<h:outputText styleClass="textPanelFooter" id="topic_msg_count55" value=" #{msgs.cdfm_openb} #{ForumTool.selectedTopic.totalNoMessages} #{msgs.cdfm_lowercase_msg} - #{ForumTool.selectedTopic.unreadNoMessages} #{msgs.cdfm_unread} " 
+								rendered="#{ForumTool.selectedTopic.totalNoMessages == 1}"/>
+						<%-- // display plural ('messages') if 0 or more than 1 messages --%>
+						<h:outputText id="topic_msg_count56" value=" #{msgs.cdfm_openb} #{ForumTool.selectedTopic.totalNoMessages} #{msgs.cdfm_lowercase_msgs} - #{ForumTool.selectedTopic.unreadNoMessages} #{msgs.cdfm_unread} " 
+						  rendered="#{(ForumTool.selectedTopic.totalNoMessages > 1 || ForumTool.selectedTopic.totalNoMessages == 0) }" styleClass="textPanelFooter" />
+						<h:outputText id="topic_moderated" value="#{msgs.cdfm_topic_moderated_flag} " styleClass="textPanelFooter" rendered="#{ForumTool.selectedTopic.moderated == 'true' }" />
+						<h:outputText value="#{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
+					
 					  <%--//designNote: for paralellism to other views, need to add read/unread count here as well as Moderated attribute--%>  
-					  <h:outputText value=" #{msgs.cdfm_openb}" styleClass="textPanelFooter"/> 
+					  <%-- 
+					  <h:outputText value=" #{msgs.cdfm_openb}" styleClass="textPanelFooter"/>
 					  <h:outputText value="123 messages - 5 unread" styleClass="textPanelFooter todo" />
 					  <h:outputText id="topic_moderated" value="  #{msgs.cdfm_topic_moderated_flag}"  styleClass="textPanelFooter" rendered="#{ForumTool.selectedTopic.topic.moderated == 'true'}" />
-
 					  <h:outputText value="#{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
+					  --%>
 					  <h:outputText value=" "  styleClass="actionLinks"/>
 					  <%--//designNote: for paralellism to other views, need to move the "Post new thread" link below, but it is a sakai:toolbar item above...same for Topic Settings --%>
-					  <sakai:tool_bar_item value="#{msgs.cdfm_container_title_thread}" action="#{ForumTool.processAddMessage}" id="df_compose_message_dfAllMessages"
+					 <sakai:tool_bar_item value="#{msgs.cdfm_container_title_thread}" action="#{ForumTool.processAddMessage}" id="df_compose_message_dfAllMessages"
 					  	rendered="#{ForumTool.selectedTopic.isNewResponse && !ForumTool.selectedTopic.locked}" />
 					<h:outputText  value=" | " rendered="#{ForumTool.selectedTopic.changeSettings && !ForumTool.selectedForum.forum.locked == 'true' && !ForumTool.selectedTopic.topic.locked == 'true'}" />
 					<sakai:tool_bar_item action="#{ForumTool.processActionTopicSettings}" id="topic_setting" value="#{msgs.cdfm_topic_settings}" 
 					rendered="#{ForumTool.selectedTopic.changeSettings}" /> 
+					
+					<h:outputText  value=" | " rendered="#{ForumTool.selectedTopic.changeSettings && !ForumTool.selectedForum.forum.locked == 'true' && !ForumTool.selectedTopic.topic.locked == 'true'}" />
+					<h:commandLink action="#{ForumTool.processActionDeleteTopicConfirm}" id="delete_confirm" 
+			value="#{msgs.cdfm_button_bar_delete}" accesskey="d" rendered="#{!ForumTool.selectedTopic.markForDeletion && ForumTool.displayTopicDeleteOption}">
+			<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId"/>
+			</h:commandLink>
+					
+					
+					
+					
+					
 					<h:outputText   value="#{ForumTool.selectedTopic.topic.shortDescription}" rendered="#{ForumTool.selectedTopic.topic.shortDescription} != ''}"  styleClass="shortDescription" />
 					<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show" 
 							rendered="#{ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null}"

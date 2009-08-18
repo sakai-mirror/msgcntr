@@ -43,9 +43,10 @@
 					title=" #{msgs.cdfm_forum_settings}">
 					<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
 				</h:commandLink>
+				<%--
 				<h:outputText  value=" | "   rendered="#{ForumTool.selectedForum.changeSettings}"/>
 				<h:outputText  value=" Delete "  styleClass="todo"  rendered="#{ForumTool.selectedForum.changeSettings}"/>
-				
+				--%>
 				<h:outputText value="#{ForumTool.selectedForum.forum.shortDescription}" styleClass="shortDescription"/>
 
 				<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show" 
@@ -104,8 +105,10 @@
 								<f:param value="#{topic.topic.id}" name="topicId"/>
 								<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
 						</h:commandLink>
+						<%--
 						<h:outputText  value=" | "   rendered="#{topic.changeSettings}" />
 						<h:outputText  value=" Delete "  styleClass="todo" rendered="#{topic.changeSettings}" />						
+						--%>
 						<h:outputText id="topic_desc" value="#{topic.topic.shortDescription}" styleClass="shortDescription" />
 						<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_read_full_description}" styleClass="show" 
 			    				rendered="#{topic.topic.extendedDescription != '' && topic.topic.extendedDescription != null}"
