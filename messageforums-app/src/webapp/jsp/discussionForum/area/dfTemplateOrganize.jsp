@@ -5,14 +5,14 @@
 <%@ taglib uri="http://sakaiproject.org/jsf/sakai" prefix="sakai" %>
 <%@ taglib uri="http://sakaiproject.org/jsf/messageforums" prefix="mf" %>
 <jsp:useBean id="msgs" class="org.sakaiproject.util.ResourceLoader" scope="session">
-   <jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messageforums.bundle.Messages"/>
+	<jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messageforums.bundle.Messages"/>
 </jsp:useBean>
 
 <f:view>
-       		<script type="text/javascript" src="/library/js/jquery.js"></script>
-       		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
-   <f:verbatim>
-      <script language="javascript">
+	<script type="text/javascript" src="/library/js/jquery.js"></script>
+	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
+	<f:verbatim>
+	<script language="javascript">
       
          function updateForums(forumIndexChanged)
          {
@@ -29,7 +29,7 @@
          		
          	for(i = 0; i < numForums; i++) {
          		var sel = document.getElementById("revise:forums:" + i +":forumIndex");
-         		
+         		sel.className="selChanged";
          		indexSet[sel.selectedIndex] = true;
          	}
          	var oldIndex = -1;
@@ -80,7 +80,7 @@
          	for(i = 0; i < numTopics; i++) {
          		var sel = document.getElementById("revise:forums:" + 
          					forumIndex + ":topics:" + i +":topicIndex");
-         		
+				sel.className="selChanged";   
          		indexSet[sel.selectedIndex] = true;
          	}
          	var oldIndex = -1;
@@ -119,67 +119,53 @@
          //because we don't know which order
          var forumIndexIterator = 0;
          
-      </script>
-   </f:verbatim>
-   <sakai:view title="#{msgs.cdfm_default_template_organize}">           
-      <h:form id="revise">
-<!--jsp/discussionForum/area/dfTemplateSettings.jsp-->
-        <sakai:tool_bar_message value="#{msgs.cdfm_default_template_organize}" />
-		 		<div class="instruction">
-		  		  <h:outputText id="instruction" value="#{msgs.cdfm_default_template_organize_instruction}"/>
-				</div>
+		 </script>
+	</f:verbatim>
+	<sakai:view title="#{msgs.cdfm_default_template_organize}">           
+		<h:form id="revise">
+		<style type="text/css">
+			@import url("/sakai-messageforums-tool/css/msgcntr.css");
+		</style>
 		
-		
-  <h:dataTable id="forums" binding="#{ForumTool.forumTable}" value="#{ForumTool.forums}" width="100%" var="forum" cellpadding="0" cellspacing="0" summary="layout">
-    <h:column rendered="#{! forum.nonePermission}">
-    <f:verbatim><div class="hierItemBlockWrapper"></f:verbatim>
-	      <f:verbatim><h4></f:verbatim>
-	         <h:selectOneMenu id="forumIndex" value="#{forum.forum.sortIndex}" onchange="updateForums(this);">
-	            <f:selectItems value="#{ForumTool.forumSelectItems}"/>
-	         </h:selectOneMenu>
-				<h:outputText id="space1" value="  &nbsp;  " escape="false" />
-	         
-				<h:outputText id="forumTitle" value="#{forum.forum.title}" />
-	        
-	      <f:verbatim></h4></f:verbatim>
-    
-	  	<%--gsilver: need a rendered atttrib for the folowing predicated on the existence of topics in this forum--%>
-		 <h:dataTable id="topics" value="#{forum.forum.topics}" var="topic" width="100%" styleClass="topicBloc"  cellspacing="0" cellpadding="0" summary="layout">
-		   <h:column>
-				<f:verbatim><div class="hierItemBlockChild"></f:verbatim>
-				<h:outputText id="space2" value="  &nbsp;  " escape="false" />
-				<h:outputText id="space3" value="  &nbsp;  " escape="false" />
-		         <h:selectOneMenu id="topicIndex" value="#{topic.sortIndex}" onchange="updateTopics(#{ForumTool.forumTable.rowIndex}, this);">
-		            <f:selectItems value="#{forum.topicSelectItems}"/>
-		         </h:selectOneMenu>
-				<h:outputText id="space4" value="  &nbsp;  " escape="false" />
-				
-						<f:verbatim><h5></f:verbatim>
-						<h:outputText id="topicTitle" value="#{topic.title}" />
-				      
-					  <f:verbatim></h5></f:verbatim>
-				
-				
-			    <f:verbatim></div></f:verbatim>
+			<!--jsp/discussionForum/area/dfTemplateOrganize.jsp-->
+			<sakai:tool_bar_message value="#{msgs.cdfm_default_template_organize}" />
+			<div class="instruction">
+				<h:outputText id="instruction" value="#{msgs.cdfm_default_template_organize_instruction}"/>
+			</div>
+			<h:dataTable id="forums" binding="#{ForumTool.forumTable}" value="#{ForumTool.forums}" width="100%" var="forum" cellpadding="0" cellspacing="0" summary="layout" styleClass="listHier">
+				<h:column rendered="#{! forum.nonePermission}">
+					<h:panelGroup style="display:block;width:90%;padding:.5em" styleClass="forumHeader">
+					<h:selectOneMenu id="forumIndex" value="#{forum.forum.sortIndex}" onchange="updateForums(this);" style="margin-right:1em">
+						<f:selectItems value="#{ForumTool.forumSelectItems}" />
+					</h:selectOneMenu>
+					<h:outputText id="forumTitle" value="#{forum.forum.title}" style="font-weight:bold;font-size:1.3em;"/>
+					</h:panelGroup>
+						<%--//designNote: need a rendered atttrib for the folowing predicated on the existence of topics in this forum--%>
+					<h:dataTable id="topics" value="#{forum.forum.topics}" var="topic" width="100%" cellspacing="0" cellpadding="0" summary="layout">
+						<h:column>
+							<h:panelGroup style="display:block;width:90%;padding:.2em;margin:.2em 0 .2em .5em" styleClass="topicBloc">
+								<h:selectOneMenu id="topicIndex" value="#{topic.sortIndex}" onchange="updateTopics(#{ForumTool.forumTable.rowIndex}, this);" style="margin-left:.3em;margin-right:1em">
+									<f:selectItems value="#{forum.topicSelectItems}"/>
+								</h:selectOneMenu>
+								<h:outputText id="topicTitle" value="#{topic.title}"style="font-weight:bold;font-size:1.2em;"/>
+							</h:panelGroup>
+						</h:column>
+					</h:dataTable>
+				</h:column>
+			</h:dataTable>
 			
-		   </h:column>
-        </h:dataTable>			
-        <f:verbatim></div><!--end single topic here --></f:verbatim>
-   </h:column>
- </h:dataTable>
-		
-		
-        <div class="act">
-          <h:commandButton action="#{ForumTool.processActionSaveTemplateOrganization}" 
-                           onclick="form.submit;" value="#{msgs.cdfm_button_bar_save_setting}" 
-                           accesskey="s" 
-						   styleClass="active"/>
-          <h:commandButton action="#{ForumTool.processActionHome}" 
-                           value="#{msgs.cdfm_button_bar_cancel}"
-                           accesskey="x" />
-       </div>
-	  </h:form>
-    </sakai:view>
+			
+				<div class="act">
+					<h:commandButton action="#{ForumTool.processActionSaveTemplateOrganization}" 
+						onclick="form.submit;" value="#{msgs.cdfm_button_bar_save_setting}" 
+						accesskey="s" 
+						styleClass="active"/>
+					<h:commandButton action="#{ForumTool.processActionHome}" 
+						value="#{msgs.cdfm_button_bar_cancel}"
+						accesskey="x" />
+				</div>
+		</h:form>
+		</sakai:view>
 </f:view>
 
 

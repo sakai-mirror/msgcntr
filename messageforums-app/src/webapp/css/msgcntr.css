@@ -1,0 +1,433 @@
+.forumHeader{
+	width: 99%;
+	background: #ffe;
+	border: 1px solid #fc6;
+	margin-bottom: 1em;
+}
+
+.forumHeader td{
+	padding: .25em .5em;
+	vertical-align: text-top;
+}
+
+td div.title{
+	font-weight: bold;
+	font-size: 1.3em;
+}
+
+.forumHeader td .title{
+	font-weight: bold;
+	font-size: 1.3em;
+}
+
+.forumHeader .actionLinks,.topicBloc .actionLinks{
+	/*actually a spacer between title + metadata and the links*/
+	padding-left: 1em;
+}
+
+.topicBloc a.show,.topicBloc a.hide,.forumHeader a.show,.forumHeader a.hide,.singleMessage a.show,.singleMessage a.hide{
+	color: #f55 !important;
+	font-size: 95%;
+	text-decoration: none !important;
+	margin: .4em 0;
+	vertical-align: middle;
+
+}
+
+.topicBloc a.show img,.topicBloc a.hide img,.forumHeader a.show img,.forumHeader a.hide img,.singleMessage a.show img,.singleMessage a.hide img{
+	vertical-align: middle;
+	padding: 2px 0;
+}
+
+td.attach{
+	vertical-align: middle;
+	padding: 2px 0;
+}
+
+.topicBloc{
+	margin: .5em 0 1em 1em;
+	border-left: 2px solid #fc6;
+	width: 95%;
+}
+
+.topicBlocLone{
+	margin: .5em 0 1em 0;
+}
+
+.topicBloc td{
+	padding-left: .5em;
+}
+
+.topicBloc td td{
+	padding-left: 0;
+}
+
+.singleMessage .title,.topicBloc .title,.pendingApproval .title{
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+.forumHeader .shortDescription,.topicBloc .shortDescription{
+	display: block;
+	margin: .5em 0;
+}
+
+.unreadMsg a:link,.unreadMsg a:visited{
+	color: #f55 !important;
+	text-decoration: none;
+}
+
+.messagePending{
+	background: #cd5;
+	color: #790;
+	padding: 0 3px;
+	margin-right: 5px;
+}
+
+.messageDenied{
+	color: #e77;
+	background: #fee;
+	padding: 0 3px;
+	margin-right: 5px;
+}
+
+.messageNew{
+	color: #fff;
+	background: #69d;
+	padding: 0 3px;
+	margin-right: 5px;
+}
+
+.attachPanel{
+	border: 1px solid #eee;
+	background: #fff;
+	font-size: 1em;
+}
+
+.attachPanel tr:hover{
+	background: none !important;
+}
+
+.attachPanel th{
+	background: #ffe;
+	border-bottom: 1px solid #eee;
+	text-align: left;
+	font-weight: normal;
+	padding: .2em .5em;
+}
+
+.attachPanel td{
+	padding: .2em .5em;
+	vertical-align: top;
+}
+
+.attachPanel td.attach{
+	width: 1em;
+}
+
+.permissionPanel{
+}
+
+.permissionPanel td{
+}
+
+.permissionPanel .colored td{
+	padding-left: .3em;
+	padding-right: 3em;
+	background: #ffe;
+}
+
+.permissionPanel .last{
+	border-bottom: 1px solid #eee;
+}
+
+.permissionPanel td.first{
+	border-left: 1px solid #eee;
+}
+
+.permissionPanel td.second{
+	border-right: 1px solid #eee;
+}
+
+.permissionPanel .blank td{
+	border: none !important;
+}
+
+.permissionPanel .header td{
+	border-bottom: 1px solid #eee;
+	border-right: none;
+	border-left: none;
+}
+
+.permissionPanel tr:hover{
+	background: #fff !important;
+}
+
+table.discTria{
+	border: 1px solid #ccc;
+	background: #eee;
+}
+
+table.discTria h4{
+	display: inline;
+	margin: 0;
+	padding: 3px;
+}
+
+table.discTria img {
+	vertical-align: middle;
+}
+
+table.discTria:hover{
+	cursor: pointer;
+	border: 1px solid #aaa;
+}
+
+.discTria{
+	background: transparent;
+}
+
+.inactive{
+	color: #aaa;
+}
+
+.selChanged{
+	border: 1px solid #aaa;
+	background: #fc6;
+	padding: 1px;
+}
+
+.messagesFlat,.messagesThreaded{
+	width: 98% !important;
+	margin: 1em 0 !important;
+	border-spacing: .5em;
+}
+
+.messagesFlat  tbody tr div,.messagesThreaded tbody tr div{
+	border: none !important;
+}
+
+.messagesFlat tbody tr td div.hierItemBlock,.messagesThreaded tbody tr td div.hierItemBlock{
+	padding: 0 0 0 .5em !important;
+	border-left: 2px solid #cd5 !important;
+	width: 100%;
+	margin: .5em !important;
+}
+
+.messagesThreaded tbody tr td{
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.titleBarBorder{
+	background: #fff;
+	margin: 2px 0 0 0;
+}
+
+.messagesThreaded tbody tr.hierItemBlock td.bogus:first-child{
+	padding: 0 !important;
+	border-left: 2px solid #69d;
+	width: 100%;
+}
+
+.messagesThreaded tbody tr.hierItemBlock td.bogus:first-child > div{
+	margin: 0;
+	border: none !important;
+}
+
+.messagesFlat tbody .title,.messagesThreaded tbody .title{
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+.messagesThreaded tbody tr.hierItemBlock td.bogus:first-child .title{
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+.messagesThreaded tbody tr.hierItemBlock td.bogus:first-child{
+	padding: 0 inherit;
+	border-left: 2px solid #69d;
+	width: 100%;
+}
+
+.messagesThreaded tbody tr.hierItemBlock td.bogus:first-child > div{
+	margin: 0;
+}
+
+.messagesThreaded tbody tr.hierItemBlock td.bogus:first-child .title{
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+.itemToolBar{
+	padding-left: .5em;
+	font-size: .9em;
+}
+
+.itemToolBar a{
+	text-decoration: none !important;
+}
+
+.otherActions{
+	padding: .2em .4em;
+	margin-left: 1em;
+	text-align: left;
+	background: #eee;
+	display: inline;
+	white-space: nowrap;
+	font-size: 1em;
+}
+
+.pendingApproval{
+	border-left: 2px solid #ccc;
+	margin: 0;
+}
+
+.singleMessage{
+	border-left: 2px solid #ccc;
+	margin-top: 1em;
+	padding-left: .5em;
+}
+
+.todo{
+	color: #790;
+}
+
+.allMessages{
+}
+
+.allMessages .messageTitle .firstChild{
+	border-left: 1px solid #cd5;
+	padding-left: 5px;
+}
+
+.allMessages .hierItemBlock .messageTitle .firstChild{
+	border-left: 1px solid #69d;
+	padding-left: 5px;
+}
+
+.printBlock{
+	margin: 1em;
+	padding: .5em;
+	font-size: 93%;
+	font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+.printTable td{
+}
+
+.printTable td .title{
+	font-weight: bold;
+}
+
+.printBlock .bordered{
+	border-color: #ccc;
+}
+
+.printBlock .messagePending{
+	background: #ccc;
+	color: #000;
+	padding: 2px;
+	margin-right: 5px;
+	border: 1px solid #000;
+}
+
+.printBlock .messageDenied{
+	color: #fff;
+	background: #000;
+	padding: 3px;
+	margin-right: 5px;
+}
+
+/*
+border-width:1px;border-style:solid;border-color:#ffbb99  #dd5500 #dd5500 #ffbb99}
+*/
+table.messageActions {
+	background: #eee;
+}
+
+table.messageActions td{
+	padding: 6px;
+	vertical-align: middle;
+	background: #eee;
+}
+
+.messageActions a{
+	text-decoration: none !important;
+	border: 1px solid #ccc !important;
+	background: #fff;
+	padding: 2px 5px;
+	vertical-align: middle;
+	margin: 0 .3em 0 0;
+}
+
+.messageActions a:hover{
+	border: 1px solid #aaa  !important;
+}
+
+.messageActions td.otherOtherActions {
+	text-align: right;
+}
+
+.messageActions a img{
+	vertical-align: middle;
+}
+
+.messageAlert{
+	background: #FFEEEE url(../images/exclamation.gif) 5px 5px no-repeat;
+	border: 1px solid #FF5555;
+	color: #FF5555;
+	margin: .5em 0;
+	padding: 4px 0 4px 2em;
+}
+
+.messageInformation{
+	background: #ffe url(../images/asterisk_yellow.gif) 5px 5px no-repeat;
+	border: 1px solid #d93;
+	color: #d93;
+	margin: .5em 0;
+	padding: 4px 0 4px 2em;
+}
+
+.messageComfirm{
+	background: #cd5 url(../images/accept.gif) 5px 5px no-repeat;
+	border: 1px solid #790;
+	color: #779900;
+	margin: .5em 0;
+	padding: 4px 0 4px 2em;
+}
+
+span.messageAlert,span.messageInformation,.messageComfirm{
+	padding-right: 1em;
+}
+
+.toggle{
+	padding-left: 1em;
+	font-size: .92em;
+	line-height: 1.5em;
+}
+
+/*the RTeditor will always produce a line break, even if the contents are empty, making the rendered 
+attribute way of omitting the whole block useless!
+So - below - hide the first line break (<br />) of any text produced by the RTeditor in CSS2 capable browsers*/
+.textPanel > br:first-child {
+	margin: 0;
+	padding: 0;
+	border-width: 0;
+	line-height: 0;
+}
+
+.itemNav{
+	border: 1px solid #fff;
+	white-space: nowrap;
+	padding: 0 .3em;
+	background: #fff;
+}
+
+.itemNav:hover{
+	border: 1px solid #eee;
+	white-space: nowrap;
+	padding: 0 .3em;
+	background: #ffe;
+}
