@@ -78,9 +78,10 @@
 				<h:dataTable value="#{ForumTool.selectedMessage.message.attachments}" var="eachAttach"  rendered="#{!empty ForumTool.selectedMessage.message.attachments}" columnClasses="attach,bogus" styleClass="attachList"   summary="layout"  
 						style="font-size:.9em;width:auto;margin-left:1em" border="0">
 					<h:column rendered="#{!empty ForumTool.selectedMessage.message.attachments}">
-						<sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
+					<sakai:contentTypeMap fileType="#{eachAttach.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
 						<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
 					</h:column>
+					<%----%>
 					<h:column>
 						<%--							<h:outputLink value="#{eachAttach.attachmentUrl}" target="_blank">
 						<h:outputText value="#{eachAttach.attachmentName}"/>
