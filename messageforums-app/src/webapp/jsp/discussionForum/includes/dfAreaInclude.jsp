@@ -57,7 +57,6 @@
 					<h:outputText value=" #{msgs.cdfm_and}"  rendered="#{!empty forum.attachList && forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null && forum.forum.extendedDescription != '<br/>'}"/>
 					<h:outputText value=" #{msgs.cdfm_attach}"  rendered="#{!empty forum.attachList}"/>
 				</h:outputLink>
-				
 				<f:verbatim><div class="toggle" style="display:none;padding-left:1em"></f:verbatim>
 					<mf:htmlShowArea value="#{forum.forum.extendedDescription}"  hideBorder="true" />
 					<%-- attachs --%>
@@ -89,8 +88,6 @@
 							
 							<h:graphicImage url="/images/folder.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages == 0 }" styleClass="topicIcon" style="margin-right:.5em"/>
 							<h:graphicImage url="/images/folder_unread.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages > 0 }" styleClass="topicIcon" style="margin-right:.5em"/>
-							<%--//desNote: only show the new "new" message if there are no unread messages --%>
-							<h:outputText styleClass="messageNew" value=" #{msgs.cdfm_newflag}"  rendered="#{topic.unreadNoMessages > 0 }" />
 							<h:outputText styleClass="highlight title" id="draft" value="#{msgs.cdfm_draft}" rendered="#{topic.topic.draft == 'true'}"/>
 							<h:outputText id="draft_space" value="  - " rendered="#{topic.topic.draft == 'true'}" styleClass="title"/>
 							<h:graphicImage url="/images/silk/lock.png" alt="#{msgs.cdfm_forum_locked}" rendered="#{forum.locked == 'true' || topic.locked == 'true'}" style="margin-right:.5em"/>
@@ -106,6 +103,9 @@
 								rendered="#{topic.isRead && (topic.totalNoMessages > 1 || topic.totalNoMessages == 0) }" styleClass="textPanelFooter" />
 							<h:outputText id="topic_moderated" value="#{msgs.cdfm_topic_moderated_flag}" styleClass="textPanelFooter" rendered="#{topic.moderated == 'true' && topic.isRead}" />
 							<h:outputText value=" #{msgs.cdfm_closeb}" styleClass="textPanelFooter" rendered="#{topic.isRead}"/>
+							<%--//desNote: only show the new "new" message if there are no unread messages --%>
+							<h:outputText styleClass="childrenNew" value=" #{msgs.cdfm_newflagparent}"  rendered="#{topic.unreadNoMessages > 0 }" />
+
 							<%--//desNote: links to act on this topic --%>
 							<h:outputText value=" "  styleClass="actionLinks"/>
 							<h:commandLink action="#{ForumTool.processActionTopicSettings}" id="topic_setting" value="#{msgs.cdfm_topic_settings}" rendered="#{topic.changeSettings}"
@@ -157,11 +157,10 @@
 								<h:dataTable  value="#{topic.attachList}" var="eachAttach" rendered="#{!empty topic.attachList}" cellpadding="3" cellspacing="0" columnClasses="attach,bogus" summary="layout"  style="font-size:.9em;width:auto;margin-left:1em" border="0">
 									<h:column>
 										<h:graphicImage url="/images/attachment.gif"/>
-									</h:column>
-									<h:column>
 										<%--<h:outputLink value="#{eachAttach.attachmentUrl}" target="_blank">
 										<h:outputText value="#{eachAttach.attachmentName}" />
 										</h:outputLink>--%>
+										<h:outputText value=" " />
 										<h:outputLink value="#{eachAttach.url}" target="_blank">
 										<h:outputText value="#{eachAttach.attachment.attachmentName}" />
 										</h:outputLink>  

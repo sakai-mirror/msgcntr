@@ -33,10 +33,8 @@
 		</table>	
 
 		<%--********************* Reply To *********************--%>	     	
-		<div class="singleMessage">
-			<p><a href="javascript:$('#replytomessage').toggle();resizeFrame('grow');" class="show"><h:outputText value="#{msgs.cdfm_replytoshowhide}"/></a></p>
-			<div  id="replytomessage">
-				<h:outputText value="#{ForumTool.selectedMessage.message.title}" styleClass="title"/>
+		<div class="singleMessageReply"> 
+				<h:outputText value="#{msgs.cdfm_reply_message_pref}" styleClass="title highlight"/> <h:outputText value="#{ForumTool.selectedMessage.message.title}" styleClass="title"/>
 				<h:outputText value="#{ForumTool.selectedMessage.message.author}" styleClass="textPanelFooter"/>
 				<h:outputText value=" #{msgs.cdfm_openb}" styleClass="textPanelFooter"/>
 				<h:outputText value="#{ForumTool.selectedMessage.message.created}" styleClass="textPanelFooter">
@@ -44,12 +42,15 @@
 				</h:outputText>
 				<h:outputText value=" #{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
 	
+				<p style="padding:0;margin:.5em 0"><a href="javascript:$('#replytomessage').toggle();resizeFrame('grow');" class="show"><h:outputText value="#{msgs.cdfm_replytoshowhide}"/></a></p>	
+			<div  id="replytomessage">	
 				<mf:htmlShowArea value="#{ForumTool.selectedMessage.message.body}" hideBorder="true" />
+	
 				<h:dataTable value="#{ForumTool.selectedMessage.message.attachments}" var="eachAttach"  rendered="#{!empty ForumTool.selectedMessage.message.attachments}" columnClasses="attach,bogus" styleClass="attachList"   summary="layout"  
 						style="font-size:.9em;width:auto;margin-left:1em" border="0">
 					<h:column rendered="#{!empty ForumTool.selectedMessage.message.attachments}">
-						  <sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
-    						<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
+						<sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
+						<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
 					</h:column>
 					<h:column>
 						<%--							<h:outputLink value="#{eachAttach.attachmentUrl}" target="_blank">
@@ -72,6 +73,7 @@
 		<h:panelGrid styleClass="jsfFormTable" columns="1" style="width: 100%;">
 		
 			<h:panelGroup style="padding-top:.5em">
+				<h:messages globalOnly="true" infoClass="success" errorClass="alertMessage" />
 				<h:message for="df_compose_title" styleClass="messageAlert" id="errorMessages" />
 				<h:outputLabel for="df_compose_title" style="display:block;float:none;clear:both;padding-bottom:.3em;padding-top:.3em;">
 					<h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStar"/>
@@ -81,15 +83,15 @@
 			</h:panelGroup>
 		</h:panelGrid>
 		
-		
-		<h:outputText value="#{msgs.cdfm_message}"/> 
-		<h:inputHidden id="msgHidden" value="#{ForumTool.selectedMessage.message.body}" />
-		<h:inputHidden id="titleHidden" value="#{ForumTool.selectedMessage.message.title}" />
-		<h:outputText value="&nbsp;&nbsp;&nbsp; " escape="false" />
-		<img src="/library/image/silk/paste_plain.png" />
-		<a  href="#"  onclick="InsertHTML();">
-		<h:outputText value="#{msgs.cdfm_message_insert}" /></a>
-
+	  <div style="padding:.5em 0;white-space:nowrap">
+			<h:outputText value="#{msgs.cdfm_message}" style="padding:.5em 0"/> 
+			<h:inputHidden id="msgHidden" value="#{ForumTool.selectedMessage.message.body}" />
+			<h:inputHidden id="titleHidden" value="#{ForumTool.selectedMessage.message.title}" />
+			<h:outputText value="&nbsp;&nbsp;&nbsp; " escape="false" />
+			<img src="/library/image/silk/paste_plain.png" />
+			<a  href="#"  onclick="InsertHTML();">
+			<h:outputText value="#{msgs.cdfm_message_insert}" /></a>
+		</div>
 		<sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
 		<script language="javascript" type="text/javascript">
 			var textareas = document.getElementsByTagName("textarea");
@@ -126,54 +128,55 @@
 		<h4>
 			<h:outputText value="#{msgs.cdfm_att}"/>
 		</h4>
-		<p>
-			<h:outputText value="#{msgs.cdfm_no_attachments}" rendered="#{empty ForumTool.attachments}" styleClass="instruction" />
-		</p>	
-
-		<%-- //designNote: moving rendered attr from column to table to avoid childless table if empty--%>
-		<h:dataTable styleClass="attachPanel" id="attmsg"  value="#{ForumTool.attachments}" var="eachAttach"   rendered="#{!empty ForumTool.attachments}"
-			columnClasses="attach,bogus,specialLink itemAction,bogus,bogus" style="width:auto">
-			<h:column>
-			    <sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
-  				<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
-			</h:column>
-			<h:column>
-				<f:facet name="header">
-					<h:outputText value="#{msgs.cdfm_title}"/>
-					</f:facet>
-					<h:outputText value="#{eachAttach.attachment.attachmentName}"/>			
-			</h:column>
-			<h:column>
-				<h:commandLink action="#{ForumTool.processDeleteAttach}" 
-						immediate="true"
-						onfocus="document.forms[0].onsubmit();"
-						title="#{msgs.cdfm_remove}">
-					<h:outputText value="#{msgs.cdfm_remove}"/>
-					<%--									<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>--%>
-					<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>
-				</h:commandLink>
-			</h:column>
-			<h:column>
-				<f:facet name="header">
-					<h:outputText value="#{msgs.cdfm_attsize}" />
-				</f:facet>
-				<h:outputText value="#{eachAttach.attachment.attachmentSize}"/>
-			</h:column>
-			<h:column>
-				<f:facet name="header">
-					<h:outputText value="#{msgs.cdfm_atttype}" />
-				</f:facet>
-				<h:outputText value="#{eachAttach.attachment.attachmentType}"/>
-			</h:column>
-		</h:dataTable>   
-		
-		<p style="padding:0" class="act">
-			<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_redirect}" immediate="true"
-				rendered="#{empty ForumTool.attachments}" style="font-size:95%"/>
-			<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_more_redirect}" immediate="true"
-				rendered="#{!empty ForumTool.attachments}" style="font-size:95%"/>
-		</p>
+		<div style="padding-left:1em">
+			<p>
+				<h:outputText value="#{msgs.cdfm_no_attachments}" rendered="#{empty ForumTool.attachments}" styleClass="instruction" />
+			</p>	
 	
+			<%-- //designNote: moving rendered attr from column to table to avoid childless table if empty--%>
+			<h:dataTable styleClass="attachPanel" id="attmsg"  value="#{ForumTool.attachments}" var="eachAttach"   rendered="#{!empty ForumTool.attachments}"
+				columnClasses="attach,bogus,specialLink itemAction,bogus,bogus" style="width:auto">
+				<h:column>
+					<sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
+					<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="#{msgs.cdfm_title}"/>
+						</f:facet>
+						<h:outputText value="#{eachAttach.attachment.attachmentName}"/>			
+				</h:column>
+				<h:column>
+					<h:commandLink action="#{ForumTool.processDeleteAttach}" 
+							immediate="true"
+							onfocus="document.forms[0].onsubmit();"
+							title="#{msgs.cdfm_remove}">
+						<h:outputText value="#{msgs.cdfm_remove}"/>
+						<%--									<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>--%>
+						<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>
+					</h:commandLink>
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="#{msgs.cdfm_attsize}" />
+					</f:facet>
+					<h:outputText value="#{eachAttach.attachment.attachmentSize}"/>
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="#{msgs.cdfm_atttype}" />
+					</f:facet>
+					<h:outputText value="#{eachAttach.attachment.attachmentType}"/>
+				</h:column>
+			</h:dataTable>   
+			<p style="padding:0" class="act">
+				<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_redirect}" immediate="true"
+					rendered="#{empty ForumTool.attachments}" style="font-size:95%"/>
+				<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_more_redirect}" immediate="true"
+					rendered="#{!empty ForumTool.attachments}" style="font-size:95%"/>
+			</p>
+		</div>
+
 		<%--********************* Label *********************
 		<sakai:panel_titled>
 		<table width="80%" align="left">

@@ -41,99 +41,97 @@
 
 			<%--RTEditor area - if enabled--%>
 			<h:panelGroup rendered="#{! ForumTool.disableLongDesc}">
-				<h4>
-					<h:outputText id="outputLabel2"   value="#{msgs.cdfm_fullDescription}"/>
-				</h4>
+				<h:outputText id="outputLabel2"   value="#{msgs.cdfm_fullDescription}" style="display:block;padding:.5em 0"/>
 				<sakai:rich_text_area rows="10" columns="70"  value="#{ForumTool.selectedTopic.topic.extendedDescription}"/>
 			</h:panelGroup>
 			
 			<%--Attachment area  --%>
 			<h4><h:outputText value="#{msgs.cdfm_att}"/></h4>
 			
-			
-			<%--designNote: would be nice to make this an include, as well as a more comprehensive MIME type check  --%>
-			<h:dataTable styleClass="attachPanel" id="attmsg" value="#{ForumTool.attachments}" var="eachAttach"  cellpadding="0" cellspacing="0" columnClasses="attach,bogus,specialLink,bogus,bogus" rendered="#{!empty ForumTool.attachments}">
-				<h:column>
-					<f:facet name="header">   <h:outputText escape="false"  value="&nbsp;"/>                                          
+			<div style="padding-left:1em">
+				<%--designNote: would be nice to make this an include, as well as a more comprehensive MIME type check  --%>
+				<h:dataTable styleClass="attachPanel" id="attmsg" value="#{ForumTool.attachments}" var="eachAttach"  cellpadding="0" cellspacing="0" columnClasses="attach,bogus,specialLink,bogus,bogus" rendered="#{!empty ForumTool.attachments}">
+					<h:column>
+						<f:facet name="header">   <h:outputText escape="false"  value="&nbsp;"/>                                          
+						</f:facet>
+						<sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
+						<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value="#{msgs.cdfm_title}"/>
+						</f:facet>
+						<h:outputText value="#{eachAttach.attachment.attachmentName}"/>
+					</h:column>
+					<h:column>
+					<f:facet name="header"><h:outputText escape="false" value="&nbsp;"/>
 					</f:facet>
-				  <sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
-  				  <h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
-				</h:column>
-				<h:column>
-					<f:facet name="header">
-						<h:outputText value="#{msgs.cdfm_title}"/>
-					</f:facet>
-					<h:outputText value="#{eachAttach.attachment.attachmentName}"/>
-				</h:column>
-				<h:column>
-				<f:facet name="header"><h:outputText escape="false" value="&nbsp;"/>
-				</f:facet>
-					<h:commandLink action="#{ForumTool.processDeleteAttachSetting}" 
-							immediate="true"
-							onfocus="document.forms[0].onsubmit();"
-							title="#{msgs.cdfm_remove}">
-						<h:outputText value="#{msgs.cdfm_remove}"/>
-						<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>
-					</h:commandLink>
-				</h:column>
-				<h:column rendered="#{!empty ForumTool.attachments}">
-					<f:facet name="header">
-						<h:outputText value="#{msgs.cdfm_attsize}" />
-					</f:facet>
-					<h:outputText value="#{eachAttach.attachment.attachmentSize}"/>
-				</h:column>
-				<h:column rendered="#{!empty ForumTool.attachments}">
-					<f:facet name="header">
-						<h:outputText value="#{msgs.cdfm_atttype}" />
-					</f:facet>
-					<h:outputText value="#{eachAttach.attachment.attachmentType}"/>
-				</h:column>
-			</h:dataTable>   
-
-			<div class="instruction">	     
-				<h:outputText value="#{msgs.cdfm_no_attachments}" rendered="#{empty ForumTool.attachments}"/>
-			</div>
-			
-			<p class="act" style="padding:0 0 1em 0;">
-				<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" 
-					value="#{msgs.cdfm_button_bar_add_attachment_more_redirect}" 
-					immediate="true"
-					accesskey="a" 
-					 rendered="#{!empty ForumTool.attachments}"
-					 style="font-size:95%"/>
-				<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" 
-					value="#{msgs.cdfm_button_bar_add_attachment_redirect}" 
-					immediate="true"
-					accesskey="a" 
-					 rendered="#{empty ForumTool.attachments}" 
-					 style="font-size:95%"/>
-			</p>
-			                                                                                  
+						<h:commandLink action="#{ForumTool.processDeleteAttachSetting}" 
+								immediate="true"
+								onfocus="document.forms[0].onsubmit();"
+								title="#{msgs.cdfm_remove}">
+							<h:outputText value="#{msgs.cdfm_remove}"/>
+							<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>
+						</h:commandLink>
+					</h:column>
+					<h:column rendered="#{!empty ForumTool.attachments}">
+						<f:facet name="header">
+							<h:outputText value="#{msgs.cdfm_attsize}" />
+						</f:facet>
+						<h:outputText value="#{eachAttach.attachment.attachmentSize}"/>
+					</h:column>
+					<h:column rendered="#{!empty ForumTool.attachments}">
+						<f:facet name="header">
+							<h:outputText value="#{msgs.cdfm_atttype}" />
+						</f:facet>
+						<h:outputText value="#{eachAttach.attachment.attachmentType}"/>
+					</h:column>
+				</h:dataTable>   
+	
+				<div class="instruction">	     
+					<h:outputText value="#{msgs.cdfm_no_attachments}" rendered="#{empty ForumTool.attachments}"/>
+				</div>
+				
+				<p class="act" style="padding:0 0 1em 0;">
+					<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" 
+						value="#{msgs.cdfm_button_bar_add_attachment_more_redirect}" 
+						immediate="true"
+						accesskey="a" 
+						 rendered="#{!empty ForumTool.attachments}"
+						 style="font-size:95%"/>
+					<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" 
+						value="#{msgs.cdfm_button_bar_add_attachment_redirect}" 
+						immediate="true"
+						accesskey="a" 
+						 rendered="#{empty ForumTool.attachments}" 
+						 style="font-size:95%"/>
+				</p>
+			</div>                                                                                  
 			<%--general posting  forum settings --%>
 			<h4><h:outputText  value="#{msgs.cdfm_topic_posting}"/></h4>
-			
-			<h:panelGrid columns="2"  styleClass="jsfFormTable">
-				<h:panelGroup>
-					<h:outputLabel for="topic_locked"  value="#{msgs.cdfm_lock_topic}" styleClass="shorttext"/>	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="topic_locked"  value="#{ForumTool.selectedTopic.locked}" styleClass="checkbox inlineForm">
-						<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-						<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-					</h:selectOneRadio>
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:outputLabel for="moderated"  value="#{msgs.cdfm_moderate_topic}" styleClass="shorttext"/>	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="moderated"  value="#{ForumTool.selectedTopic.moderated}" styleClass="checkbox inlineForm"
-							onclick="javascript:disableOrEnableModeratePerm();" >
-						<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-						<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-					</h:selectOneRadio>
-				</h:panelGroup>
-			</h:panelGrid>
-			
+			<div style="padding-left:1em">
+				<h:panelGrid columns="2"  styleClass="jsfFormTable">
+					<h:panelGroup>
+						<h:outputLabel for="topic_locked"  value="#{msgs.cdfm_lock_topic}" styleClass="shorttext"/>	
+					</h:panelGroup>
+					<h:panelGroup>
+						<h:selectOneRadio layout="lineDirection"  id="topic_locked"  value="#{ForumTool.selectedTopic.locked}" styleClass="checkbox inlineForm">
+							<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
+							<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
+						</h:selectOneRadio>
+					</h:panelGroup>
+					<h:panelGroup>
+						<h:outputLabel for="moderated"  value="#{msgs.cdfm_moderate_topic}" styleClass="shorttext"/>	
+					</h:panelGroup>
+					<h:panelGroup>
+						<h:selectOneRadio layout="lineDirection"  id="moderated"  value="#{ForumTool.selectedTopic.moderated}" styleClass="checkbox inlineForm"
+								onclick="javascript:disableOrEnableModeratePerm();" >
+							<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
+							<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
+						</h:selectOneRadio>
+					</h:panelGroup>
+				</h:panelGrid>
+			</div>
 			<%--
 			<h4><h:outputText  value="Confidential Responses"/></h4>
 			<h:selectBooleanCheckbox   title= "#{msgs.cdfm_topic_allow_anonymous_postings}"  value="false" />

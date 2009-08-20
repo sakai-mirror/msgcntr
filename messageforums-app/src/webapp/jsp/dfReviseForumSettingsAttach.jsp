@@ -42,7 +42,7 @@
 			
 			<%--RTEditor area - if enabled--%>
 			<h:panelGroup rendered="#{! ForumTool.disableLongDesc}">
-				<h4><h:outputText id="outputLabel2" value="#{msgs.cdfm_fullDescription}"/></h4>	
+				<h:outputText id="outputLabel2" value="#{msgs.cdfm_fullDescription}" style="display:block;padding:.5em 0"/>
 				<sakai:rich_text_area rows="10" columns="70" value="#{ForumTool.selectedForum.forum.extendedDescription}"/>
 			</h:panelGroup>
 			
@@ -51,88 +51,90 @@
 			<h4>
 				<h:outputText value="#{msgs.cdfm_att}"/>
 			</h4>
-				<%--designNote: would be nice to make this an include, as well as a more comprehensive MIME type check  --%> 
-			<h:dataTable styleClass="attachPanel" id="attmsg"  value="#{ForumTool.attachments}" var="eachAttach"  cellpadding="0" cellspacing="0" columnClasses="attach,bogus,specialLink,bogus,bogus" rendered="#{!empty ForumTool.attachments}">
-				<h:column>
-					<f:facet name="header">   <h:outputText value=" "/>                                          
-					</f:facet>
-				  <sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
-  				<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
-				</h:column>
-				<h:column>
-					<f:facet name="header">
-						<h:outputText value="#{msgs.cdfm_title}"/>
-					</f:facet>
-					<h:outputText value="#{eachAttach.attachment.attachmentName}"/>
-				</h:column>
-				<h:column>
-					<f:facet name="header">
-						<h:outputText value=" "/>
-					</f:facet>
-					<h:commandLink action="#{ForumTool.processDeleteAttachSetting}" 
-							immediate="true"
-							onfocus="document.forms[0].onsubmit();"
-							title="#{msgs.cdfm_remove}">
-						<h:outputText value="#{msgs.cdfm_remove}"/>
-						<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>
-					</h:commandLink>
-				</h:column>
-				<h:column rendered="#{!empty ForumTool.attachments}">
-					<f:facet name="header">
-						<h:outputText value="#{msgs.cdfm_attsize}" />
-					</f:facet>
-					<h:outputText value="#{eachAttach.attachment.attachmentSize}"/>
-				</h:column>
-				<h:column rendered="#{!empty ForumTool.attachments}">
-					<f:facet name="header">
-						<h:outputText value="#{msgs.cdfm_atttype}" />
-					</f:facet>
-					<%--//designNote: do we really need this info if the lookup has worked? I Suppose till the MIME type check is more comprehensive, yes --%>
-					<h:outputText value="#{eachAttach.attachment.attachmentType}"/>
-				</h:column>
-			</h:dataTable>   
-					                                               
-			<div class="instruction">	        
-				<h:outputText value="#{msgs.cdfm_no_attachments}" rendered="#{empty ForumTool.attachments}"/>
-			</div>
-			<p class="act" style="padding:0 0 1em 0;">
-				<h:commandButton  action="#{ForumTool.processAddAttachmentRedirect}"
-					value="#{msgs.cdfm_button_bar_add_attachment_more_redirect}" 
-					immediate="true" 
-					style="font-size:96%"
-					rendered="#{!empty ForumTool.attachments}"/>
-				<h:commandButton  action="#{ForumTool.processAddAttachmentRedirect}"
-					value="#{msgs.cdfm_button_bar_add_attachment_redirect}" 
-					immediate="true" 
-					style="font-size:96%"
-					rendered="#{empty ForumTool.attachments}"
-					/>
-			</p>	
-					
+			<div style="padding-left:1em">
+					<%--designNote: would be nice to make this an include, as well as a more comprehensive MIME type check  --%> 
+				<h:dataTable styleClass="attachPanel" id="attmsg"  value="#{ForumTool.attachments}" var="eachAttach"  cellpadding="0" cellspacing="0" columnClasses="attach,bogus,specialLink,bogus,bogus" rendered="#{!empty ForumTool.attachments}">
+					<h:column>
+						<f:facet name="header">   <h:outputText value=" "/>                                          
+						</f:facet>
+						<sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
+						<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value="#{msgs.cdfm_title}"/>
+						</f:facet>
+						<h:outputText value="#{eachAttach.attachment.attachmentName}"/>
+					</h:column>
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value=" "/>
+						</f:facet>
+						<h:commandLink action="#{ForumTool.processDeleteAttachSetting}" 
+								immediate="true"
+								onfocus="document.forms[0].onsubmit();"
+								title="#{msgs.cdfm_remove}">
+							<h:outputText value="#{msgs.cdfm_remove}"/>
+							<f:param value="#{eachAttach.attachment.attachmentId}" name="dfmsg_current_attach"/>
+						</h:commandLink>
+					</h:column>
+					<h:column rendered="#{!empty ForumTool.attachments}">
+						<f:facet name="header">
+							<h:outputText value="#{msgs.cdfm_attsize}" />
+						</f:facet>
+						<h:outputText value="#{eachAttach.attachment.attachmentSize}"/>
+					</h:column>
+					<h:column rendered="#{!empty ForumTool.attachments}">
+						<f:facet name="header">
+							<h:outputText value="#{msgs.cdfm_atttype}" />
+						</f:facet>
+						<%--//designNote: do we really need this info if the lookup has worked? I Suppose till the MIME type check is more comprehensive, yes --%>
+						<h:outputText value="#{eachAttach.attachment.attachmentType}"/>
+					</h:column>
+				</h:dataTable>   
+						                                               
+				<div class="instruction">	        
+					<h:outputText value="#{msgs.cdfm_no_attachments}" rendered="#{empty ForumTool.attachments}"/>
+				</div>
+				<p class="act" style="padding:0 0 1em 0;">
+					<h:commandButton  action="#{ForumTool.processAddAttachmentRedirect}"
+						value="#{msgs.cdfm_button_bar_add_attachment_more_redirect}" 
+						immediate="true" 
+						style="font-size:96%"
+						rendered="#{!empty ForumTool.attachments}"/>
+					<h:commandButton  action="#{ForumTool.processAddAttachmentRedirect}"
+						value="#{msgs.cdfm_button_bar_add_attachment_redirect}" 
+						immediate="true" 
+						style="font-size:96%"
+						rendered="#{empty ForumTool.attachments}"
+						/>
+				</p>	
+			</div>		
 			<%--general posting  forum settings --%>
 			<h4 style="margin:0"><h:outputText  value="#{msgs.cdfm_forum_posting}"/></h4>
-			<h:panelGrid columns="2" styleClass="jsfFormTable" style="margin-top:0">
-				<h:panelGroup>
-					<h:outputText  value="#{msgs.cdfm_lock_forum}" />	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="forum_locked"  value="#{ForumTool.selectedForum.locked}"  styleClass="selectOneRadio">
-						<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-						<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-					</h:selectOneRadio>
-				</h:panelGroup>
-				<h:panelGroup styleClass="shorttext">
+			<div style="padding-left:1em">
+				<h:panelGrid columns="2" styleClass="jsfFormTable" style="margin-top:0">
+					<h:panelGroup>
+						<h:outputText  value="#{msgs.cdfm_lock_forum}" />	
+					</h:panelGroup>
+					<h:panelGroup>
+						<h:selectOneRadio layout="lineDirection"  id="forum_locked"  value="#{ForumTool.selectedForum.locked}"  styleClass="selectOneRadio">
+							<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
+							<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
+						</h:selectOneRadio>
+					</h:panelGroup>
+					<h:panelGroup styleClass="shorttext">
 					<h:outputText   value="#{msgs.cdfm_moderate_forum}" />	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="moderated"  value="#{ForumTool.selectedForum.moderated}" 
-						onclick="javascript:disableOrEnableModeratePerm();"  styleClass="selectOneRadio">
-						<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-						<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-					</h:selectOneRadio>
-				</h:panelGroup>
-			</h:panelGrid>
-
+					</h:panelGroup>
+					<h:panelGroup>
+						<h:selectOneRadio layout="lineDirection"  id="moderated"  value="#{ForumTool.selectedForum.moderated}" 
+							onclick="javascript:disableOrEnableModeratePerm();"  styleClass="selectOneRadio">
+							<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
+							<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
+						</h:selectOneRadio>
+					</h:panelGroup>
+				</h:panelGrid>
+			</div>
 		   <%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
 			  
 			<div class="act">
