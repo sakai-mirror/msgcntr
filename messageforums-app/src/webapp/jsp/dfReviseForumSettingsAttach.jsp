@@ -8,11 +8,23 @@
 	<jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messagecenter.bundle.Messages"/>
 </jsp:useBean>
 <f:view>
+	<script type="text/javascript" src="/library/js/jquery.js"></script>
+	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>      
+	<script type="text/javascript" src="/sakai-messageforums-tool/js/jquery.charcounter.js"> </script>
+	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/permissions_header.js"/>
+	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
 	<sakai:view title="#{msgs.cdfm_discussion_forum_settings}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 		<!-- Y:\msgcntr\messageforums-app\src\webapp\jsp\dfReviseForumSettingsAttach.jsp -->
 		<h:form id="revise">
-			<script type="text/javascript" src="/library/js/jquery.js"></script>
-			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
+		  <script type="text/javascript">
+            $(document).ready(function(){
+				var charRemFormat = $('.charRemFormat').text();
+				$(".forum_shortDescriptionClass").charCounter(255, {
+					container: ".charsRemaining",
+					format: charRemFormat
+				 });
+			 });				 
+        </script>
 			<sakai:tool_bar_message value="#{msgs.cdfm_discussion_forum_settings}" />
 			<div class="instruction">
 				<h:outputText id="instruction"  value="#{msgs.cdfm_settings_instruction}"/>
@@ -34,8 +46,16 @@
 				<h:panelGroup>
 					<h:outputText value="" />
 					<%-- //designNote: this label should alert that textarea has a 255 max chars limit --%>
-					<h:outputLabel id="outputLabel1" for="forum_shortDescription"  value="#{msgs.cdfm_shortDescription}" styleClass="block"/>	
-					<h:inputTextarea rows="3" cols="45" id="forum_shortDescription"  value="#{ForumTool.selectedForum.forum.shortDescription}"/>
+					<h:outputLabel id="outputLabel1" for="forum_shortDescription"  value="#{msgs.cdfm_shortDescription}" />	
+							<h:outputText value="#{msgs.cdfm_shortDescriptionCharsRem}"  styleClass="charRemFormat" style="display:none"/>
+							<%--
+						
+							<h:outputText value="%1 chars remain"  styleClass="charRemFormat" style="display:none"/>
+						--%>
+							<h:outputText value="" styleClass="charsRemaining" style="padding-left:3em;font-size:.85em;"/>
+							<h:outputText value=""  style="display:block"/>
+					
+					<h:inputTextarea rows="3" cols="45" id="forum_shortDescription"  value="#{ForumTool.selectedForum.forum.shortDescription}" styleClass="forum_shortDescriptionClass" style="float:none"/>
 					<h:outputText value="" />
 				</h:panelGroup>	
 			</h:panelGrid>

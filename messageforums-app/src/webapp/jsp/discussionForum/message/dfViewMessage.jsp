@@ -12,6 +12,15 @@
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 			<!--jsp/discussionForum/message/dfViewMessage.jsp-->
+			<script type="text/javascript">
+				$(document).ready(function() {
+					if ($('table.messageActions a').length==0){
+						$('.messageActions').hide()
+					}
+					});
+			</script>
+
+
 			<%--breadcrumb and thread nav grid--%>
 			<h:panelGrid columns="2" summary="layout" width="100%" styleClass="navPanel">
 				<h:panelGroup>
@@ -60,6 +69,8 @@
 			<%-- topic short description and long description --%>
 			<div class="topicBloc" style="width:80%;padding:0 .5em;margin:0;">
 				<p class="textPanel">
+					<h:graphicImage url="/images/silk/lock.png" alt="#{msgs.cdfm_forum_locked}" 
+						 rendered="#{ForumTool.selectedTopic.locked =='true'}" style="margin-right:.5em"/>
 					<h:outputText value="#{ForumTool.selectedTopic.topic.shortDescription}" />
 				</p>
 				<%-- link to open and close long desc. --%>
@@ -73,7 +84,7 @@
 						<f:param value="dfViewMessage" name="redirectToProcessAction"/>
 						<f:param value="true" name="composeExpand"/>
 						<h:graphicImage url="/images/collapse.gif" />
-						<h:outputText value="#{msgs.cdfm_full_description}" />
+						<h:outputText value="#{msgs.cdfm_read_full_description}" />
 					</h:commandLink>
 					<h:commandLink immediate="true" 
 							action="#{ForumTool.processDfComposeToggle}" 
@@ -83,7 +94,7 @@
 							styleClass="hide">
 						<f:param value="dfViewMessage" name="redirectToProcessAction"/>
 						<h:graphicImage url="/images/expand.gif"/>
-						<h:outputText value="#{msgs.cdfm_full_description}" />
+						<h:outputText value="#{msgs.cdfm_hide_full_description}" />
 					</h:commandLink>
 				</p>
 				<mf:htmlShowArea value="#{ForumTool.selectedTopic.topic.extendedDescription}" 
@@ -160,7 +171,7 @@
 						<h:outputText 	rendered="#{ForumTool.allowedToApproveMsg && ForumTool.allowedToDenyMsg}" value="#{msgs.cdfm_msg_pending_label}" styleClass="messagePending"/>
 						<h:outputText value="#{ForumTool.selectedMessage.message.title}"  styleClass="title" />
 						<h:outputText value="<br />" escape="false" />
-						<h:outputText value="#{ForumTool.selectedMessage.message.author}" styleClass="textPanelFooter" style="padding-left:.5em"/>
+						<h:outputText value="#{ForumTool.selectedMessage.message.author}" styleClass="textPanelFooter"/>
 						<h:outputText value=" #{msgs.cdfm_openb} "  styleClass="textPanelFooter" />
 						<h:outputText value="#{ForumTool.selectedMessage.message.created}"  styleClass="textPanelFooter" >
 							<f:convertDateTime pattern="#{msgs.date_format}" />  

@@ -16,12 +16,43 @@
 			if (window.focus) {newwindow.focus()}
 			}
 		</script>
+		
 		<h:form id="msgForum"   rendered="#{!ForumTool.selectedTopic.topic.draft || ForumTool.selectedTopic.topic.createdBy == ForumTool.userId}">
 			<!--jsp/discussionForum/message/dfAllMessages.jsp-->
 	
 			<script type="text/javascript" src="/library/js/jquery.js"></script>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 			<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
+	<%--//
+		//plugin required below
+		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/pxToEm.js"/>
+	
+		/*
+		gsilver: get a value representing max indents
+	 	from the server configuraiton service or the language bundle, parse 
+		all the indented items, and if the item indent goes over the value, flatten to the value 
+		*/
+		<script type="text/javascript">
+		$(document).ready(function() {
+			// pick value from element (that gets it from language bundle)
+			maxThreadDepth =$('#maxthreaddepth').text()
+			// double check that this is a number
+			if (isNaN(maxThreadDepth)){
+				maxThreadDepth=10
+			}
+			// for each message, if the message is indented more than the value above
+			// void that and set the new indent to the value
+			$("td.messageTitle").each(function (i) {
+				paddingDepth= $(this).css('padding-left').split('px');
+				if ( paddingDepth[0] > parseInt(maxThreadDepth.pxToEm ({scope:'body', reverse:true}))){
+					$(this).css ('padding-left', maxThreadDepth + 'em');
+				}
+			});
+		});
+		</script>	
+		// element into which the value gets insert and retrieved from
+		<span class="highlight"  id="maxthreaddepth" class="skip"><h:outputText value="#{msgs.cdfm_maxthreaddepth}" /></span>
+//--%>
 	
 			<sakai:tool_bar separator="#{msgs.cdfm_toolbar_separator}">
 				<%--
@@ -156,10 +187,12 @@
 				</h:panelGroup>
 			</h:panelGrid>	
 			<%--<%@include file="dfViewSearchBar.jsp"%> --%>
+
 			<%--//designNote: need a rendered attribute here that will toggle the display of the table (if messages) or a textblock (class="instruction") if there are no messages--%> 				
 			<h:outputText value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.selectedTopic.messages}"  styleClass="instruction" style="display:block"/>
+			<%--//gsilver: need a rendered attribute here that will toggle the display of the table (if messages) or a textblock (class="instruction") if there are no messages--%> 						
 			<mf:hierDataTable styleClass=" listHier  specialLink allMessages" id="messagesInHierDataTable" rendered="#{!empty ForumTool.selectedTopic.messages}"  value="#{ForumTool.messages}" var="message" expanded="#{ForumTool.expanded}"
-					columnClasses="attach,messageTitle,bogus,bogus" cellspacing="0" cellpadding="0" style="border:none">
+					columnClasses="attach,messageTitle,attach,bogus,bogus" cellspacing="0" cellpadding="0" style="border:none">
 				<h:column id="_toggle">
 					<f:facet name="header">
 						<h:commandLink action="#{ForumTool.processActionToggleExpanded}" immediate="true" title="#{msgs.cdfm_collapse_expand_all}">
@@ -224,10 +257,13 @@
 							<f:param value="#{ForumTool.selectedTopic.topic.baseForum.id}" name="forumId"/>
 						</h:commandLink>
 						<%-- //designNote: icon to mark as read, does it belong here? Is it the right icon? Is this functionality desired?--%>
+						<%--
 						<h:outputText value="  " />
+
 						<h:graphicImage value="/images/trans.gif" rendered="#{!message.read}"
 							alt="#{msgs.cdfm_mark_as_read}" title="#{msgs.cdfm_mark_as_read}"
 							onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);" styleClass="markAsReadIcon"/>
+						--%>	
 					</h:panelGroup>
 					<%--  thread metadata (count) --%>
 					<%-- designNote: debug block --%>
@@ -243,6 +279,16 @@
 					<h:outputText  value="#{msgs.cdfm_newflagresponses}" styleClass="childrenNew childrenNewThread" rendered="#{message.depth == 0 && message.childUnread > 0}"/>							
 				</h:column>
 				<%-- author column --%>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="&nbsp;" escape="false"/>
+					</f:facet>
+
+					<h:graphicImage value="/images/trans.gif" rendered="#{message.read}" style="margin-left:.5em"/>
+					<h:graphicImage value="/images/trans.gif" rendered="#{!message.read}"
+						alt="#{msgs.cdfm_mark_as_read}" title="#{msgs.cdfm_mark_as_read}"
+						onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);" styleClass="markAsReadIcon"/>
+				</h:column>	
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="#{msgs.cdfm_authoredby}" />

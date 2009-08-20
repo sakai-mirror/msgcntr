@@ -9,8 +9,24 @@
 
 <sakai:view title="#{msgs.cdfm_reply_tool_bar_message}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 	<!--jsp/dfMessageReplyThread.jsp-->    
-	<h:form id="dfCompose">
+		<h:form id="dfCompose" styleClass="specialLink">
 		<script type="text/javascript" src="/library/js/jquery.js"></script>
+			<script type="text/javascript">
+				$(document).ready(function() {
+					$('#openLinkBlock').hide();
+					jQuery('.toggle').click(function(e) { 
+						$('#replytomessage').toggle('slow');
+						$('.toggleParent').toggle();					
+						 resizeFrame('grow')
+				});
+				$('#countme').click(function(e){
+					$('#counttotal').text ((countStuff()));
+					msgupdatecounts = $('.msg-updatecount').text();
+					$('#countmetitle').text(msgupdatecounts);
+				});					
+				});
+			</script>
+				
 		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 		<h:outputText styleClass="alertMessage" value="#{msgs.cdfm_reply_deleted}" rendered="#{ForumTool.errorSynch}" />
 		
@@ -41,8 +57,19 @@
 					<f:convertDateTime pattern="#{msgs.date_format}" />  
 				</h:outputText>
 				<h:outputText value=" #{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
-	
-				<p style="padding:0;margin:.5em 0"><a href="javascript:$('#replytomessage').toggle();resizeFrame('grow');" class="show"><h:outputText value="#{msgs.cdfm_replytoshowhide}"/></a></p>	
+					<p style="padding:0;margin:.5em 0" id="openLinkBlock" class="toggleParent">
+						<a href="#" id="showMessage" class="toggle show">
+							<h:graphicImage url="/images/collapse.gif"/>	
+							<h:outputText value=" #{msgs.cdfm_read_full_rep_tomessage}" />
+						</a>
+					</p>
+					<p style="padding:0;margin:.5em 0" id="hideLinkBlock" class="toggleParent">
+						<a href="#" id="hideMessage" class="toggle show">
+							<h:graphicImage url="/images/expand.gif" />					
+							<h:outputText value=" #{msgs.cdfm_hide_full_rep_tomessage}"/>
+						</a>
+					</p>
+
 			<div  id="replytomessage">	
 				<mf:htmlShowArea value="#{ForumTool.selectedMessage.message.body}" hideBorder="true" />
 	
@@ -71,7 +98,6 @@
 		</p>	 
 
 		<h:panelGrid styleClass="jsfFormTable" columns="1" style="width: 100%;">
-		
 			<h:panelGroup style="padding-top:.5em">
 				<h:messages globalOnly="true" infoClass="success" errorClass="alertMessage" />
 				<h:message for="df_compose_title" styleClass="messageAlert" id="errorMessages" />
@@ -90,12 +116,39 @@
 			<h:outputText value="&nbsp;&nbsp;&nbsp; " escape="false" />
 			<img src="/library/image/silk/paste_plain.png" />
 			<a  href="#"  onclick="InsertHTML();">
-			<h:outputText value="#{msgs.cdfm_message_insert}" /></a>
+					<h:outputText value="#{msgs.cdfm_message_insert}" />
+				</a>
+				<a  id="countme" href="#" style="margin-left:3em"><img src="/library/image/silk/table_add.png" /> <span id="countmetitle"><h:outputText value="#{msgs.cdfm_message_count}" /></span></a>
+				<span  id="counttotal" class="highlight"> </span>
+				<h:outputText value="#{msgs.cdfm_message_count_update}" styleClass="msg-updatecount skip"/>		
 		</div>
 		<sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
 		<script language="javascript" type="text/javascript">
+			 function countStuff() 
+			 {
+				var textInfo
 			var textareas = document.getElementsByTagName("textarea");
 			var rteId = textareas.item(0).id;
+					var oEditor = FCKeditorAPI.GetInstance(rteId) ;
+					var oDOM = oEditor.EditorDocument ;
+					if ( document.all ) // If Internet Explorer.
+					{
+						 charCount = oDOM.body.innerText.length ;
+						 wordCount=oDOM.body.innerText.split(" ").length;
+					}
+					else // If Gecko.
+					{
+						var r = oDOM.createRange();	
+						r.selectNodeContents(oDOM.body);
+						charCount = r.toString().length;
+						wordCount = r.toString().split(" ").length;
+					}
+					msgupdatecounts = $('.msg-updatecount').text();
+					textInfo = "(" + wordCount + ")"
+					return textInfo;
+				}
+			</script>
+			<script language="javascript" type="text/javascript">
 			
 			//	        function FCKeditor_OnComplete( editorInstance )
 			//	        {
@@ -104,6 +157,9 @@
 			//	        }
 			
 			// set the previous message variable
+				var textareas = document.getElementsByTagName("textarea");
+				var rteId = textareas.item(0).id;
+
 			var messagetext = document.forms['dfCompose'].elements['dfCompose:msgHidden'].value;
 			var titletext = document.forms['dfCompose'].elements['dfCompose:titleHidden'].value;
 			

@@ -1,7 +1,7 @@
 <%-- Display single message in threaded view. (included for each message). --%>
 <%-- designNote: what does read/unread mean in this context since I am seeing the whole message?--%>
 <h:outputText escape="false" value="<a id=\"#{message.message.id}\" name=\"#{message.message.id}\"></a>" />
-	<f:verbatim><div class="hierItemBlock" style="border:1px solid red"></f:verbatim>
+	<f:verbatim><div class="hierItemBlock" ></f:verbatim>
 			<%-- a deleted message --%>
 			<h:panelGroup styleClass="inactive" rendered="#{message.deleted}" >
 				<f:verbatim><span></f:verbatim>
@@ -34,6 +34,10 @@
 				<h:outputText  value="#{message.message.created}" rendered="#{!message.read}" styleClass="unreadMsg textPanelFooter md">
 					<f:convertDateTime pattern="#{msgs.date_format_paren}" />
 				</h:outputText>
+		</h:panelGroup>
+		<%-- reply and other actions panel --%>
+		<%-- If message actually deleted, don't display links --%>
+		<h:panelGroup rendered="#{!message.deleted}" styleClass="itemToolBar">
 				<%-- mark as read link --%>
 					<h:graphicImage value="/images/trans.gif"
 						alt="#{msgs.cdfm_mark_as_read}" 
@@ -41,10 +45,6 @@
 						rendered="#{!message.read}"
 						styleClass="markAsReadIcon"
 						onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);"/>
-			</h:panelGroup>
-		<%-- reply and other actions panel --%>
-			<%-- If message actually deleted, don't display links --%>
-			<h:panelGroup rendered="#{!message.deleted}" styleClass="itemToolBar">
 				<%-- Reply link --%>
 				<h:panelGroup rendered="#{ForumTool.selectedTopic.isNewResponseToResponse && message.msgApproved && !ForumTool.selectedTopic.locked}">
 					<h:commandLink action="#{ForumTool.processDfMsgReplyMsgFromEntire}" title="#{msgs.cdfm_reply}"> 
@@ -55,7 +55,9 @@
 						<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId" />
 					</h:commandLink>
 				</h:panelGroup>
+		</h:panelGroup>
 				<%-- (Hide) Other Actions links --%>
+		<%--
 				<h:panelGroup rendered="#{(ForumTool.selectedTopic.isPostToGradebook && ForumTool.gradebookExist) || ForumTool.selectedTopic.isModeratedAndHasPerm || message.revise 
 						|| message.userCanDelete}" style="display:none">
 						<h:outputText value=" #{msgs.cdfm_toolbar_separator} " rendered="#{ForumTool.selectedTopic.isNewResponseToResponse && message.msgApproved && !ForumTool.selectedTopic.locked}" />
@@ -64,7 +66,9 @@
 						<h:outputText value="#{msgs.cdfm_other_actions}" />
 					</h:outputLink>
 				</h:panelGroup>
+		--%>
 					<h:outputText value="</div>" escape="false" />
+		<h:panelGroup rendered="#{!message.deleted}"  style="display:block;margin:0">
 				<%--//designNote: panel holds other actions, display toggled above (do some testing - do they show up when they should not? Do I get a 
 						"moderate" link when it is not a moderated context, or when the message is mine?) --%>
 				<h:outputText escape="false" value="<div id=\"#{message.message.id}_advanced_box\" class=\"otherActions\" style=\"margin:2px 0;\">" />
@@ -98,18 +102,16 @@
 					</h:panelGroup>
 					<%-- Moderate other action --%>
 					<h:panelGroup rendered="#{ForumTool.selectedTopic.isModeratedAndHasPerm}">
-						<h:commandLink action="#{ForumTool.processActionDisplayMessage}" immediate="true" title=" #{msgs.cdfm_moderate}">
-							<h:outputText value="#{msgs.cdfm_moderate}" />
+						<h:commandLink action="#{ForumTool.processActionDisplayMessage}" immediate="true" title=" #{msgs.cdfm_moderate}" value="#{msgs.cdfm_moderate}">
 							<f:param value="#{message.message.id}" name="messageId" />
 							<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId" />
 							<f:param value="#{ForumTool.selectedTopic.topic.baseForum.id}" name="forumId" />
 						</h:commandLink>
 					</h:panelGroup>
+			<f:verbatim></div></f:verbatim>			
 			</h:panelGroup>
 			<!-- close the div with class of specialLink -->
-			<f:verbatim></div></f:verbatim>
-		<%-- a float clearer --%>
-		<f:verbatim><div style="clear:both;height:1px;width:100%;" class="titleBarBorder"></div></f:verbatim>
+	<%--<f:verbatim></div></f:verbatim>-->
 	<%-- the message body--%>
 	<mf:htmlShowArea value="#{message.message.body}" hideBorder="true" rendered="#{!message.deleted}" />
 	<%-- attach list --%>	
@@ -126,4 +128,4 @@
 		</h:dataTable>
 	</h:panelGroup>
 	<%-- close the div with class of hierItemBlock --%>
-<f:verbatim></div></f:verbatim>
+<h:outputText escape="false" value="</div>"  rendered="#{!message.deleted}"/>
