@@ -122,7 +122,6 @@ create table MFR_MESSAGE_T (
    MODIFIED_BY varchar2(36) not null,
    TITLE varchar2(255) not null,
    BODY clob not null,
-   WORDCOUNT int(36) not null,
    AUTHOR varchar2(255) not null,
    LABEL varchar2(255),
    IN_REPLY_TO number(19,0),
