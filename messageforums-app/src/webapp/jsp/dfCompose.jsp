@@ -135,7 +135,7 @@
 						<h:outputText value="#{msgs.cdfm_title}"/>
 					</f:facet>
 					  <sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
-  					<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />s
+  					<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
 					<h:outputText value=" "/>
 					<h:outputText value="#{eachAttach.attachment.attachmentName}"/>
 				</h:column>
