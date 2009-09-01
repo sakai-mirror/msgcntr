@@ -873,7 +873,14 @@ public class PrivateMessagesTool
     try
     {
       User user=UserDirectoryService.getUser(id) ;
-      userName= user.getSortName() + " (" + user.getDisplayId() + ")";
+      if (ServerConfigurationService.getBoolean("msg.displayEid", true))
+      {
+    	  userName= user.getSortName() + " (" + user.getDisplayId() + ")";
+      }
+      else
+      {
+    	  userName= user.getSortName();
+      }
     }
     catch (UserNotDefinedException e) {
 		// TODO Auto-generated catch block
@@ -887,7 +894,13 @@ public class PrivateMessagesTool
    try
    {
      User user=UserDirectoryService.getUser(userId) ;
-     userName= user.getDisplayName() + " (" + user.getDisplayId() + ")";
+     if (ServerConfigurationService.getBoolean("msg.displayEid", true))
+     {
+    	 userName= user.getDisplayName() + " (" + user.getDisplayId() + ")";
+     }
+     else {
+    	 userName= user.getDisplayName();
+     }   
    }
    catch (UserNotDefinedException e) {
 	// TODO Auto-generated catch block
@@ -4194,8 +4207,14 @@ private   int   getNum(char letter,   String   a)
        try
        {
     	 User user = UserDirectoryService.getUser(getUserId());
-         authorString = user.getSortName() + " (" + user.getDisplayId() + ")";
-
+    	 if (ServerConfigurationService.getBoolean("msg.displayEid", true))
+    	 {
+    		 authorString = user.getSortName() + " (" + user.getDisplayId() + ")";
+    	 }
+    	 else
+    	 {
+    		 authorString = user.getSortName();
+    	 }
        }
        catch(Exception e)
        {
