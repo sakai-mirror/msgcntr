@@ -6346,11 +6346,13 @@ public class DiscussionForumTool
 
 
 			String useremail = user.getEmail();
-			if (useremail != null && !"".equalsIgnoreCase(useremail))
-				if (LOG.isDebugEnabled())
+			if (useremail != null && !"".equalsIgnoreCase(useremail)) {
+				if (LOG.isDebugEnabled()) {
 					LOG.debug("Username = " + user.getDisplayId()
 							+ " , useremail : " + useremail);
-			emaillist.add(useremail);
+				}
+				emaillist.add(useremail);
+			}
 
 
 		}

@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -68,7 +69,7 @@ import org.sakaiproject.api.app.messageforums.Message;
 public class ForumsEmailService {
 	private static Log log = LogFactory.getLog(ForumsEmailService.class);
 
-	private List toEmailAddress;
+	private List<String> toEmailAddress;
 
 	private Message reply;
 
@@ -81,7 +82,7 @@ public class ForumsEmailService {
 	/**
 	 * Creates a new SamigoEmailService object.
 	 */
-	public ForumsEmailService(List toEmailAddress, Message reply,
+	public ForumsEmailService(List<String> toEmailAddress, Message reply,
 			DiscussionMessageBean currthread) {
 		this.toEmailAddress = filterMailAddresses(toEmailAddress);
 		this.reply = reply;
@@ -94,7 +95,7 @@ public class ForumsEmailService {
 	}
 
 	public void send() {
-		List attachmentList = null;
+		List<Attachment> attachmentList = null;
 		Attachment a = null;
 		try {
 			Properties props = System.getProperties();
@@ -134,11 +135,12 @@ public class ForumsEmailService {
 			// form the list of to: addresses from the users users collection
 			InternetAddress[] to = new InternetAddress[toEmailAddress.size()];
 
-			Iterator useriter = toEmailAddress.iterator();
+			
 			int indx = 0;
-			while (useriter.hasNext()) {
-				String email = (String) useriter.next();
+			for (int i = 0; i < toEmailAddress.size(); i++) {
+				String email = toEmailAddress.get(i);
 				log.info("got mail <" + email + ">");
+
 				if ((email != null) && (email.length() > 0) && isValidEmail(email)) {
 					log.info("adding email <" + email + ">");
 					try {
@@ -150,7 +152,12 @@ public class ForumsEmailService {
 					}
 				}
 			}
-
+			//if the to list is empty return
+			if (indx == 0) {
+				log.warn("no valid emails where found to send the email to");
+				return;
+			}
+			
 			msg.setSubject(subject);
 
 			// DiscussionMessageBean
@@ -208,14 +215,14 @@ public class ForumsEmailService {
 			if (log.isDebugEnabled()) {
 				log.debug("Email content: " + content.toString());
 			}
-			ArrayList fileList = new ArrayList();
-			ArrayList fileNameList = new ArrayList();
+			ArrayList<File> fileList = new ArrayList<File>();
+			ArrayList<String> fileNameList = new ArrayList<String>();
 			if (attachmentList != null) {
 				if (prefixedPath == null || prefixedPath.equals("")) {
 					log.error("forum.email.prefixedPath is not set");
 					return;
 				}
-				Iterator iter = attachmentList.iterator();
+				Iterator<Attachment> iter = attachmentList.iterator();
 				while (iter.hasNext()) {
 					a = (Attachment) iter.next();
 					log.debug("send(): file");
@@ -246,6 +253,10 @@ public class ForumsEmailService {
 					.getString("testMode@org.sakaiproject.email.api.EmailService");
 			if ("true".equalsIgnoreCase(testmode)) {
 				log.info("Email testMode = true,  printing out text: ");
+				Enumeration<String> en = msg.getAllHeaderLines();
+				while (en.hasMoreElements()) {
+					log.info(en.nextElement());
+				}
 				log.info(content.toString());
 				return;
 			}
@@ -275,7 +286,7 @@ public class ForumsEmailService {
 			if (attachmentList != null) {
 				if (prefixedPath != null && !prefixedPath.equals("")) {
 					StringBuilder sbPrefixedPath;
-					Iterator iter = attachmentList.iterator();
+					Iterator<Attachment> iter = attachmentList.iterator();
 					while (iter.hasNext()) {
 						sbPrefixedPath = new StringBuilder(prefixedPath);
 						sbPrefixedPath.append("/email_tmp/");
@@ -303,7 +314,7 @@ public class ForumsEmailService {
 		// Shouldn't come to here because resourceId is unique
 		if (!success) {
 			log
-					.error("getAttachedFile(): File exists already! This should not heppen. Please check for resourceId.");
+					.error("getAttachedFile(): File exists already! This should not happen. Please check for resourceId.");
 		}
 		File file = new File(filename);
 		success = file.createNewFile();

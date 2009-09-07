@@ -198,6 +198,8 @@ public class EmailNotificationManagerImpl extends HibernateDaoSupport implements
 			if (readUsers.contains(userId)) {
 				LOG.debug("user " + userId + " has read in topic: " + topic.getId());
 				ret.add(userId);
+			} else {
+				LOG.debug("Removing user: " + userId + "as they don't have read rights on topic: " + topic.getId());
 			}
 		}
 		return ret;
@@ -205,9 +207,6 @@ public class EmailNotificationManagerImpl extends HibernateDaoSupport implements
 
 	private List<String> getSiteUsersByNotificationLevel(final String contextid,
 			final int notificationlevel) {
-
-		// siteusers contains a list of userids (string)
-		List<String> siteusers = new ArrayList<String>();
 
 		if (LOG.isDebugEnabled()) {
 			LOG
@@ -226,7 +225,7 @@ public class EmailNotificationManagerImpl extends HibernateDaoSupport implements
 		};
 
  
-		siteusers = (List) getHibernateTemplate().execute(hcb);
+		List<String> siteusers = (List) getHibernateTemplate().execute(hcb);
 
 		// get all site users that are
 		// either want all notification
@@ -245,17 +244,18 @@ public class EmailNotificationManagerImpl extends HibernateDaoSupport implements
 			User user = usersList.get(i);
 
 
+			// find emails for each user
 			String useremail = user.getEmail();
-			if (useremail != null || "".equalsIgnoreCase(useremail))
-				if (LOG.isDebugEnabled())
+			if (useremail != null && !"".equalsIgnoreCase(useremail)) {
+				if (LOG.isDebugEnabled()) {
 					LOG.debug("Username = " + user.getDisplayId()
 							+ " , useremail : " + useremail);
-			emaillist.add(useremail);
+				}
+				emaillist.add(useremail);
+			}
 
 
 		}
-
-		// find emails for each user
 
 		return emaillist;
 

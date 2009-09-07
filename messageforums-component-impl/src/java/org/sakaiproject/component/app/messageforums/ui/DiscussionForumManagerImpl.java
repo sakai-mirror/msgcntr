@@ -2255,31 +2255,24 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     
 
     public Set<String> getUsersAllowedForTopic(Long topicId, boolean checkReadPermission, boolean checkModeratePermission) {
-  	  if (topicId == null) {
+  	 LOG.debug("getUsersAllowedForTopic(" + topicId + ", " + checkReadPermission + ", " + checkModeratePermission + ")"); 
+  	 
+     if (topicId == null) {
   		  throw new IllegalArgumentException("Null topicId passed to getUsersAllowedToReadTopic");
   	  }
   	  
   	  Set<String> usersAllowed = new HashSet<String>();
 
   	  // we need to get all of the membership items associated with this topic
-  	  
+
   	  // first, check to see if it is in the thread
   	  Set<DBMembershipItem> topicItems = new HashSet<DBMembershipItem>();
-  	  Set<DBMembershipItem> allTopicItems = (Set<DBMembershipItem>)ThreadLocalManager.get("message_center_membership_topic");
-  	  if (allTopicItems != null) {
-  		  for (DBMembershipItem topicItem : allTopicItems) {
-  			  if (topicItem.getId().equals(topicId)) {
-  				  topicItems.add(topicItem);
-  			  }
-  		  }
-  	  } else {
-  		  // it is not already in the thread, so we need to retrieve the membership items
-  		  DiscussionTopic topicWithMemberships = (DiscussionTopic)forumManager.getTopicByIdWithMemberships(topicId);
-  		  if (topicWithMemberships != null && topicWithMemberships.getMembershipItemSet() != null) {
-  			  topicItems = topicWithMemberships.getMembershipItemSet();
-  		  }
+  	  DiscussionTopic topicWithMemberships = (DiscussionTopic)forumManager.getTopicByIdWithMemberships(topicId);
+  	  if (topicWithMemberships != null && topicWithMemberships.getMembershipItemSet() != null) {
+  		  topicItems = topicWithMemberships.getMembershipItemSet();
   	  }
-  	  
+
+
   	  Set<Role> rolesInSite = new HashSet<Role>();
   	  Set<Group> groupsInSite = new HashSet<Group>();
 
@@ -2325,6 +2318,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   				  (checkReadPermission && membershipItem.getPermissionLevel().getRead() && checkModeratePermission && membershipItem.getPermissionLevel().getModeratePostings())) {
   			  if (membershipItem.getType().equals(DBMembershipItem.TYPE_ROLE)) {
   				  // add the users who are a member of this role
+  				  LOG.debug("Adding users in role: " + membershipItem.getName() + " with read: " + membershipItem.getPermissionLevel().getRead());
   				  Set<String> usersInRole = currentSite.getUsersHasRole(membershipItem.getName());
   				  usersAllowed.addAll(usersInRole);
   			  } else if (membershipItem.getType().equals(DBMembershipItem.TYPE_GROUP)) {
