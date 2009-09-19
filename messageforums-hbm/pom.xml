@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <name>sakai-messageforums-hbm</name>
   <parent>
-    <artifactId>msgcntr-base</artifactId>
+    <artifactId>msgcntr</artifactId>
     <groupId>org.sakaiproject</groupId>
     <version>1.5-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <groupId>org.sakaiproject</groupId>
+  <groupId>org.sakaiproject.msgcntr</groupId>
   <artifactId>sakai-messageforums-hbm</artifactId>
   <organization>
     <name>Sakai Project</name>
@@ -28,15 +28,10 @@
       <groupId>org.sakaiproject</groupId>
       <artifactId>sakai-messageforums-api</artifactId>
     </dependency>
-<!--org.sakaiprojectsakai-site-api${sakai.version}-->
-<!--org.sakaiprojectsakai-user-api${sakai.version}-->
-<!--org.sakaiprojectsakai-authz-api${sakai.version}-->
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>1.0.4</version>
     </dependency>
-<!--org.sakaiprojectsakai-util-api${sakai.version}-->
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>

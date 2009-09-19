@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>msgcntr-base</artifactId>
+    <artifactId>msgcntr</artifactId>
     <groupId>org.sakaiproject</groupId>
     <version>1.5-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <name>Sakai MessageForums Components</name>
-  <groupId>org.sakaiproject</groupId>
+  <groupId>org.sakaiproject.msgcntr</groupId>
   <artifactId>sakai-messageforums-components</artifactId>
   <organization>
     <name>Sakai Project</name>
@@ -21,7 +21,7 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.sakaiproject</groupId>
+      <groupId>org.sakaiproject.msgcntr</groupId>
       <artifactId>sakai-messageforums-component-impl</artifactId>
       <exclusions>
         <exclusion>
