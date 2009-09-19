@@ -638,7 +638,7 @@ public class MessageForumStatisticsBean {
 					while(messageIter.hasNext()){
 						final Message mes = (Message) messageIter.next();
 						
-						if(mes.getId().equals((new Long(selectedMsgId)))){
+						if(mes.getId().equals((Long.valueOf(selectedMsgId)))){
 							Message mesWithAttach = (Message)messageManager.getMessageByIdWithAttachments(mes.getId()); 
 							List decoAttachList = new ArrayList();
 							List attachList = mesWithAttach.getAttachments();

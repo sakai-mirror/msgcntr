@@ -1027,7 +1027,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
 
     boolean saveArea = forum.getId() == null;
-    forum.setDraft(new Boolean(draft));
+    forum.setDraft(Boolean.valueOf(draft));
 //    ActorPermissions originalForumActorPermissions = null;
 //    if (saveArea)
 //    {
@@ -1076,7 +1076,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
       String dfType = typeManager.getDiscussionForumType();
       Area area = areaManager.getAreaByContextIdAndTypeId(contextId, dfType);
       forum.setArea(area);
-      forum.setSortIndex(new Integer(0));
+      forum.setSortIndex(Integer.valueOf(0));
       area.addDiscussionForum(forum);
       areaManager.saveArea(area);
     }
@@ -1117,7 +1117,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
             + ")");
 
     boolean saveForum = topic.getId() == null;
-    topic.setDraft(new Boolean(draft));
+    topic.setDraft(Boolean.valueOf(draft));
     forumManager.saveDiscussionForumTopic(topic);
     if (saveForum)
     {

@@ -706,7 +706,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         status.setTopicId(topicId);
         status.setMessageId(messageId);
         status.setUserId(userId);
-        status.setRead(new Boolean(read));
+        status.setRead(Boolean.valueOf(read));
 
         if (trulyUnread) {
         	Message message = (Message) getMessageById(messageId);
@@ -975,7 +975,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         LOG.debug("markMessageApproval executing with messageId: " + messageId);
         
         Message message = (Message) getMessageById(messageId);
-        message.setApproved(new Boolean(approved));
+        message.setApproved(Boolean.valueOf(approved));
         
         getHibernateTemplate().saveOrUpdate(message);
     }
@@ -1170,7 +1170,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
     
     private Integer convertBooleanToInteger(boolean value) {
        Integer retVal = (Boolean.TRUE.equals(value)) ? 1 : 0;
-       return new Integer(retVal);
+       return Integer.valueOf(retVal);
     }
     
     private String getContextId() {

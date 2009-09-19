@@ -364,7 +364,7 @@ public class HierPvtMsgDataTableRender extends HtmlBasicRenderer {
 						if(hasChildBoolean && dmb.getDepth()==0)
 						{
 							writer.write(" <img src=\"" + BARIMG + "\" style=\"" + CURSOR
-									+ "\" id=\"_id_" + new Integer(hideDivNo).toString() +
+									+ "\" id=\"_id_" + Integer.valueOf(hideDivNo).toString() +
 									"__img_hide_division_\"" +
 							" onclick=\"");
 							int childNo = getTotalChildNo(dmb, msgBeanList);
@@ -636,7 +636,7 @@ public class HierPvtMsgDataTableRender extends HtmlBasicRenderer {
 		try {
 			int processedInt = processed.intValue();
 			if ((rows > 0) && (++processedInt > rows)) {
-				processed = new Integer(processedInt);
+				processed = Integer.valueOf(processedInt);
 				return;
 			}
 			data.setRowIndex(++rowIndex);

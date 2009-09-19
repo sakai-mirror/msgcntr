@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -69,7 +68,6 @@ import org.sakaiproject.authz.api.Role;
 import org.sakaiproject.authz.cover.AuthzGroupService;
 import org.sakaiproject.authz.cover.SecurityService;
 import org.sakaiproject.component.app.messageforums.MembershipItem;
-import org.sakaiproject.component.app.messageforums.dao.hibernate.DBMembershipItemImpl;
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.content.api.FilePickerHelper;
@@ -91,8 +89,8 @@ import org.sakaiproject.tool.messageforums.ui.DiscussionAreaBean;
 import org.sakaiproject.tool.messageforums.ui.DiscussionForumBean;
 import org.sakaiproject.tool.messageforums.ui.DiscussionMessageBean;
 import org.sakaiproject.tool.messageforums.ui.DiscussionTopicBean;
-import org.sakaiproject.tool.messageforums.ui.MessageForumStatisticsBean;
 import org.sakaiproject.tool.messageforums.ui.EmailNotificationBean;
+import org.sakaiproject.tool.messageforums.ui.MessageForumStatisticsBean;
 import org.sakaiproject.tool.messageforums.ui.PermissionBean;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.cover.UserDirectoryService;
@@ -431,7 +429,7 @@ public class DiscussionForumTool
 
      List retSort = new ArrayList();
      for(int i = 1; i <= num; i++) {
-        Integer index = new Integer(i);
+        Integer index = Integer.valueOf(i);
         retSort.add(new SelectItem(index, index.toString()));
      }
      
@@ -481,7 +479,7 @@ public class DiscussionForumTool
             
               String assignName = thisAssign.getName(); 
             
-              item = new SelectItem((new Integer(i+1)).toString(), assignName); 
+              item = new SelectItem((Integer.valueOf(i+1)).toString(), assignName); 
               assignments.add(item); 
             } 
             catch(Exception e) 
@@ -569,7 +567,7 @@ public class DiscussionForumTool
           {
             if(((String)((SelectItem)assignments.get(i)).getLabel()).equals(forum.getDefaultAssignName()))
             {
-              decoForum.setGradeAssign(new Integer(i).toString());
+              decoForum.setGradeAssign(Integer.valueOf(i).toString());
               break;
             }
           }
@@ -4523,7 +4521,7 @@ public class DiscussionForumTool
   {
     if(selectedForum.getGradeAssign() != null && !DEFAULT_GB_ITEM.equals(selectedForum.getGradeAssign()))
     {
-      forum.setDefaultAssignName( ((SelectItem)assignments.get( new Integer(selectedForum.getGradeAssign()).intValue())).getLabel());
+      forum.setDefaultAssignName( ((SelectItem)assignments.get( Integer.valueOf(selectedForum.getGradeAssign()).intValue())).getLabel());
     }
   }
   
@@ -4583,7 +4581,7 @@ public class DiscussionForumTool
   	
     if(selectedTopic.getGradeAssign() != null && !DEFAULT_GB_ITEM.equals(selectedTopic.getGradeAssign()))
     {
-      topic.setDefaultAssignName( ((SelectItem)assignments.get( new Integer(selectedTopic.getGradeAssign()).intValue())).getLabel());
+      topic.setDefaultAssignName( ((SelectItem)assignments.get( Integer.valueOf(selectedTopic.getGradeAssign()).intValue())).getLabel());
     }
   }
   
@@ -4932,7 +4930,7 @@ public class DiscussionForumTool
 
 			  if(!DEFAULT_GB_ITEM.equalsIgnoreCase(selectedAssign)) {
 				  String gradebookUid = ToolManager.getCurrentPlacement().getContext();
-				  String selAssignName = ((SelectItem)assignments.get((new Integer(selectedAssign)).intValue())).getLabel();		  
+				  String selAssignName = ((SelectItem)assignments.get((Integer.valueOf(selectedAssign)).intValue())).getLabel();		  
 				  String studentId = UserDirectoryService.getUser(selectedMessage.getMessage().getCreatedBy()).getId();
 				  
 				  setUpGradeInformation(gradebookUid, selAssignName, studentId);
@@ -4972,7 +4970,7 @@ public class DiscussionForumTool
    
    public boolean isFewerDigit(String validateString)
    {
-     String stringValue = new Double(validateString).toString();
+     String stringValue = Double.valueOf(validateString).toString();
      if(stringValue.lastIndexOf(".") >= 0)
      {
        String subString = stringValue.substring(stringValue.lastIndexOf("."));
@@ -5058,12 +5056,12 @@ public class DiscussionForumTool
     {   
         GradebookService gradebookService = (org.sakaiproject.service.gradebook.shared.GradebookService) 
         ComponentManager.get("org.sakaiproject.service.gradebook.GradebookService"); 
-        String selectedAssignName = ((SelectItem)assignments.get((new Integer(selectedAssign)).intValue())).getLabel();
+        String selectedAssignName = ((SelectItem)assignments.get((Integer.valueOf(selectedAssign)).intValue())).getLabel();
         String gradebookUuid = ToolManager.getCurrentPlacement().getContext();
         String studentUid = UserDirectoryService.getUser(selectedMessage.getMessage().getCreatedBy()).getId();
 
         gradebookService.setAssignmentScore(gradebookUuid,  
-        		  selectedAssignName, studentUid, new Double(gradePoint), "");
+        		  selectedAssignName, studentUid, Double.valueOf(gradePoint), "");
         if (gradeComment != null && gradeComment.trim().length() > 0)
         {
         	gradebookService.setAssignmentScoreComment(gradebookUuid,  
@@ -5288,14 +5286,14 @@ public class DiscussionForumTool
             return;
           }
           else
-            if (changeView.equals("expand"))
+            if ("expand".equals(changeView))
             {
               threaded = true;
               expanded = "true";
               return;
             }
             else
-              if (changeView.equals("collapse"))
+              if ("collapse".equals(changeView))
               {
                 threaded = true;
                 expanded = "false";

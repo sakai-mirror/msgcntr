@@ -300,8 +300,8 @@ public class HierDataTableRender extends HtmlBasicRenderer
 			//////
 			if(dmb.getDepth() > 0 && !"true".equals(noArrows))
 			{
-				//////writer.write("<div style=\"display:none\"  id=\"_id_" + new Integer(hideDivNo).toString() + "__hide_division_" + "\">");
-				writer.write("<tr style=\"display:none\" id=\"_id_" + new Integer(hideDivNo).toString() + "__hide_division_" + "\">");
+				//////writer.write("<div style=\"display:none\"  id=\"_id_" + Integer.valueOf(hideDivNo).toString() + "__hide_division_" + "\">");
+				writer.write("<tr style=\"display:none\" id=\"_id_" + Integer.valueOf(hideDivNo).toString() + "__hide_division_" + "\">");
 			}
 			else if(dmb.getDepth() > 0)
 			{
@@ -344,13 +344,13 @@ public class HierDataTableRender extends HtmlBasicRenderer
 					}
 					if(hasChildBoolean && dmb.getDepth()==0)
 					{
-						writer.write(" <img src=\""   + BARIMG + "\" style=\"" + CURSOR + "\" id=\"_id_" + new Integer(hideDivNo).toString() + "__img_hide_division_\"" +
+						writer.write(" <img src=\""   + BARIMG + "\" style=\"" + CURSOR + "\" id=\"_id_" + Integer.valueOf(hideDivNo).toString() + "__img_hide_division_\"" +
 								" onclick=\"");
 						int childNo = getTotalChildNo(dmb, msgBeanList);
 						String hideTr = "";
 						for(int i=0; i<childNo; i++)
 						{
-							hideTr += "javascript:showHideDiv('_id_" + new Integer(hideDivNo+i).toString() + "', '" +  RESOURCE_PATH + "');";
+							hideTr += "javascript:showHideDiv('_id_" + Integer.valueOf(hideDivNo+i).toString() + "', '" +  RESOURCE_PATH + "');";
 						}
 						writer.write(hideTr);
 						writer.write("mySetMainFrameHeight('Main" + org.sakaiproject.tool.cover.ToolManager.getCurrentPlacement().getId().replace("-","x") + "');");
@@ -400,13 +400,13 @@ public class HierDataTableRender extends HtmlBasicRenderer
 						
 						if(hasChildBoolean && dmb.getDepth()==0)
 						{
-							writer.write(" <img src=\""   + BARIMG + "\" style=\"position:absolute;left:-1em;" + CURSOR + "\" id=\"_id_" + new Integer(hideDivNo).toString() + "__img_hide_division_\"" +
+							writer.write(" <img src=\""   + BARIMG + "\" style=\"position:absolute;left:-1em;" + CURSOR + "\" id=\"_id_" + Integer.valueOf(hideDivNo).toString() + "__img_hide_division_\"" +
 									" onclick=\"");
 							int childNo = getTotalChildNo(dmb, msgBeanList);
 							String hideTr = "";
 							for(int i=0; i<childNo; i++)
 							{
-								hideTr += "javascript:showHideDiv('_id_" + new Integer(hideDivNo+i).toString() + "', '" +  RESOURCE_PATH + "');";
+								hideTr += "javascript:showHideDiv('_id_" + Integer.valueOf(hideDivNo+i).toString() + "', '" +  RESOURCE_PATH + "');";
 							}
 							writer.write(hideTr);
 							writer.write("setMainFrameHeight('Main" + org.sakaiproject.tool.cover.ToolManager.getCurrentPlacement().getId().replace("-","x") + "');");
@@ -433,7 +433,7 @@ public class HierDataTableRender extends HtmlBasicRenderer
 			writer.writeText("\n", null);
 			if(dmb.getDepth() == 0 && hasChildBoolean)
 			{
-				//////writer.write("<div style=\"display:none\"  id=\"_id_" + new Integer(hideDivNo).toString() + "__hide_division_" + "\">");
+				//////writer.write("<div style=\"display:none\"  id=\"_id_" + Integer.valueOf(hideDivNo).toString() + "__hide_division_" + "\">");
 			}
 			if(dmb !=null && dmb.getDepth()>0)
 			{
@@ -445,7 +445,7 @@ public class HierDataTableRender extends HtmlBasicRenderer
 		    if(expanded.equalsIgnoreCase("true"))
 		    {
 		    	writer.write("<script type=\"text/javascript\">");
-		    	writer.write("  showHideDiv('_id_" + new Integer(hideDivNo).toString() +
+		    	writer.write("  showHideDiv('_id_" + Integer.valueOf(hideDivNo).toString() +
 		    			"', '" +  RESOURCE_PATH + "');");
 		    	writer.write("</script>");
 		    }
@@ -463,7 +463,7 @@ public class HierDataTableRender extends HtmlBasicRenderer
 					{
 						//////writer.write("</div>");
 				    writer.write("<script type=\"text/javascript\">");
-				    writer.write("  showHideDiv('_id_" + new Integer(hideDivNo).toString() +
+				    writer.write("  showHideDiv('_id_" + Integer.valueOf(hideDivNo).toString() +
 				        "', '" +  RESOURCE_PATH + "');");
 				    hideDivNo++;
 				    writer.write("</script>");
@@ -473,7 +473,7 @@ public class HierDataTableRender extends HtmlBasicRenderer
 				{
 					//////writer.write("</div>");					
 			    writer.write("<script type=\"text/javascript\">");
-			    writer.write("  showHideDiv('_id_" + new Integer(hideDivNo).toString() +
+			    writer.write("  showHideDiv('_id_" + Integer.valueOf(hideDivNo).toString() +
 			        "', '" +  RESOURCE_PATH + "');");
 			    hideDivNo++;
 			    writer.write("</script>");
@@ -699,7 +699,7 @@ public class HierDataTableRender extends HtmlBasicRenderer
 			int processedInt = processed.intValue();
 			if ((rows > 0) && (++processedInt > rows)) 
 			{
-				processed = new Integer(processedInt);
+				processed = Integer.valueOf(processedInt);
 				return ;
 			}
 			data.setRowIndex(++rowIndex);

@@ -449,7 +449,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
       for(Iterator i = resultList.iterator(); i.hasNext(); ) {
          tempForum = (BaseForum)i.next();
          
-         tempForum.setSortIndex(new Integer(sort_index++));
+         tempForum.setSortIndex(Integer.valueOf(sort_index++));
       }
       
       return resultList;      
@@ -498,7 +498,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         for(Iterator i = resultList.iterator(); i.hasNext(); ) {
            tempForum = (BaseForum)i.next();
            
-           tempForum.setSortIndex(new Integer(sort_index++));
+           tempForum.setSortIndex(Integer.valueOf(sort_index++));
         }
         
         return resultList;      
@@ -770,7 +770,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         forum.setUuid(getNextUuid());
         forum.setCreated(new Date());
         forum.setCreatedBy(getCurrentUser());
-        forum.setSortIndex(new Integer(0));
+        forum.setSortIndex(Integer.valueOf(0));
         forum.setShortDescription("short-desc");
         forum.setExtendedDescription("ext desc");
         forum.setAutoForward(Boolean.FALSE);
@@ -793,7 +793,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         boolean isNew = forum.getId() == null;
 
         if (forum.getSortIndex() == null) {
-            forum.setSortIndex(new Integer(0));
+            forum.setSortIndex(Integer.valueOf(0));
         }
 
         forum.setModified(new Date());
@@ -821,7 +821,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         boolean isNew = forum.getId() == null;
 
         if (forum.getSortIndex() == null) {
-            forum.setSortIndex(new Integer(0));
+            forum.setSortIndex(Integer.valueOf(0));
         }
         if (forum.getLocked() == null) {
             forum.setLocked(Boolean.FALSE);
@@ -829,7 +829,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         if (forum.getModerated() == null) {
         	forum.setModerated(Boolean.FALSE);
         }
-        forum.setDraft(new Boolean(draft));
+        forum.setDraft(Boolean.valueOf(draft));
         forum.setModified(new Date());
         if(getCurrentUser()!=null){
         forum.setModifiedBy(getCurrentUser());
@@ -856,7 +856,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
            if(someTopicHasZeroSortIndex) {
               for(Iterator i = topics.iterator(); i.hasNext(); ) {
                  DiscussionTopic topic = (DiscussionTopic)i.next();
-                 topic.setSortIndex(new Integer(topic.getSortIndex().intValue() + 1));
+                 topic.setSortIndex(Integer.valueOf(topic.getSortIndex().intValue() + 1));
               }
            }
         }
@@ -905,7 +905,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
             topic.setMutable(Boolean.FALSE);
         }
         if (topic.getSortIndex() == null) {
-            topic.setSortIndex(new Integer(0));
+            topic.setSortIndex(Integer.valueOf(0));
         }
         topic.setModified(new Date());
         if(getCurrentUser()!=null){
@@ -964,8 +964,8 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         topic.setUserId(userId);
         topic.setShortDescription("short-desc");
         topic.setExtendedDescription("ext-desc");
-        topic.setMutable(new Boolean(topicIsMutable));
-        topic.setSortIndex(new Integer(0));
+        topic.setMutable(Boolean.valueOf(topicIsMutable));
+        topic.setSortIndex(Integer.valueOf(0));
         topic.setModified(new Date());
         if(getCurrentUser()!=null){
         topic.setModifiedBy(getCurrentUser());
@@ -1272,7 +1272,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 			for(Iterator i = resultList.iterator(); i.hasNext(); ) {
 				tempForum = (BaseForum)i.next();
 
-				tempForum.setSortIndex(new Integer(sort_index++));
+				tempForum.setSortIndex(Integer.valueOf(sort_index++));
 			}
 
 			return resultList;      
@@ -1321,7 +1321,7 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
 			for(Iterator i = resultList.iterator(); i.hasNext(); ) {
 				tempForum = (BaseForum)i.next();
 
-				tempForum.setSortIndex(new Integer(sort_index++));
+				tempForum.setSortIndex(Integer.valueOf(sort_index++));
 			}
 
 			return resultList;      
