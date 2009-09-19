@@ -2,6 +2,7 @@
   <name>sakai-messageforums-tool</name>
   <comment/>
   <projects>
+    <project>sakai-messageforums-api</project>
     <project>sakai-messageforums-hbm</project>
   </projects>
   <buildSpec>

@@ -199,6 +199,7 @@ public interface MessageForumsForumManager {
 	 * @return
 	 */
 	public BaseForum getForumByIdWithTopicsAttachmentsAndMessages(final Long forumId);
+
 	
 	/**
 	 * 
@@ -208,4 +209,13 @@ public interface MessageForumsForumManager {
 	 * messages, and attachments populated
 	 */
 	public List getForumByTypeAndContextWithTopicsAllAttachments(final String typeUuid, final String contextId);
+	
+	/**
+	 * 
+	 * @param topicId
+	 * @return the Topic with the given id with the DBMembershipItems initialized.
+	 * Does not initialize attachments or messages.
+	 */
+	public Topic getTopicByIdWithMemberships(final Long topicId);
+
 }

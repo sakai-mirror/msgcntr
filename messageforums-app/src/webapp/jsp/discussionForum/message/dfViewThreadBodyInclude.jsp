@@ -88,6 +88,14 @@
 	
 	<h:outputText escape="false" value="<div id=\"#{message.message.id}_advanced_box\" style=\"display:none\">" />
 
+                                        <%-- Email --%>
+                                        <h:panelGroup rendered="#{message.userCanEmail}">
+                                                <h:outputLink id="createEmail1" value="mailto:#{message.authorEmail}?subject=Feedback on #{message.message.title}">
+                                                        <h:outputText value="#{msgs.cdfm_button_bar_email}"/>
+                                                </h:outputLink>
+                                        <h:outputText value=" #{msgs.cdfm_toolbar_separator} " />
+                                        </h:panelGroup>
+
 	<h:panelGroup rendered="#{ForumTool.selectedTopic.isPostToGradebook && ForumTool.gradebookExist}">
 		<h:commandLink action="#{ForumTool.processDfMsgGrdFromThread}" value="#{msgs.cdfm_button_bar_grade}">
 			<f:param value="#{message.message.id}" name="messageId" />

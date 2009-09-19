@@ -1,7 +1,9 @@
 <projectDescription>
   <name>sakai-messageforums-hbm</name>
   <comment/>
-  <projects/>
+  <projects>
+    <project>sakai-messageforums-api</project>
+  </projects>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
