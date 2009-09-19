@@ -33,7 +33,7 @@ public class PrivateTopicDecoratedBean
   private Topic topic;
   private int totalNoMessages;
   private int unreadNoMessages;
-  private List messages;
+  private List messages = new ArrayList();
 
   private boolean hasNextTopic=false;
   private boolean hasPreviousTopic=false;
