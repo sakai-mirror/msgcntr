@@ -3195,7 +3195,7 @@ public class DiscussionForumTool
 	    	for(int i=0; i<tempMsgs.size(); i++)
 	    	{
 	    		DiscussionMessageBean thisDmb = (DiscussionMessageBean)tempMsgs.get(i);
-	    		if(((DiscussionMessageBean)tempMsgs.get(i)).getMessage().getId().toString().equals(messageId))
+	    		if(((DiscussionMessageBean)tempMsgs.get(i)).getMessage().getId().longValue() == messageId)
 	    		{
 	    			selectedMessage.setDepth(thisDmb.getDepth());
 	    			selectedMessage.setHasNext(thisDmb.getHasNext());
