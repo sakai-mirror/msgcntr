@@ -499,7 +499,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   {
 	  if (topicId == null)
 	  {
-		  LOG.error("approveAllPendingMessages failed with topicId: " + topicId);
+		  LOG.error("approveAllPendingMessages failed with null topicId");
           throw new IllegalArgumentException("Null Argument");
 	  }
 	  List messages = this.getMessagesByTopicId(topicId);
@@ -1564,8 +1564,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   public boolean  getAnonRole()
   {
     LOG.debug("getAnonRoles()");
-   List roleList = new ArrayList();
-    AuthzGroup realm = null;
+   AuthzGroup realm = null;
    try
     {
       realm = AuthzGroupService.getAuthzGroup(getContextSiteId());      
@@ -1629,7 +1628,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     {
       LOG.debug("isForumOwner(DiscussionForum " + forum + ")");
     }
-    if (forum.getCreatedBy().equals(userDirectoryService.getCurrentUser()) && !isRoleSwapView())
+    if (forum.getCreatedBy().equals(userDirectoryService.getCurrentUser().getId()) && !isRoleSwapView())
     {
       return true;
     }
@@ -1651,7 +1650,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     {
       LOG.debug("isTopicOwner(DiscussionTopic " + topic + ")");
     }
-    if (topic.getCreatedBy().equals(userDirectoryService.getCurrentUser()) && !isRoleSwapView())
+    if (topic.getCreatedBy().equals(userDirectoryService.getCurrentUser().getId()) && !isRoleSwapView())
     {
       return true;
     }
@@ -2175,14 +2174,14 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
       attach.setAttachmentName(name);
 
       ContentResource cr = contentHostingService.getResource(attachId);
-      attach.setAttachmentSize((new Long(cr.getContentLength())).toString());
+      attach.setAttachmentSize((Long.valueOf(cr.getContentLength())).toString());
       attach.setCreatedBy(cr.getProperties().getProperty(
           cr.getProperties().getNamePropCreator()));
       attach.setModifiedBy(cr.getProperties().getProperty(
           cr.getProperties().getNamePropModifiedBy()));
       attach.setAttachmentType(cr.getContentType());
       String tempString = cr.getUrl();
-      String newString = new String();
+      String newString = "";
       char[] oneChar = new char[1];
       for (int i = 0; i < tempString.length(); i++)
       {
@@ -2336,7 +2335,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   	  }
 
 
-  	  Set<Role> rolesInSite = new HashSet<Role>();
+  	  Set<Role> rolesInSite = null;
   	  Set<Group> groupsInSite = new HashSet<Group>();
 
   	  Site currentSite;
