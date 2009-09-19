@@ -427,7 +427,10 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
 
         LOG.debug("findViewableMessageCountByTopicId executing with topicId: " + topicId);
 
+        if(getCurrentUser()!=null){
         return findViewableMessageCountByTopicIdByUserId(topicId, getCurrentUser());
+        }
+        else return 0;
     }
 
    public int findUnreadMessageCountByTopicIdByUserId(final Long topicId, final String userId){
@@ -480,7 +483,10 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
 
        LOG.debug("findUnreadViewableMessageCountByTopicId executing with topicId: " + topicId);
 
+       if(getCurrentUser()!=null){
        return findUnreadViewableMessageCountByTopicIdByUserId(topicId, getCurrentUser());
+       }
+       else return 0;
    }
     
     public int findReadMessageCountByTopicId(final Long topicId) {
@@ -489,7 +495,9 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
             throw new IllegalArgumentException("Null Argument");
         }
 
+        if(getCurrentUser()!=null){
         return findReadMessageCountByTopicIdByUserId(topicId, getCurrentUser());
+        }else return 0;
     }
     
     /**
@@ -533,7 +541,10 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
             throw new IllegalArgumentException("Null Argument");
         }
 
+        if(getCurrentUser()!=null){
         return findReadViewableMessageCountByTopicIdByUserId(topicId, getCurrentUser());
+        }
+        else return 0;
     }
     
     public List findMessagesByTopicId(final Long topicId) {
@@ -633,7 +644,9 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
             throw new IllegalArgumentException("Null Argument");
         }
 
-        return findUnreadStatusByUserId(topicId, messageId, getCurrentUser());       
+        if(getCurrentUser()!=null){
+        return findUnreadStatusByUserId(topicId, messageId, getCurrentUser()); 
+        }else return null;
     }
 
     public void deleteUnreadStatus(Long topicId, Long messageId) {
@@ -662,7 +675,10 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
 
         LOG.debug("markMessageReadForUser executing with topicId: " + topicId + ", messageId: " + messageId);
 
+        if(getCurrentUser()!=null){
         markMessageReadForUser(topicId, messageId, read, getCurrentUser());
+        }
+        else return;
     }
     
     public void markMessageReadForUser(Long topicId, Long messageId, boolean read, String userId)
@@ -779,7 +795,9 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         }
         
         message.setModified(new Date());
+        if(getCurrentUser()!=null){
         message.setModifiedBy(getCurrentUser());
+        }
         if(message.getUuid() == null || message.getCreated() == null
         	|| message.getCreatedBy() == null || message.getModified() == null
         	|| message.getModifiedBy() == null || message.getTitle() == null 
@@ -1257,9 +1275,9 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
 		return false;
 	}
 
-	public Map getReadStatusForMessagesWithId(final List msgIds, final String userId)
+	public Map<Long, Boolean> getReadStatusForMessagesWithId(final List msgIds, final String userId)
 	{
-		Map statusMap = new HashMap();
+		Map<Long, Boolean> statusMap = new HashMap<Long, Boolean>();
 		if( msgIds != null && msgIds.size() > 0)
 		{
 			HibernateCallback hcb = new HibernateCallback() {
