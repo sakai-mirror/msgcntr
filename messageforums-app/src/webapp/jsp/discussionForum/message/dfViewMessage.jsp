@@ -155,6 +155,7 @@
 	
     <h:panelGrid columns="3" styleClass="itemSummary" style="width: 100%;">
     	<h:outputText value="#{msgs.cdfm_subject}"/>
+		
 
 		<%-- Display if message deleted. need to wrap text since inactive class styles children tags only --%>
     	<h:panelGroup styleClass="inactive" rendered="#{ForumTool.selectedMessage.message.deleted}">
@@ -189,6 +190,14 @@
         	</h:outputText>
         	<h:outputText value=" #{msgs.cdfm_closeb}" />
 	    </h:panelGroup>
+		
+		<h:outputText value="" />
+		
+		<h:outputText value="#{msgs.cdfm_readby}" />
+		<h:panelGroup>
+			<h:outputText value="#{ForumTool.selectedMessage.message.numReaders}" />
+		</h:panelGroup>
+		
 		<h:outputText value="" />
       
       <h:outputText value="#{msgs.cdfm_att}" rendered="#{!empty ForumTool.selectedMessage.attachList}" />
