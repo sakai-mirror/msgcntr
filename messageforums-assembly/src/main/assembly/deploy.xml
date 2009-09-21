@@ -12,6 +12,7 @@
             <useTransitiveDependencies>false</useTransitiveDependencies>
             <includes>
                 <include>org.sakaiproject.msgcntr:sakai-messageforums-api:jar:*</include>
+		<include>org.sakaiproject.msgcntr:sakai-messageforums-hbm:jar:*</include>
 		<include>org.sakaiproject.msgcntr:sakai-messageforums-help:jar:*</include>
             </includes>
         </dependencySet>
