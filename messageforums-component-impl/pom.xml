@@ -4,7 +4,7 @@
   <name>sakai-messageforums-component-impl</name>
   <parent>
     <artifactId>msgcntr</artifactId>
-    <groupId>org.sakaiproject</groupId>
+    <groupId>org.sakaiproject.msgcntr</groupId>
     <version>1.5-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
@@ -66,18 +66,17 @@
       <version>1.7.0</version>
     </dependency>
     <dependency>
-      <groupId>org.sakaiproject</groupId>
+      <groupId>org.sakaiproject.common</groupId>
       <artifactId>sakai-common-type-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sakaiproject</groupId>
+      <groupId>org.sakaiproject.common</groupId>
       <artifactId>sakai-common-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>1.0.4</version>
-    </dependency>
+     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
