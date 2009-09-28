@@ -7,7 +7,7 @@
 </jsp:useBean>
 
 <f:view>
-<sakai:view>
+<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 <script language="JavaScript">
 	// open print preview in another browser window so can size approx what actual
 	// print out will look like
@@ -17,9 +17,6 @@
 	}
 </script>
 	<h:form id="msgForum" styleClass="specialLink">
-		<style type="text/css">
-			@import url("/sakai-messageforums-tool/css/msgcntr.css");
-		</style>
 
 	<!--jsp/discussionForum/message/dfFlatView.jsp-->
   		<script type="text/javascript" src="/library/js/jquery.js"></script>
@@ -80,7 +77,7 @@
 			</h:panelGrid>
 	
 		<%--rjlowe: Expanded View to show the message bodies, threaded --%>
-		<h:outputText   value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.messages}"   styleClass="messageInformation" />
+		<h:outputText   value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.messages}"   styleClass="instruction" style="display:block" />
 		<mf:hierDataTable id="expandedThreadedMessages" value="#{ForumTool.messages}" var="message" 
    	 		noarrows="true" styleClass="listHier messagesThreaded" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
 			<h:column id="_msg_subject">

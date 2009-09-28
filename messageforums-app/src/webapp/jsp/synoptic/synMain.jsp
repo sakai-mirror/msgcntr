@@ -31,7 +31,7 @@
 </jsp:useBean>
 
 <f:view>
-  <sakai:view>
+		<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 			<h:form styleClass="specialLink">
 	  <sakai:script contextBase="/sakai-messageforums-tool" path="/js/popupscripts.js"/>
 
@@ -72,11 +72,10 @@
 		 			<h:commandLink action="synMain"
 						actionListener="#{mfSynopticBean.processReadAll}"
 						rendered="#{eachSite.unreadPrivateAmt > 0}"
-														style="padding: 0 1em"
 														title="#{msgs.syn_mark_as_read}">
 
-													<h:graphicImage url="/images/12-em-check.png" alt="#{msgs.syn_mark_as_read}"
-															rendered="#{eachSite.unreadPrivateAmt > 0}" />
+													<h:graphicImage url="/images/trans.gif" alt="#{msgs.syn_mark_as_read}"
+															rendered="#{eachSite.unreadPrivateAmt > 0}"  styleClass="markAsReadIcon"/>
 															<h:outputText  value="#{msgs.syn_mark_as_read}"/>
 													<%--		
 							<h:graphicImage url="/../library/image/silk/email_edit.png" title="#{msgs.syn_mark_as_read}"
@@ -147,7 +146,7 @@
 				<h:outputText value="  " rendered="true" />
 										<h:outputText escape="false" value="&nbsp;&nbsp;" />
 	 			<h:commandLink action="synMain" actionListener="#{mfSynopticBean.processReadAll}" styleClass="active" >
-									<h:graphicImage url="/images/12-em-check.png" alt="#{msgs.syn_mark_as_read}" />
+									<h:graphicImage url="/images/trans.gif" alt="#{msgs.syn_mark_as_read}"  styleClass="markAsReadIcon"/>
 										<h:outputText value="#{msgs.syn_mark_as_read} " />
 					<f:param name="contextId" value="#{eachSite.siteId}" />
 				</h:commandLink>

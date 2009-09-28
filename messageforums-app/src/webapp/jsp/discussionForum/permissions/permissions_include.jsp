@@ -137,7 +137,7 @@
       </h:selectOneMenu>
     </h:panelGroup>
   </h:panelGrid>
-	<h:panelGrid columns="2" summary="layout" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'topic'}" style="margin-top:.5em;clear:both">
+	<h:panelGrid columns="2" summary="layout" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'topic' && !ForumTool.selectedForum.markForDeletion}" style="margin-top:.5em;clear:both">
     <h:panelGroup>  	
 			<h:outputLabel for="topic_assignments"  value="#{msgs.perm_choose_assignment}"  ></h:outputLabel>
   	</h:panelGroup>		

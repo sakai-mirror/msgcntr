@@ -9,12 +9,8 @@
 </jsp:useBean>
 
 <f:view>
-   <sakai:view title="#{msgs.cdfm_default_template_settings}">           
+   <sakai:view title="#{msgs.cdfm_default_template_settings}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">           
       <h:form id="revise">
-	  			<style type="text/css">
-				@import url("/sakai-messageforums-tool/css/msgcntr.css");
-			</style>
-
              		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 <!--jsp/discussionForum/area/dfTemplateSettings.jsp-->

@@ -9,14 +9,11 @@
 </jsp:useBean>
 
 <f:view>
-   <sakai:view>
+	<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 
       <h:form id="revise">
              		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
-		<style type="text/css">
-			@import url("/sakai-messageforums-tool/css/msgcntr.css");
-		</style>
 
 		<script type="text/javascript">
 			$(document).ready(function(){
@@ -56,12 +53,12 @@
 			</p>
 			<p>
 				<a id="show" class="show"  href="#">
-					<h:graphicImage url="/images/collapse.gif" /><h:outputText   value="#{msgs.cdfm_read_full_description}"/>
+					<h:graphicImage url="/images/collapse.gif" /><h:outputText   value="#{msgs.cdfm_full_description}"/>
 				</a>
 			</p>
 			<p>
 				<a id="hide" class="hide"  href="#">
-					<h:graphicImage url="/images/expand.gif" /><h:outputText   value="#{msgs.cdfm_hide_full_description}"/>
+					<h:graphicImage url="/images/expand.gif" /><h:outputText   value="#{msgs.cdfm_full_description}"/>
 				</a>
 			</p>
 			<div class="textPanel toggle" id="toggle">

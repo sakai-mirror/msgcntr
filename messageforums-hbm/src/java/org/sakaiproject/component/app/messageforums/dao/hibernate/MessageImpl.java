@@ -39,6 +39,7 @@ public class MessageImpl extends MutableEntityImpl implements Message
 
 	private String title;
 	private String body;
+  private int wordCount;
 	private String author;
 	private Set attachmentsSet; // = new HashSet();
 	private String label;
@@ -490,16 +491,21 @@ public class MessageImpl extends MutableEntityImpl implements Message
 		this.gradeAssignmentName = gradeAssignmentName;
 	}
 
-
 	public Integer getNumReaders() {
 		return numReaders;
 	}
 
+	
 	public void setNumReaders(Integer numReaders) {
 		this.numReaders = numReaders;
 
 	}
 
+	public int getWordCount() {
+		return wordCount;
+	}
+	public void setWordCount(int wordCount) {
+	    this.wordCount = wordCount;
+	}
 
 }
-

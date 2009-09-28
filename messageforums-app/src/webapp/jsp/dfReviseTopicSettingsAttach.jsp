@@ -10,12 +10,9 @@
 <f:view>
 	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/permissions_header.js"/>
 	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
-  <sakai:view title="#{msgs.cdfm_discussion_topic_settings}">
+	<sakai:view title="#{msgs.cdfm_discussion_topic_settings}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 <!--jsp/dfReviseTopicSettingsAttach.jsp-->
     <h:form id="revise">
-			<style type="text/css">
-			@import url("/sakai-messageforums-tool/css/msgcntr.css");
-			</style>
            		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
       <sakai:tool_bar_message value="#{msgs.cdfm_discussion_topic_settings}" />

@@ -7,13 +7,10 @@
 </jsp:useBean>
 <f:view>
 
-	<sakai:view title="#{msgs.cdfm_add_comment}">
+<sakai:view title="#{msgs.cdfm_add_comment}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 	       		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 		<h:form id="dfMsgAddComment">
-			<style type="text/css">
-				@import url("/sakai-messageforums-tool/css/msgcntr.css");
-			</style>
 
 			<h3><h:outputText value="#{msgs.cdfm_add_comment}" /></h3>
 			<h4>

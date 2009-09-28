@@ -35,7 +35,7 @@
 			<f:convertDateTime pattern="#{msgs.date_format_paren}" />
 		</h:outputText>
 				<%-- mark as read link --%>
-				<h:graphicImage value="/images/12-em-check.png"
+					<h:graphicImage value="/images/trans.gif"
 			alt="#{msgs.cdfm_mark_as_read}" 
 			title="#{msgs.cdfm_mark_as_read}" 
 			rendered="#{!message.read}"
@@ -61,6 +61,7 @@
 <%--
 >>>>>>> .merge-right.r65916
 					style="cursor:pointer;margin-left:1em"
+						styleClass="markAsReadIcon"
 					onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);"/>
 					--%>
 		</h:panelGroup>
