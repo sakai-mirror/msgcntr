@@ -12,11 +12,16 @@
 	// open print preview in another browser window so can size approx what actual
 	// print out will look like
 	function printFriendly(url) {
-		window.open(url,'mywindow','width=960,height=1100'); 		
+		newwindow=window.open(url,'mywindow','width=960,height=1100,scrollbars=yes,resizable=yes');
+		if (window.focus) {newwindow.focus()}
 	}
 </script>
-	<h:form id="msgForum">
-<!--jsp/discussionForum/message/dfAllMessages.jsp-->
+	<h:form id="msgForum" styleClass="specialLink">
+		<style type="text/css">
+			@import url("/sakai-messageforums-tool/css/msgcntr.css");
+		</style>
+
+	<!--jsp/discussionForum/message/dfFlatView.jsp-->
   		<script type="text/javascript" src="/library/js/jquery.js"></script>
   		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
@@ -26,9 +31,6 @@
 		  			rendered="#{ForumTool.selectedTopic.isNewResponse && !ForumTool.selectedTopic.locked}" />
 		  			
 		  		<h:commandLink action="#{ForumTool.processActionMarkAllAsRead}" rendered="#{ForumTool.selectedTopic.isMarkAsRead}"> 
-      				<h:graphicImage value="/../../library/image/silk/email.png" alt="#{msgs.msg_is_unread}" 
-				   	    onmouseover="this.src=this.src.replace(/email\.png/, 'email_open.png');"
-   	        			onmouseout="this.src=this.src.replace(/email_open\.png/, 'email.png');" />
    	        		<h:outputText value=" #{msgs.cdfm_mark_all_as_read}" />
                 </h:commandLink>
                 <%--
@@ -45,7 +47,6 @@
 					<h:graphicImage url="/../../library/image/silk/printer.png" alt="#{msgs.print_friendly}" title="#{msgs.print_friendly}" />
 				</h:outputLink>
  		</sakai:tool_bar>
-
 			<h:panelGrid columns="2" summary="layout" width="100%" styleClass="navPanel specialLink">
 			    <h:panelGroup>
 					<f:verbatim><div class="breadCrumb specialLink"><h3></f:verbatim>
@@ -79,8 +80,9 @@
 			</h:panelGrid>
 	
 		<%--rjlowe: Expanded View to show the message bodies, threaded --%>
+		<h:outputText   value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.messages}"   styleClass="messageInformation" />
 		<mf:hierDataTable id="expandedThreadedMessages" value="#{ForumTool.messages}" var="message" 
-   	 		noarrows="true" styleClass="listHier" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
+   	 		noarrows="true" styleClass="listHier messagesThreaded" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
 			<h:column id="_msg_subject">
 				<%@include file="dfViewThreadBodyInclude.jsp" %>
 			</h:column>

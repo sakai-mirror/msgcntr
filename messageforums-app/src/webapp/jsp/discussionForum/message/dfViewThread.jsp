@@ -12,11 +12,16 @@
 	// open print preview in another browser window so can size approx what actual
 	// print out will look like
 	function printFriendly(url) {
-		window.open(url,'mywindow','width=960,height=1100'); 		
+	newwindow=window.open(url,'mywindow','width=960,height=1100');
+	if (window.focus) {newwindow.focus()}
 	}
 </script>
 	<h:form id="msgForum" rendered="#{!ForumTool.selectedTopic.topic.draft || ForumTool.selectedTopic.topic.createdBy == ForumTool.userId}">
-<!--jsp/discussionForum/message/dfAllMessages.jsp-->
+		<style type="text/css">
+			@import url("/sakai-messageforums-tool/css/msgcntr.css");
+		</style>
+
+		<!--jsp/discussionForum/message/dfViewThread.jsp-->
        		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
@@ -26,9 +31,6 @@
 		  			rendered="#{ForumTool.selectedTopic.isNewResponse && ForumTool.selectedThreadHead.msgApproved && !ForumTool.selectedTopic.locked}" />
 		  		
 		  		<h:commandLink action="#{ForumTool.processActionMarkAllThreadAsRead}" rendered="#{ForumTool.selectedTopic.isMarkAsRead}"> 
-      				<h:graphicImage value="/../../library/image/silk/email.png" alt="#{msgs.msg_is_unread}" 
-				   	    onmouseover="this.src=this.src.replace(/email\.png/, 'email_open.png');"
-   	        			onmouseout="this.src=this.src.replace(/email_open\.png/, 'email.png');" />
    	        		<h:outputText value=" #{msgs.cdfm_mark_all_as_read}" />
                 </h:commandLink>
                 <%--
@@ -40,9 +42,9 @@
 					<h:graphicImage url="/../../library/image/silk/printer.png" alt="#{msgs.print_friendly}" title="#{msgs.print_friendly}" />
 				</h:outputLink>
  		</sakai:tool_bar>
-			<h:panelGrid columns="2" summary="layout" width="100%" styleClass="navPanel specialLink">
+			<h:panelGrid columns="2" summary="layout" width="100%" styleClass="specialLink">
 			    <h:panelGroup>
-					<f:verbatim><div class="breadCrumb specialLink"><h3></f:verbatim>
+					<f:verbatim><div class="specialLink"><h3></f:verbatim>
 			      <h:commandLink action="#{ForumTool.processActionHome}" value="#{msgs.cdfm_message_forums}" title=" #{msgs.cdfm_message_forums}"
 			      		rendered="#{ForumTool.messagesandForums}" />
 			      <h:commandLink action="#{ForumTool.processActionHome}" value="#{msgs.cdfm_discussion_forums}" title=" #{msgs.cdfm_discussion_forums}"
@@ -83,7 +85,7 @@
 		
 		<%--rjlowe: Expanded View to show the message bodies, but not threaded --%>
 		<h:dataTable id="expandedMessages" value="#{ForumTool.selectedThread}" var="message" rendered="#{!ForumTool.threaded}"
-   	 		styleClass="listHier" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
+   	 		styleClass="listHier messagesFlat specialLink" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
 			<h:column>
 				<%@include file="dfViewThreadBodyInclude.jsp" %>
 			</h:column>
@@ -91,14 +93,14 @@
 		
 		<%--rjlowe: Expanded View to show the message bodies, threaded --%>
 		<mf:hierDataTable id="expandedThreadedMessages" value="#{ForumTool.selectedThread}" var="message" rendered="#{ForumTool.threaded}"
-   	 		noarrows="true" styleClass="listHier" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
+   	 		noarrows="true" styleClass="listHier messagesThreaded specialLink" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
 			<h:column id="_msg_subject">
 				<%@include file="dfViewThreadBodyInclude.jsp" %>
 			</h:column>
 		</mf:hierDataTable>
 				
 		<h:inputHidden id="mainOrForumOrTopic" value="dfViewThread" />
-
+		<%--//designNote:  need a message if no messages (as in when there are no unread ones)  --%>
 	<%
 	  	String thisId = request.getParameter("panel");
   		if (thisId == null) 
