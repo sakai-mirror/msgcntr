@@ -302,7 +302,6 @@ public class HierDataTableRender extends HtmlBasicRenderer
 			{
 				//////writer.write("<div class=\"hideDiv\" style=\"display:none\"  id=\"_id_" + new Integer(hideDivNo).toString() + "__hide_division_" + "\">");
 				writer.write("<tr style=\"display:none\" id=\"_id_" + Integer.valueOf(hideDivNo).toString() + "__hide_division_" + "\">");
->>>>>>> .merge-right.r65916
 			}
 			else if(dmb.getDepth() > 0)
 			{
