@@ -42,7 +42,7 @@
       		
 			<%--RTEditor area - if enabled--%>
 			<h:panelGroup rendered="#{! ForumTool.disableLongDesc}">
-			<h4><h:outputText id="outputLabel2" value="#{msgs.cdfm_fullDescription}"/></h4>	
+				<h:outputText id="outputLabel2" value="#{msgs.cdfm_fullDescription}" style="display:block;padding:.5em 0"/>
 			<sakai:rich_text_area rows="10" columns="70" value="#{ForumTool.selectedForum.forum.extendedDescription}"/>
 	      	</h:panelGroup>
 	      	
@@ -51,6 +51,7 @@
 	      <h4>
 		        <h:outputText value="#{msgs.cdfm_att}"/>
 	      </h4>
+			<div style="padding-left:1em">
 				<%--designNote: would be nice to make this an include, as well as a more comprehensive MIME type check  --%> 
 			<h:dataTable styleClass="attachPanel" id="attmsg"  value="#{ForumTool.attachments}" var="eachAttach"  cellpadding="0" cellspacing="0" columnClasses="attach,bogus,specialLink,bogus,bogus" rendered="#{!empty ForumTool.attachments}">
 				<h:column>
@@ -108,9 +109,10 @@
 					rendered="#{empty ForumTool.attachments}"
 					/>
 			</p>	
-					
+			</div>		
 			<%--general posting  forum settings --%>
 			<h4 style="margin:0"><h:outputText  value="#{msgs.cdfm_forum_posting}"/></h4>
+			<div style="padding-left:1em">
 			<h:panelGrid columns="2" styleClass="jsfFormTable" style="margin-top:0">
    			<h:panelGroup>
 					<h:outputText  value="#{msgs.cdfm_lock_forum}" />	
@@ -132,7 +134,7 @@
   					</h:selectOneRadio>
 				</h:panelGroup>
 			</h:panelGrid>
-
+			</div>
 	   <%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
 	      
       <div class="act">

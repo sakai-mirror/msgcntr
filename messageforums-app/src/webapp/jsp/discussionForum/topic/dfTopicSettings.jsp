@@ -31,7 +31,7 @@
 		<%--//designNote: this just feels weird - presenting somehting that sort of looks like the form used to create the topic (with an editable permissions block!) to comfirm deletion --%>
 <!--jsp/discussionForum/topic/dfTopicSettings.jsp-->
 		<sakai:tool_bar_message value="#{msgs.cdfm_delete_topic_title}" />
-		<h:outputText styleClass="messageAlert" value="#{msgs.cdfm_delete_topic}" rendered="#{ForumTool.selectedTopic.markForDeletion}"/>
+		<h:outputText styleClass="messageAlert" style="display:block" value="#{msgs.cdfm_delete_topic}" rendered="#{ForumTool.selectedTopic.markForDeletion}"/>
 		<div class="topicBloc" style="padding:0 .5em">
 			<p>	
 				<span class="title">

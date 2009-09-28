@@ -1,7 +1,7 @@
 <%-- Display single message in threaded view. (included for each message). --%>
 <%-- designNote: what does read/unread mean in this context since I am seeing the whole message?--%>
 <h:outputText escape="false" value="<a id=\"#{message.message.id}\" name=\"#{message.message.id}\"></a>" />
-	<f:verbatim><div class="hierItemBlock"></f:verbatim>
+	<f:verbatim><div class="hierItemBlock" style="border:1px solid red"></f:verbatim>
 			<%-- a deleted message --%>
 	<h:panelGroup styleClass="inactive" rendered="#{message.deleted}" >
 		<f:verbatim><span></f:verbatim>
@@ -23,15 +23,15 @@
 			<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId" />
 			<f:param value="#{ForumTool.selectedTopic.topic.baseForum.id}" name="forumId" />
 		</h:commandLink>
-				<h:outputText value="<br />" escape="false" />
+				<h:outputText value="<br /><div class=\"messageMetadata\">" escape="false" />
 				<%--author --%>
-				<h:outputText value="  #{message.message.author}" rendered="#{message.read}" styleClass="textPanelFooter"/>
-				<h:outputText  value="  #{message.message.author}" rendered="#{!message.read }" styleClass="unreadMsg textPanelFooter"/>
+				<h:outputText value="  #{message.message.author}" rendered="#{message.read}" styleClass="textPanelFooter md"/>
+				<h:outputText  value="  #{message.message.author}" rendered="#{!message.read }" styleClass="unreadMsg textPanelFooter md"/>
 				<%--date --%>
-				<h:outputText value="#{message.message.created}" rendered="#{message.read}" styleClass="textPanelFooter">
+				<h:outputText value="#{message.message.created}" rendered="#{message.read}" styleClass="textPanelFooter md">
 			<f:convertDateTime pattern="#{msgs.date_format_paren}" />
 		</h:outputText>
-				<h:outputText  value="#{message.message.created}" rendered="#{!message.read}" styleClass="unreadMsg textPanelFooter">
+				<h:outputText  value="#{message.message.created}" rendered="#{!message.read}" styleClass="unreadMsg textPanelFooter md">
 			<f:convertDateTime pattern="#{msgs.date_format_paren}" />
 		</h:outputText>
 				<%-- mark as read link --%>
@@ -80,16 +80,17 @@
 		</h:panelGroup>
 		<%-- (Hide) Other Actions links --%>
 		<h:panelGroup rendered="#{(ForumTool.selectedTopic.isPostToGradebook && ForumTool.gradebookExist) || ForumTool.selectedTopic.isModeratedAndHasPerm || message.revise 
-									|| message.userCanDelete}">
+						|| message.userCanDelete}" style="display:none">
 						<h:outputText value=" #{msgs.cdfm_toolbar_separator} " rendered="#{ForumTool.selectedTopic.isNewResponseToResponse && message.msgApproved && !ForumTool.selectedTopic.locked}" />
 						<h:outputLink value="#" onclick="toggleDisplayInline('#{message.message.id}_advanced_box'); return false;">
 				<h:graphicImage value="/../../library/image/silk/cog.png" alt="#{msgs.cdfm_other_actions}" />
 				<h:outputText value="#{msgs.cdfm_other_actions}" />
 			</h:outputLink>
 		</h:panelGroup>
+					<h:outputText value="</div>" escape="false" />
 				<%--//designNote: panel holds other actions, display toggled above (do some testing - do they show up when they should not? Do I get a 
 						"moderate" link when it is not a moderated context, or when the message is mine?) --%>
-				<h:outputText escape="false" value="<span id=\"#{message.message.id}_advanced_box\" class=\"otherActions\" style=\"display:none\">" />
+				<h:outputText escape="false" value="<div id=\"#{message.message.id}_advanced_box\" class=\"otherActions\" style=\"margin:2px 0;\">" />
 					<%-- link to grade --%>
                                         <%-- Email --%>
                                         <h:panelGroup rendered="#{message.userCanEmail}">
@@ -137,7 +138,7 @@
 	</h:panelGroup>
 			</h:panelGroup>
 			<!-- close the div with class of specialLink -->
-			<f:verbatim></span></f:verbatim>
+			<f:verbatim></div></f:verbatim>
 		<%-- a float clearer --%>
 		<f:verbatim><div style="clear:both;height:1px;width:100%;" class="titleBarBorder"></div></f:verbatim>
 	<%-- the message body--%>

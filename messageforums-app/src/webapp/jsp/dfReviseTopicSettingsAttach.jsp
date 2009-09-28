@@ -41,16 +41,14 @@
 
 			<%--RTEditor area - if enabled--%>
 		<h:panelGroup rendered="#{! ForumTool.disableLongDesc}">
-		  <h4>
-				<h:outputText id="outputLabel2"   value="#{msgs.cdfm_fullDescription}"/>
-			</h4>
+				<h:outputText id="outputLabel2"   value="#{msgs.cdfm_fullDescription}" style="display:block;padding:.5em 0"/>
 			<sakai:rich_text_area rows="10" columns="70"  value="#{ForumTool.selectedTopic.topic.extendedDescription}"/>
 		</h:panelGroup>
 		
 			<%--Attachment area  --%>
 		<h4><h:outputText value="#{msgs.cdfm_att}"/></h4>
 		
-
+			<div style="padding-left:1em">
 			<%--designNote: would be nice to make this an include, as well as a more comprehensive MIME type check  --%>
 			<h:dataTable styleClass="attachPanel" id="attmsg" value="#{ForumTool.attachments}" var="eachAttach"  cellpadding="0" cellspacing="0" columnClasses="attach,bogus,specialLink,bogus,bogus" rendered="#{!empty ForumTool.attachments}">
 				<h:column>
@@ -108,10 +106,10 @@
 					 rendered="#{empty ForumTool.attachments}" 
 					 style="font-size:95%"/>
 			</p>
-
+			</div>                                                                                  
 			<%--general posting  forum settings --%>
 			<h4><h:outputText  value="#{msgs.cdfm_topic_posting}"/></h4>
-				
+			<div style="padding-left:1em">
 			<h:panelGrid columns="2"  styleClass="jsfFormTable">
 				<h:panelGroup>
 				  <h:outputLabel for="topic_locked"  value="#{msgs.cdfm_lock_topic}" styleClass="shorttext"/>	
@@ -133,7 +131,7 @@
   					</h:selectOneRadio>
 				</h:panelGroup>
 			</h:panelGrid>
-
+			</div>
 		<%--
 		   <h4><h:outputText  value="Confidential Responses"/></h4>
 		   <h:selectBooleanCheckbox   title= "#{msgs.cdfm_topic_allow_anonymous_postings}"  value="false" />

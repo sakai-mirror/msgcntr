@@ -91,7 +91,7 @@
 
 						<h:graphicImage url="/images/folder.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages == 0 }" styleClass="topicIcon" style="margin-right:.5em"/>
 						<h:graphicImage url="/images/folder_unread.gif" alt="Topic Folder" rendered="#{topic.unreadNoMessages > 0 }" styleClass="topicIcon" style="margin-right:.5em"/>
-						<h:outputText styleClass="messageNew" value=" #{msgs.cdfm_newflag}"  rendered="#{topic.unreadNoMessages > 0 }" />
+
 
 						<h:outputText styleClass="highlight title" id="draft" value="#{msgs.cdfm_draft}" rendered="#{topic.topic.draft == 'true'}"/>
 						<h:outputText id="draft_space" value="  - " rendered="#{topic.topic.draft == 'true'}" styleClass="title"/>
@@ -105,6 +105,9 @@
 						<h:outputText styleClass="textPanelFooter" id="topic_msgs_count" value=" #{msgs.cdfm_openb} #{topic.totalNoMessages} #{msgs.cdfm_lowercase_msgs} - #{topic.unreadNoMessages} #{msgs.cdfm_unread}" rendered="#{topic.isRead && (topic.totalNoMessages > 1 ||  topic.totalNoMessages == 0)}"/>
 				  	<h:outputText id="topic_moderated" value="#{msgs.cdfm_topic_moderated_flag}" styleClass="textPanelFooter" rendered="#{topic.moderated == 'true'}" />
     	      <h:outputText value=" #{msgs.cdfm_closeb}"styleClass="textPanelFooter" />
+
+						<h:outputText styleClass="childrenNew" value=" #{msgs.cdfm_newflagparent}"  rendered="#{topic.unreadNoMessages > 0 }" />
+
 						<h:outputText value=" "  styleClass="actionLinks"/>
 						<h:commandLink action="#{ForumTool.processActionTopicSettings}" id="topic_setting" value="#{msgs.cdfm_topic_settings}"
 						rendered="#{topic.changeSettings}" title=" #{msgs.cdfm_topic_settings}">

@@ -5,43 +5,53 @@
 <jsp:useBean id="msgs" class="org.sakaiproject.util.ResourceLoader" scope="session">
    <jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messagecenter.bundle.Messages"/>
 </jsp:useBean>
-
 <f:view>
+
 	<sakai:view title="#{msgs.cdfm_reply_tool_bar_message}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
-<!--jsp/dfMessageReply.jsp-->    
+	<!--jsp/dfMessageReplyThread.jsp-->    
       <h:form id="dfCompose">
              		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
-			<h:outputText styleClass="messageAlert" value="#{msgs.cdfm_reply_deleted}" rendered="#{ForumTool.errorSynch}" />
-		  <h3><h:outputText value="#{msgs.cdfm_reply_tool_bar_message}"  /></h3>
-			<table class="topicBloc topicBlocLone" border="0">
+		<h:outputText styleClass="alertMessage" value="#{msgs.cdfm_reply_deleted}" rendered="#{ForumTool.errorSynch}" />
+		
+		
+		<h3><h:outputText value="#{msgs.cdfm_reply_thread_tool_bar_message}"  /></h3>
+	
+		<table class="topicBloc topicBlocLone">
 				<tr>
 					<td>
-						<h4 style="margin:0 0 1em 0">
+					<span class ="title">
 							<h:outputText value="#{ForumTool.selectedForum.forum.title}" />
 							<h:outputText value="/ "/>
 	      <h:outputText value="#{ForumTool.selectedTopic.topic.title}"/>
-		  </h4>	
+					</span>
+					<p class="textPanel">
 		  <h:outputText value="#{ForumTool.selectedTopic.topic.shortDescription}"/>
+					</p>
 					</td>
 				</tr>	
 			</table>
-			<div class="singleMessage">
-				<%-- //designNote: need to make this toggle look and behave exactly like the  rest --%> 
-				<p><a href="javascript:$('#replytomessage').toggle();resizeFrame('grow')" class="show"><h:outputText value="#{msgs.cdfm_replytoshowhide}"/></a></p>
-				<div  id="replytomessage">   
-					<h:outputText value="#{ForumTool.selectedMessage.message.title}" styleClass="title"/>
-					<h:outputText value="#{ForumTool.selectedMessage.message.author}" styleClass="textPanelFooter"  style="padding-left:.5em"/>
+
+		<%--********************* Reply To *********************--%>	     	
+		<div class="singleMessageReply"> 
+				<h:outputText value="#{msgs.cdfm_reply_message_pref}" styleClass="title highlight"/> <h:outputText value="#{ForumTool.selectedMessage.message.title}" styleClass="title"/>
+				<h:outputText value="#{ForumTool.selectedMessage.message.author}" styleClass="textPanelFooter"/>
 					<h:outputText value=" #{msgs.cdfm_openb}" styleClass="textPanelFooter"/>
 					<h:outputText value="#{ForumTool.selectedMessage.message.created}" styleClass="textPanelFooter">
 						<f:convertDateTime pattern="#{msgs.date_format}" />  
 					</h:outputText>
 					<h:outputText value=" #{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
+	
+				<p style="padding:0;margin:.5em 0"><a href="javascript:$('#replytomessage').toggle();resizeFrame('grow');" class="show"><h:outputText value="#{msgs.cdfm_replytoshowhide}"/></a></p>	
+			<div  id="replytomessage">	
 					<mf:htmlShowArea value="#{ForumTool.selectedMessage.message.body}" hideBorder="true" />
-					<h:dataTable value="#{ForumTool.selectedMessage.message.attachments}" var="eachAttach"  rendered="#{!empty ForumTool.selectedMessage.message.attachments}" columnClasses="attach,bogus" styleClass="attachList">
+	
+				<h:dataTable value="#{ForumTool.selectedMessage.message.attachments}" var="eachAttach"  rendered="#{!empty ForumTool.selectedMessage.message.attachments}" columnClasses="attach,bogus" styleClass="attachList"   summary="layout"  
+						style="font-size:.9em;width:auto;margin-left:1em" border="0">
 						<h:column rendered="#{!empty ForumTool.selectedMessage.message.attachments}">
-							  <sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
+						<sakai:contentTypeMap fileType="#{eachAttach.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
   							  <h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
+					<%----%>
 						</h:column>
 						<h:column>
 							<%--							<h:outputLink value="#{eachAttach.attachmentUrl}" target="_blank">
@@ -61,23 +71,28 @@
               <h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStarInline" />
 		</p>	  
 
-			<h:panelGrid styleClass="jsfFormTable" columns="1" style="width: 100%;margin:0;">
+		<h:panelGrid styleClass="jsfFormTable" columns="1" style="width: 100%;">
           
 			<h:panelGroup style="padding-top:.5em">
           <h:messages globalOnly="true" infoClass="success" errorClass="alertMessage" />
 				<h:message for="df_compose_title" styleClass="messageAlert" id="errorMessages"/>	
-				<h:outputLabel for="df_compose_title" styleClass="block" style="display:block;float:none;clear:both;padding-bottom:.3em;padding-top:.5em"><h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStar"/><h:outputText value="#{msgs.cdfm_reply_title}" /></h:outputLabel>
+				<h:outputLabel for="df_compose_title" style="display:block;float:none;clear:both;padding-bottom:.3em;padding-top:.3em;">
+					<h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStar"/>
+					<h:outputText value="#{msgs.cdfm_reply_title}" />
+				</h:outputLabel>
 					<h:inputText value="#{ForumTool.composeTitle}" style="width: 30em;" required="true" id="df_compose_title" />
 				</h:panelGroup>
 			</h:panelGrid>
-		     <h:outputText value="#{msgs.cdfm_message}" /> 
 		    
+	  <div style="padding:.5em 0;white-space:nowrap">
+			<h:outputText value="#{msgs.cdfm_message}" style="padding:.5em 0"/> 
 		    <h:inputHidden id="msgHidden" value="#{ForumTool.selectedMessage.message.body}" />
 		    <h:inputHidden id="titleHidden" value="#{ForumTool.selectedMessage.message.title}" />
 			<h:outputText value="&nbsp;&nbsp;&nbsp; " escape="false" />
-			<a  href="#"  onclick="InsertHTML();">
 			<img src="/library/image/silk/paste_plain.png" />
+			<a  href="#"  onclick="InsertHTML();">
 			<h:outputText value="#{msgs.cdfm_message_insert}" /></a>
+		</div>
             <sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
             <script language="javascript" type="text/javascript">
             var textareas = document.getElementsByTagName("textarea");
@@ -96,7 +111,7 @@
             function InsertHTML() 
             { 
               // These lines will write to the original textarea and makes the quoting work when FCK is not present
-              var finalhtml = '<b><i><h:outputText value="#{msgs.cdfm_insert_original_text_comment}" /></i></b><br/><b><i><h:outputText value="#{msgs.cdfm_from}" /></i></b> <i><h:outputText value="#{ForumTool.selectedMessage.message.author}" /><h:outputText value=" #{msgs.cdfm_openb}" /><h:outputText value="#{ForumTool.selectedMessage.message.created}" ><f:convertDateTime pattern="#{msgs.date_format}" /></h:outputText><h:outputText value="#{msgs.cdfm_closeb}" /></i><br/><b><i><h:outputText value="#{msgs.cdfm_subject}" /></i></b> <i>' + titletext + '</i><br/><br/><i>' + messagetext + '</i><br/><br/>';
+			var finalhtml = '<b><i>Original Message:</i></b><br/><b><i><h:outputText value="#{msgs.cdfm_from}" /></i></b> <i><h:outputText value="#{ForumTool.selectedMessage.message.author}" /><h:outputText value=" #{msgs.cdfm_openb}" /><h:outputText value="#{ForumTool.selectedMessage.message.created}" ><f:convertDateTime pattern="#{msgs.date_format}" /></h:outputText><h:outputText value="#{msgs.cdfm_closeb}" /></i><br/><b><i><h:outputText value="#{msgs.cdfm_subject}" /></i></b> <i>' + titletext + '</i><br/><br/><i>' + messagetext + '</i><br/><br/>';
               document.forms['dfCompose'].elements[rteId].value = finalhtml;
               // Get the editor instance that we want to interact with.
               var oEditor = FCKeditorAPI.GetInstance(rteId);
@@ -114,19 +129,17 @@
 	        <h4>
 	          <h:outputText value="#{msgs.cdfm_att}"/>
 	        </h4>
+		<div style="padding-left:1em">
 			<p>
 			<h:outputText value="#{msgs.cdfm_no_attachments}" rendered="#{empty ForumTool.attachments}" styleClass="instruction" />
 			</p>	
+	
 	    <%--//designNote: moving rendered attr from column to table to avoid childless table if empty--%>
 			<h:dataTable styleClass="attachPanel" id="attmsg"  value="#{ForumTool.attachments}" var="eachAttach"   rendered="#{!empty ForumTool.attachments}"
-			columnClasses="attach,bogus,specialLink itemAction,bogus,bogus">
+				columnClasses="attach,bogus,specialLink itemAction,bogus,bogus" style="width:auto">
 				<h:column>
-					<h:graphicImage url="/images/excel.gif" rendered="#{eachAttach.attachment.attachmentType == 'application/vnd.ms-excel'}" alt="" />
-					<h:graphicImage url="/images/html.gif" rendered="#{eachAttach.attachment.attachmentType == 'text/html'}" alt="" />
-					<h:graphicImage url="/images/pdf.gif" rendered="#{eachAttach.attachment.attachmentType == 'application/pdf'}"/>
-					<h:graphicImage url="/images/ppt.gif" rendered="#{eachAttach.attachment.attachmentType == 'application/vnd.ms-powerpoint'}" alt="" />
-					<h:graphicImage url="/images/text.gif" rendered="#{eachAttach.attachment.attachmentType == 'text/plain'}" alt="" />
-					<h:graphicImage url="/images/word.gif" rendered="#{eachAttach.attachment.attachmentType == 'application/msword'}" alt="" />
+					<sakai:contentTypeMap fileType="#{eachAttach.attachment.attachmentType}" mapType="image" var="imagePath" pathPrefix="/library/image/"/>
+					<h:graphicImage id="exampleFileIcon" value="#{imagePath}" />
 				</h:column>
 				  <h:column>
 					  <f:facet name="header">
@@ -157,23 +170,51 @@
 				<h:outputText value="#{eachAttach.attachment.attachmentType}"/>
 			  </h:column>
 			</h:dataTable>   
-  
 			<p style="padding:0" class="act">
 				<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_redirect}" immediate="true"
 					rendered="#{empty ForumTool.attachments}" style="font-size:95%"/>
 				<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_more_redirect}" immediate="true"
 					rendered="#{!empty ForumTool.attachments}" style="font-size:95%"/>
 			</p>
+		</div>
         		
+		<%--********************* Label *********************
+		<sakai:panel_titled>
+		<table width="80%" align="left">
+		<tr>
+		<td align="left" width="20%">
+		<h:outputText value="Label"/>
+		</td>
+		<td align="left">
+		<h:selectOneListbox size="1" id="viewlist">
+		<f:selectItem itemLabel="Normal" itemValue="none"/>
+		</h:selectOneListbox>  
+		</td>                           
+		</tr>                                
+		</table>
+		</sakai:panel_titled>
+		--%>
+		
+		
+		
+		<%--
+		<tr>
+		<td>
+		<h:outputText value="Label" />
+		</td>
+		<td>
+		<h:outputText value="#{ForumTool.selectedMessage.message.label}" />  
+		</td>
+		</tr>
+		--%>
+
+		
 			<p style="padding:0" class="act">
         <sakai:button_bar_item action="#{ForumTool.processDfReplyMsgPost}" value="#{msgs.cdfm_button_bar_post_message}" accesskey="s" styleClass="active" />
     <%--    <sakai:button_bar_item action="#{ForumTool.processDfReplyMsgSaveDraft}" value="#{msgs.cdfm_button_bar_save_draft}" /> --%>
-        <sakai:button_bar_item action="#{ForumTool.processDfReplyMsgCancel}" value="#{msgs.cdfm_button_bar_cancel}" accesskey="x" />
+		<sakai:button_bar_item action="#{ForumTool.processDfReplyThreadCancel}" value="#{msgs.cdfm_button_bar_cancel}" accesskey="x" />
 			</p>
-			<%--
-				<sakai:button_bar>
-      </sakai:button_bar>
-			--%>
+		
 <script type="text/javascript">
 setTimeout(function(){ 
   var _div = document.getElementsByTagName('div');
@@ -195,6 +236,7 @@ setTimeout(function(){
 </script>
       
     </h:form>
+	
   </sakai:view>
 </f:view> 
 

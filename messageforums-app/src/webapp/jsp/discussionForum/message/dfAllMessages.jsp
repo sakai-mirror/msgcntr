@@ -115,6 +115,7 @@
 			</h:commandLink>
 					
 					
+									
 					<h:outputText   value="#{ForumTool.selectedTopic.topic.shortDescription}" rendered="#{ForumTool.selectedTopic.topic.shortDescription} != ''}"  styleClass="shortDescription" />
 					
 					
@@ -184,7 +185,9 @@
 				</h:panelGroup>
 				
 					<h:panelGroup rendered="#{!message.deleted}" styleClass="firstChild">
-					<h:outputText styleClass="messageNew" value=" #{msgs.cdfm_newflag}" rendered="#{!message.read || message.childUnread > 0}"/>	
+
+					<h:outputText styleClass="messageNew" value=" #{msgs.cdfm_newflag}" rendered="#{!message.read}"/>	
+
 					<%-- message has been submitted and is pending approval by moderator --%>
 						<h:outputText value="#{msgs.cdfm_msg_pending_label}" styleClass="messagePending" rendered="#{message.msgPending}" />
 						<%-- message has been submitted and has bene denied  approval by moderator --%>
@@ -237,6 +240,7 @@
 					<h:outputText escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount ==0}"  value="#{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msg} - #{message.childUnread} #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
 					<h:outputText escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount ==1}"  value="#{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs} - #{message.childUnread} #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
 					<h:outputText  escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount > 1}" value=" #{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs} - #{message.childUnread} #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
+					<h:outputText  value="#{msgs.cdfm_newflagresponses}" styleClass="childrenNew childrenNewThread" rendered="#{message.depth == 0 && message.childUnread > 0}"/>							
 			</h:column>
 				<%-- author column --%>
 			<h:column>
