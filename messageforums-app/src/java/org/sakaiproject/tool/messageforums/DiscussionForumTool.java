@@ -3699,6 +3699,7 @@ public class DiscussionForumTool
     composeTitle = null;
     attachments.clear();
 
+    getSelectedTopic();
     getThreadFromMessage();
     return MESSAGE_VIEW;
   }
