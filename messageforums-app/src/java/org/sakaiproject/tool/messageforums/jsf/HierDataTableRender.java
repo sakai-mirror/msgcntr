@@ -300,7 +300,7 @@ public class HierDataTableRender extends HtmlBasicRenderer
 			//////
 			if(dmb.getDepth() > 0 && !"true".equals(noArrows))
 			{
-				//////writer.write("<div style=\"display:none\"  id=\"_id_" + new Integer(hideDivNo).toString() + "__hide_division_" + "\">");
+				//////writer.write("<div class=\"hideDiv\" style=\"display:none\"  id=\"_id_" + new Integer(hideDivNo).toString() + "__hide_division_" + "\">");
 				writer.write("<tr style=\"display:none\" id=\"_id_" + new Integer(hideDivNo).toString() + "__hide_division_" + "\">");
 			}
 			else if(dmb.getDepth() > 0)
@@ -378,8 +378,28 @@ public class HierDataTableRender extends HtmlBasicRenderer
 					if(column.getId().endsWith("_msg_subject"))
 					{
 						// rjlowe: using padding-left: 1em instead of &nbsp;
+						// gsilver: limiting indentation to 10, after that they are flat (in the display)
+					
 					    writer.writeAttribute("style","padding-left:" + dmb.getDepth() + "em;", "style");
 						
+						/*
+						int maxthreaddepth = 10;		
+						if (dmb.getDepth() > maxthreaddepth)
+					    	
+					    {
+							writer.writeAttribute("style","padding-left:" + maxthreaddepth + "em;", "style");
+					    }
+					    else{
+							writer.writeAttribute("style","padding-left:" + dmb.getDepth() + "em;", "style");
+					    }
+					    */
+						//gsilver: Savitha - here is where the thread indent gets set - need to consult ServerConfigurationService
+						// for a value, set maxthreaddepth to that value. If no value set maxthreaddepth to 20	
+
+						writer.writeAttribute("style","padding-left:" + dmb.getDepth() + "em;", "style");
+
+						// DEBUG:   writer.write(Integer.toString(dmb.getDepth()));
+
 						//String indent = "";
 						//int indentInt = dmb.getDepth() * 4;
 						//for(int i=0; i<indentInt; i++)

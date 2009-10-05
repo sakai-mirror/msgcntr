@@ -794,6 +794,27 @@ public class DiscussionForumTool
     return FORUM_DETAILS;
   }
 
+  
+  /**
+   * Action for the delete option present the main forums page
+   * @return
+   */
+  
+  public String processActionDeleteForumMainConfirm()
+  {
+
+	  LOG.debug("processForumMainConfirm()");
+
+	  String forumId = getExternalParameterByKey(FORUM_ID);
+	  DiscussionForum forum = forumManager.getForumById(new Long(forumId));
+	  selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
+
+	  selectedForum.setMarkForDeletion(true);
+	  return FORUM_SETTING;
+  }
+
+  
+  
   /**
    * Forward to delete forum confirmation screen
    * 
@@ -1006,6 +1027,7 @@ public class DiscussionForumTool
       prepareRemoveAttach.clear();
       return gotoMain();
     }
+    setPermissionMode(PERMISSION_MODE_TOPIC);
     attachments.clear();
     prepareRemoveAttach.clear();
     
@@ -1114,6 +1136,11 @@ public class DiscussionForumTool
     forum.setExtendedDescription(FormattedText.processFormattedText(forum.getExtendedDescription(), alertMsg));
     forum.setTitle(FormattedText.processFormattedText(forum.getTitle(), alertMsg));
     forum.setShortDescription(FormattedText.processFormattedText(forum.getShortDescription(), alertMsg));
+    
+    if (forum.getExtendedDescription().equals("<br/>"))
+	{
+		forum.setExtendedDescription("");
+	}
     
     saveForumSelectedAssignment(forum);
     saveForumAttach(forum);  
@@ -1406,6 +1433,11 @@ public class DiscussionForumTool
     	topic.setShortDescription(FormattedText.processFormattedText(topic.getShortDescription(), alertMsg));
     	topic.setExtendedDescription(FormattedText.processFormattedText(topic.getExtendedDescription(), alertMsg));
     	
+    	if (topic.getExtendedDescription().equals("<br/>"))
+    	{
+    		topic.setExtendedDescription("");
+    	}
+    	
         topic.setBaseForum(selectedForum.getForum());
         saveTopicSelectedAssignment(topic);
         saveTopicAttach(topic);
@@ -1427,6 +1459,39 @@ public class DiscussionForumTool
     return gotoMain();
   }
 
+   
+  /**
+   * @return
+   */
+  public String processActionDeleteTopicMainConfirm()
+  {
+	  {
+		  LOG.debug("processActionTopicSettings()");
+
+		  DiscussionTopic topic = null;
+		  if(getExternalParameterByKey(TOPIC_ID) != "" && getExternalParameterByKey(TOPIC_ID) != null){
+			  topic = (DiscussionTopic) forumManager.getTopicByIdWithAttachments(new Long(getExternalParameterByKey(TOPIC_ID)));
+		  } else if(selectedTopic != null) {
+			  topic = selectedTopic.getTopic();
+		  }
+		  if (topic == null)
+		  {
+			  return gotoMain();
+		  }
+		  setSelectedForumForCurrentTopic(topic);
+		  if(!uiPermissionsManager.isChangeSettings(topic,selectedForum.getForum()))
+		  {
+			  setErrorMessage(getResourceBundleString(INSUFFICIENT_PRIVILEGES_NEW_TOPIC));
+			  return gotoMain();
+		  }
+		  selectedTopic = new DiscussionTopicBean(topic, selectedForum.getForum(),uiPermissionsManager, forumManager);
+		
+		  selectedTopic.setMarkForDeletion(true);
+		    return TOPIC_SETTING;
+	  }
+  }
+
+  
   /**
    * @return
    */
@@ -1447,6 +1512,7 @@ public class DiscussionForumTool
     selectedTopic.setMarkForDeletion(true);
     return TOPIC_SETTING;
   }
+
 
   /**
    * @return
@@ -2887,6 +2953,9 @@ public class DiscussionForumTool
       StringBuilder alertMsg = new StringBuilder();
       aMsg.setTitle(FormattedText.processFormattedText(getComposeTitle(), alertMsg));
       aMsg.setBody(FormattedText.processFormattedText(getComposeBody(), alertMsg));
+      int wc=wordCount(aMsg.getBody());
+      
+      aMsg.setWordCount(wc);
       
       aMsg.setAuthor(getUserNameOrEid());
       
@@ -3578,8 +3647,25 @@ public class DiscussionForumTool
 	  selectedMessageCount = 0;
 	  functionClick = 0;
 	  getThreadFromMessage();
+	  
+	  this.composeBody = null;
+	  this.composeLabel = null;
+	  this.composeTitle = null;
+
+	  this.attachments.clear();
+	  
 	  return MESSAGE_VIEW;
   }
+  
+  public int wordCount(String text)
+  {
+  	  String w1=text.replaceAll("\\<.*?\\>","").replaceAll("\r\n"," ");
+	  //w1=w1.replaceAll("\r\n"," ");
+	  String[] op= w1.split(" ");
+	  int wordcount=op.length;  
+	  return wordcount;
+  }
+  
   
   public String processDfMsgRevisedPost()
   {
@@ -3634,13 +3720,14 @@ public class DiscussionForumTool
       }
     }
     String currentBody = getComposeBody();
-    String revisedInfo = getResourceBundleString(LAST_REVISE_BY);
+    String revisedInfo = "<p class=\"lastRevise textPanelFooter\">" + getResourceBundleString(LAST_REVISE_BY);
+    int wc=wordCount(currentBody);
     
     revisedInfo += getUserNameOrEid();
     
     revisedInfo  += " " + getResourceBundleString(LAST_REVISE_ON);
     Date now = new Date();
-    revisedInfo += now.toString() + " <br/> ";
+    revisedInfo += now.toString() + " </p> ";
     
 /*    if(currentBody != null && currentBody.length()>0 && currentBody.startsWith("Last Revised By "))
     {
@@ -3655,6 +3742,7 @@ public class DiscussionForumTool
     StringBuilder alertMsg = new StringBuilder();
     dMsg.setTitle(FormattedText.processFormattedText(getComposeTitle(), alertMsg));
     dMsg.setBody(FormattedText.processFormattedText(revisedInfo, alertMsg));
+    dMsg.setWordCount(wc);
     dMsg.setDraft(Boolean.FALSE);
     dMsg.setModified(new Date());
     
@@ -4319,13 +4407,16 @@ public class DiscussionForumTool
 	  Message currMessage = selectedMessage.getMessage();
 	  
 	  StringBuilder sb = new StringBuilder();
-	  sb.append("<div style=\"font-style:italic; padding-bottom: 1.0em;\">");
-	  sb.append("<div style=\"font-weight:bold;\">");
+	  sb.append("<div class=\"messageCommentWrap\">");
+	  sb.append("<div class=\"messageCommentMD\">");
 	  sb.append(getResourceBundleString(MOD_COMMENT_TEXT) + " ");
 	  sb.append(UserDirectoryService.getCurrentUser().getDisplayName());
 	  sb.append("</div>");
+	  sb.append("<div class=\"messageCommentBody\">");
 	  sb.append(moderatorComments);
 	  sb.append("</div>");
+	  sb.append("</div>");
+	  
 	  
 	  String originalText = currMessage.getBody();
 	  currMessage.setBody(sb.toString() + originalText);
