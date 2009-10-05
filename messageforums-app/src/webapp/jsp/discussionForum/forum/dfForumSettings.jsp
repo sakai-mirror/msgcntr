@@ -10,15 +10,17 @@
 
 <f:view>
 	<sakai:view toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
-
       <h:form id="revise">
-             		<script type="text/javascript" src="/library/js/jquery.js"></script>
+            <script type="text/javascript" src="/library/js/jquery.js"></script>
+
+       		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
+			<%--			--%>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
 
 		<script type="text/javascript">
 			$(document).ready(function(){
 				//fade permission block 
-				$('#permissionReadOnly').fadeTo("fast", 0.50);
+				// $('#permissionReadOnly').fadeTo("fast", 0.50);
 				// and then disable all the inputs/selects in the permission include so as not to confuse people
 				// cannot seem to be able to submit this if these inputs are disabled :-(
 				// $('#permissionReadOnly input, #permissionReadOnly select').attr('disabled', 'disabled');
@@ -184,13 +186,13 @@
 			</h:column>			 		
 		</h:dataTable>		 	
       </mf:forumHideDivision>
-      --%>
+
 		<div id="permissionReadOnlyW">
 		<div id="permissionReadOnly">	
       <%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
 		</div>	
 		</div>
-      
+      --%>      
        <div class="act">
           <h:commandButton id ="revise" rendered="#{!ForumTool.selectedForum.markForDeletion}" 
                            immediate="true"  action="#{ForumTool.processActionReviseForumSettings}" 

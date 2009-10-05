@@ -45,7 +45,6 @@
 			rendered="#{!message.read}"
 						styleClass="markAsReadIcon"
 			onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);"
-			onclick="doAjax(#{message.message.id}, #{ForumTool.selectedTopic.topic.id}, this);"	
 			onmouseover="this.src=this.src.replace(/email\.png/, 'email_open.png');"
 			onmouseout="this.src=this.src.replace(/email_open\.png/, 'email.png');" />
 	
@@ -142,5 +141,6 @@
 			</h:column>
 		</h:dataTable>
 	</h:panelGroup>
+		</h:panelGroup>
 	<%-- close the div with class of hierItemBlock --%>
 <h:outputText escape="false" value="</div>"  rendered="#{!message.deleted}"/>

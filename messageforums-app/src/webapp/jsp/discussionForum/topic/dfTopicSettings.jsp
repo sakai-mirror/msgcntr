@@ -28,6 +28,7 @@
 			});
 		</script>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
+       		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>			
 		<%--//designNote: this just feels weird - presenting somehting that sort of looks like the form used to create the topic (with an editable permissions block!) to comfirm deletion --%>
 <!--jsp/discussionForum/topic/dfTopicSettings.jsp-->
 		<sakai:tool_bar_message value="#{msgs.cdfm_delete_topic_title}" />
@@ -89,12 +90,12 @@
 					</h:panelGroup>
 				</h:panelGrid>
 			</p>
-		  --%>
+
 		  
 				<div id="permissionReadOnly">	  
 	  <%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
 				 </div> 
-	    
+		  --%>	    
 	  <%--
       <mf:forumHideDivision title="#{msgs.cdfm_access}" id="access_perm" hideByDefault="true">
 	  	<p class="shorttext">
