@@ -58,18 +58,21 @@ public class MessageForumSynopticBeanLite {
 	private static final String CHARON_PREFS = "sakai:portal:sitenav";
 	private static final String PERFORMANCE_2 = "2";
 	private String performance;
-	private String userRequestSynoptic;
-	
+	private Boolean userRequestSynoptic;
+	private Boolean disableMyWorkspace;
+	private String disableMyWorkspaceDisabledMessage;
 	
 	public List<DecoratedSynopticMsgcntrItem> getContents(){
-		if(myContents != null){
-			return myContents;
-		}
 		
 		
-		if(isMyWorkspace()){
+		
+		if(isMyWorkspace() && !isDisableMyWorkspace()){
+			if(myContents != null){
+				return myContents;
+			}
+			
 			performance = getPerformance();
-			userRequestSynoptic = getUserRequestSynoptic();
+			userRequestSynoptic = isUserRequestSynoptic();
 				
 			List<SynopticMsgcntrItem> synItems;
 			myContentsSize = -1;
@@ -183,7 +186,7 @@ public class MessageForumSynopticBeanLite {
 			
 			return myContents;
 		}else{
-			//not workspace
+			//not workspace or workspace is disabled
 			return null;
 		}
 	}
@@ -210,7 +213,7 @@ public class MessageForumSynopticBeanLite {
 	}
 	
 	public void showSynopticInfo(){
-		setUserRequestSynoptic("false");
+		setUserRequestSynoptic(Boolean.valueOf(false));
 	}
 	
 	public DecoratedSynopticMsgcntrItem getSiteHomepageContent(){
@@ -505,7 +508,7 @@ public class MessageForumSynopticBeanLite {
 	
 	public String getPerformance() {
 		if(performance == null){
-			performance = ServerConfigurationService.getString("msgcntr.synoptic.myworkspace.performance");
+			performance = ServerConfigurationService.getString(SynopticMsgcntrManager.MYWORKSPACE_PERFORMANCE);
 		}
 		return performance;
 	}
@@ -514,14 +517,14 @@ public class MessageForumSynopticBeanLite {
 		this.performance = performance;
 	}
 
-	public String getUserRequestSynoptic() {
+	public Boolean isUserRequestSynoptic() {
 		if(userRequestSynoptic == null){
-			userRequestSynoptic = ServerConfigurationService.getString("msgcntr.synoptic.myworkspace.userRequestSynoptic");
+			userRequestSynoptic = ServerConfigurationService.getBoolean(SynopticMsgcntrManager.MYWORKSPACE_USERPROMPT, false);
 		}
 		return userRequestSynoptic;
 	}
 
-	public void setUserRequestSynoptic(String userRequestSynoptic) {
+	public void setUserRequestSynoptic(Boolean userRequestSynoptic) {
 		this.userRequestSynoptic = userRequestSynoptic;
 	}
 	
@@ -887,6 +890,30 @@ public class MessageForumSynopticBeanLite {
 
 	public void setMyDisplayedSites(int myDisplayedSites) {
 		this.myDisplayedSites = myDisplayedSites;
+	}
+
+	public Boolean isDisableMyWorkspace() {
+		if(disableMyWorkspace != null){
+			return disableMyWorkspace;
+		}
+		disableMyWorkspace = ServerConfigurationService.getBoolean(SynopticMsgcntrManager.DISABLE_MYWORKSPACE, false);
+		return disableMyWorkspace;
+	}
+
+	public void setDisableMyWorkspace(Boolean disableMyWorkspace) {
+		this.disableMyWorkspace = disableMyWorkspace;
+	}
+
+	public String getDisableMyWorkspaceDisabledMessage() {
+		if(disableMyWorkspaceDisabledMessage != null){
+			return disableMyWorkspaceDisabledMessage;
+		}
+		disableMyWorkspaceDisabledMessage = ServerConfigurationService.getString(SynopticMsgcntrManager.DISABLE_MYWORKSPACE_DISABLEDMESSAGE);
+		return disableMyWorkspaceDisabledMessage;
+	}
+
+	public void setDisableMyWorkspaceDisabledMessage(String disableMyWorkspaceMessage) {
+		this.disableMyWorkspaceDisabledMessage = disableMyWorkspaceMessage;
 	}
 
 }
