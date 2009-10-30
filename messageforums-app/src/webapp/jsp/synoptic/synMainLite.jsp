@@ -27,6 +27,8 @@
 
 //this function (setupTableParsers) setting has to be in the jsp page b/c of the msgs.syn_no_messages string.
 var SynMainLite = SynMainLite || {};
+var messagesDisabled = <h:outputText value="#{mfSynopticBeanLite.disableMessages}"/>;
+var forumsDisabled = <h:outputText value="#{mfSynopticBeanLite.disableForums}"/>;
 
 SynMainLite.setupTableHeaders = function (){
 	try{
@@ -34,8 +36,12 @@ SynMainLite.setupTableHeaders = function (){
 	//make the user realize they can click the headers for sorting) to have the correct text from the msgs variable
 	$("#hideHeader")[0].innerHTML = "<h:outputText value="#{msgs.syn_hide}"/>";
 	$("#siteHeader")[0].innerHTML = '<h:outputText value="#{msgs.syn_site_heading}"/>';
-	$("#messagesHeader")[0].innerHTML = '<h:outputText value="#{msgs.syn_private_heading}"/>';
-	$("#forumsHeader")[0].innerHTML = '<h:outputText value="#{msgs.syn_discussion_heading}"/>';
+	if(!messagesDisabled){
+		$("#messagesHeader")[0].innerHTML = '<h:outputText value="#{msgs.syn_private_heading}"/>';
+	}
+	if(!forumsDisabled){
+		$("#forumsHeader")[0].innerHTML = '<h:outputText value="#{msgs.syn_discussion_heading}"/>';
+	}
 	$("#showOptions")[0].innerHTML = '<h:outputText value="#{msgs.syn_options}"/>';
 	}catch(e){
 	}
@@ -88,24 +94,53 @@ SynMainLite.setupTableParsers = function (){
 	    }); 
 	    
 	    //apply orderers to workspaceTable
-	    $(".workspaceTable").tablesorter({ 
-		    
-	        headers: {
-	    	0: { 
-	    	    sorter:'checkbox' 
-	    	},
-	    	1: { 
-	 	       sorter:'title' 
-	    	}, 
-	    	2: { 
-		        sorter:'newMessageCount' 
-		    }, 
-	        3: { 
-	            sorter:'newMessageCount' 
-	        } 
-	        } 
-	    });
-
+	    
+	    if(!messagesDisabled && !forumsDisabled){
+		    $(".workspaceTable").tablesorter({ 
+			    
+		        headers: {
+		    	0: { 
+		    	    sorter:'checkbox' 
+		    	},
+		    	1: { 
+		 	       sorter:'title' 
+		    	}, 
+		    	2: { 
+			        sorter:'newMessageCount' 
+			    }, 
+		        3: { 
+		            sorter:'newMessageCount' 
+		        } 
+		        } 
+		    });
+	    }else if(messagesDisabled && forumsDisabled){
+	    	 $(".workspaceTable").tablesorter({ 
+				    
+			        headers: {
+			    	0: { 
+			    	    sorter:'checkbox' 
+			    	},
+			    	1: { 
+			 	       sorter:'title' 
+			    	} 
+			        } 
+			    });
+	    }else{
+	    	 $(".workspaceTable").tablesorter({ 
+				    
+			        headers: {
+			    	0: { 
+			    	    sorter:'checkbox' 
+			    	},
+			    	1: { 
+			 	       sorter:'title' 
+			    	}, 
+			    	2: { 
+				        sorter:'newMessageCount' 
+				    }
+			        } 
+			    });
+	    }
 	};
 
 
@@ -244,7 +279,7 @@ function mySetMainFrameHeightViewCell(id)
 								
 		   		</h:column>
 	
-				<h:column rendered="#{mfSynopticBeanLite.performance != '2'}">
+				<h:column rendered="#{mfSynopticBeanLite.performance != '2' && !mfSynopticBeanLite.disableMessages}">
 					<f:facet name="header">
 						<%-- Consult SynMainLite.setupTableHeaders for header text  --%>
 						<f:verbatim><a href="" id="messagesHeader" onclick="return false;"></a></f:verbatim> 					
@@ -273,7 +308,7 @@ function mySetMainFrameHeightViewCell(id)
 				</h:column>
 				
 	
-				<h:column rendered="#{mfSynopticBeanLite.performance == '2'}">
+				<h:column rendered="#{mfSynopticBeanLite.performance == '2' && !mfSynopticBeanLite.disableMessages}">
 					<f:facet name="header">
 						<%-- Consult SynMainLite.setupTableHeaders for header text  --%>
 						<f:verbatim><a href="" id="messagesHeader" onclick="return false;"></a></f:verbatim> 					
@@ -288,7 +323,7 @@ function mySetMainFrameHeightViewCell(id)
 					</h:panelGroup>
 				</h:column>
 	
-				<h:column rendered="#{mfSynopticBeanLite.performance != '2'}">
+				<h:column rendered="#{mfSynopticBeanLite.performance != '2' && !mfSynopticBeanLite.disableForums}">
 					<f:facet name="header">
 						<%-- Consult SynMainLite.setupTableHeaders for header text  --%>
 						<f:verbatim><a href="" id="forumsHeader" onclick="return false;"></a></f:verbatim>					
@@ -314,7 +349,7 @@ function mySetMainFrameHeightViewCell(id)
 						
 					</h:panelGroup>
 				</h:column>
-				<h:column rendered="#{mfSynopticBeanLite.performance == '2'}">
+				<h:column rendered="#{mfSynopticBeanLite.performance == '2' && !mfSynopticBeanLite.disableForums}">
 					<f:facet name="header">
 						<%-- Consult SynMainLite.setupTableHeaders for header text  --%>
 						<f:verbatim><a href="" id="forumsHeader" onclick="return false;"></a></f:verbatim>					

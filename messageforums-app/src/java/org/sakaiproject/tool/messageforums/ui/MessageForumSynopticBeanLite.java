@@ -60,6 +60,8 @@ public class MessageForumSynopticBeanLite {
 	private String performance;
 	private Boolean userRequestSynoptic;
 	private Boolean disableMyWorkspace;
+	private Boolean disableMessages;
+	private Boolean disableForums;
 	private String disableMyWorkspaceDisabledMessage;
 	
 	public List<DecoratedSynopticMsgcntrItem> getContents(){
@@ -134,13 +136,13 @@ public class MessageForumSynopticBeanLite {
 							//this covers the case when a tool had unread messages but then the tool was 
 							//removed from the site
 							boolean isMessageForumsPageInSite = isMessageForumsPageInSite(site);
-							if(!isMessageForumsPageInSite && !isMessagesPageInSite(site) && dSynopticItem.getNewMessagesCount() != 0){
+							if(!isDisableMessages() && !isMessageForumsPageInSite && !isMessagesPageInSite(site) && dSynopticItem.getNewMessagesCount() != 0){
 								//update synoptic item since it the db is out of sync:
 								getSynopticMsgcntrManager()
 								.resetMessagesAndForumSynopticInfo(
 										synopticMsgcntrItem.getUserId(),
 										synopticMsgcntrItem.getSiteId());
-							}else if(!isMessageForumsPageInSite && !isForumsPageInSite(site) && dSynopticItem.getNewForumCount() != 0){
+							}else if(!isDisableForums() && !isMessageForumsPageInSite && !isForumsPageInSite(site) && dSynopticItem.getNewForumCount() != 0){
 								//update synoptic item since it the db is out of sync:
 								getSynopticMsgcntrManager()
 								.resetMessagesAndForumSynopticInfo(
@@ -902,6 +904,30 @@ public class MessageForumSynopticBeanLite {
 
 	public void setDisableMyWorkspace(Boolean disableMyWorkspace) {
 		this.disableMyWorkspace = disableMyWorkspace;
+	}
+
+	public boolean isDisableMessages() {
+		if(disableMessages != null){
+			return disableMessages;
+		}
+		disableMessages = ServerConfigurationService.getBoolean(SynopticMsgcntrManager.DISABLE_MESSAGES, false);
+		return disableMessages;
+	}
+
+	public void setDisableMessages(Boolean disableMessages) {
+		this.disableMessages = disableMessages;
+	}
+
+	public boolean isDisableForums() {
+		if(disableForums != null){
+			return disableForums;
+		}
+		disableForums = ServerConfigurationService.getBoolean(SynopticMsgcntrManager.DISABLE_FORUMS, false);
+		return disableForums;
+	}
+
+	public void setDisableForums(Boolean disableForums) {
+		this.disableForums = disableForums;
 	}
 
 	public String getDisableMyWorkspaceDisabledMessage() {

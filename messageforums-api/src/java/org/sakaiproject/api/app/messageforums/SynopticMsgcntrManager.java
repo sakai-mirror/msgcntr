@@ -8,6 +8,8 @@ public interface SynopticMsgcntrManager {
 	public static final long OPT_LOCK_WAIT = 1000;
 	public static final int NUM_OF_ATTEMPTS = 20;
 	public static final String DISABLE_MYWORKSPACE = "msgcntr.synoptic.myworkspace.disable";
+	public static final String DISABLE_FORUMS = "msgcntr.synoptic.disable.forums";
+	public static final String DISABLE_MESSAGES = "msgcntr.synoptic.disable.messages";
 	public static final String MYWORKSPACE_PERFORMANCE = "msgcntr.synoptic.myworkspace.performance";
 	public static final String MYWORKSPACE_USERPROMPT = "msgcntr.synoptic.myworkspace.userRequestSynoptic";
 	public static final String DISABLE_MYWORKSPACE_DISABLEDMESSAGE = "msgcntr.synoptic.myworkspace.disabledMessage";

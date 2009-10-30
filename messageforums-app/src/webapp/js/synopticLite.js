@@ -9,7 +9,7 @@ var count = 0;
 
 SynMainLite.toggleHiddenRows = function(){
 	jQuery("tr", $(".workspaceTable")).each(function(){
-		 if($(this.cells).size() == 4){
+		 if($(this.cells).size() >= 1){
 			$($(this.cells)[0]).addClass('optionsTable');
 			$($(this.cells)[0]).hide();
 			count++
@@ -40,7 +40,7 @@ SynMainLite.resetCheckboxes = function(){
 	//this function resets the checkboxes back to their orignal
 	//value
 	jQuery("tr", $(".workspaceTable")).each(function(){
-		 if($(this.cells).size() == 4){				
+		 if($(this.cells).size() >= 1){				
 			if($(this.cells)[0].childNodes.length == 2){
 				//checkbox exists, so reset to original setting
 				$(this.cells)[0].childNodes[0].checked = $(this.cells)[0].childNodes[1].checked;
@@ -56,6 +56,8 @@ SynMainLite.setupTableCss = function(){
 		 if($(this.cells).size() == 4){		
 			 $($(this.cells)[2]).addClass('rightAlignColumn');
 			 $($(this.cells)[3]).addClass('rightAlignColumn');
+		 }else if($(this.cells).size() == 3){		
+			 $($(this.cells)[2]).addClass('rightAlignColumn');
 		 }	
 	});
 
