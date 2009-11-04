@@ -76,6 +76,11 @@
       <attribute value="jar:file:/home/dhorwitz/.m2/repository/org/sakaiproject/common/sakai-privacy-api/1.0.0-beta02-SNAPSHOT/sakai-privacy-api-1.0.0-beta02-SNAPSHOT-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/sakaiproject/search/search-api/1.2-SNAPSHOT/search-api-1.2-SNAPSHOT.jar" sourcepath="M2_REPO/org/sakaiproject/search/search-api/1.2-SNAPSHOT/search-api-1.2-SNAPSHOT-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/dhorwitz/.m2/repository/org/sakaiproject/search/search-api/1.2-SNAPSHOT/search-api-1.2-SNAPSHOT-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring/2.5.6.SEC01/spring-2.5.6.SEC01.jar" sourcepath="M2_REPO/org/springframework/spring/2.5.6.SEC01/spring-2.5.6.SEC01-sources.jar"/>
   <classpathentry kind="lib" path="/usr/java/jdk1.5.0_20/lib/tools.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

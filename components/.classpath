@@ -21,7 +21,6 @@
       <attribute value="jar:file:/home/dhorwitz/.m2/repository/org/sakaiproject/kernel/sakai-kernel-util/1.1.0-beta04-SNAPSHOT/sakai-kernel-util-1.1.0-beta04-SNAPSHOT-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="src" path="/sakai-messageforums-api"/>
   <classpathentry kind="src" path="/sakai-messageforums-component-impl"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 </classpath>
