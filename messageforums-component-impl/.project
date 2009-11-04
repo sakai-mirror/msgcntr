@@ -2,12 +2,8 @@
   <name>sakai-messageforums-component-impl</name>
   <comment/>
   <projects>
-    <project>sakai-common-manager-api</project>
-    <project>sakai-common-type-api</project>
-    <project>sakai-gradebook-service-api</project>
     <project>sakai-messageforums-api</project>
     <project>sakai-messageforums-hbm</project>
-    <project>sakai-privacy-api</project>
   </projects>
   <buildSpec>
     <buildCommand>

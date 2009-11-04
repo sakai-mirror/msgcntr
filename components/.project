@@ -2,6 +2,7 @@
   <name>sakai-messageforums-components</name>
   <comment/>
   <projects>
+    <project>sakai-messageforums-api</project>
     <project>sakai-messageforums-component-impl</project>
   </projects>
   <buildSpec>
