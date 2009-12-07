@@ -12,6 +12,7 @@
     <h:form id="dfCompose">
            		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
+       		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
 			<script type="text/javascript">
 				$(document).ready(function() {
 					$('#openLinkBlock').hide();
@@ -83,44 +84,23 @@
 				     <h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStar"/>
 					<h:outputText value="#{msgs.cdfm_title}"/>
 				</h:outputLabel>
-					   <h:inputText value="#{ForumTool.composeTitle}" style="width:30em;" required="true" id="df_compose_title">
+					   <h:inputText value="#{ForumTool.composeTitle}" style="width:30em;" maxlength="250" required="true" id="df_compose_title">
 					     <f:validator validatorId="MessageTitle" />
+						 <f:validateLength minimum="1" maximum="255"/>
 					   </h:inputText>
 				   </h:panelGroup>
           </h:panelGrid>
 
 
+				<p><h:message for="df_compose_body" styleClass="messageAlert" id="bodyErrorMessages" /></p>
 	            <h:outputText value="#{msgs.cdfm_message}" />
 			<a  id="countme" href="#" style="margin-left:3em"><img src="/library/image/silk/table_add.png" /> <span id="countmetitle"><h:outputText value="#{msgs.cdfm_message_count}" /></span></a>
 			<span  id="counttotal" class="highlight"> </span>
 			<h:outputText value="#{msgs.cdfm_message_count_update}" styleClass="msg-updatecount skip"/>		
 
-	            <sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
-			<script language="javascript" type="text/javascript">
-			 function countStuff() 
-			 {
-				var textInfo
-					var textareas = document.getElementsByTagName("textarea");
-					var rteId = textareas.item(0).id;
-					var oEditor = FCKeditorAPI.GetInstance(rteId) ;
-					var oDOM = oEditor.EditorDocument ;
-					if ( document.all ) // If Internet Explorer.
-					{
-						 charCount = oDOM.body.innerText.length ;
-						 wordCount=oDOM.body.innerText.split(" ").length;
-					}
-					else // If Gecko.
-					{
-						var r = oDOM.createRange();	
-						r.selectNodeContents(oDOM.body);
-						charCount = r.toString().length;
-						wordCount = r.toString().split(" ").length;
-					}
-					msgupdatecounts = $('.msg-updatecount').text();
-					textInfo = "(" + wordCount + ")";
-					return textInfo;
-				}
-			</script>
+	            <sakai:inputRichText value="#{ForumTool.composeBody}" id="df_compose_body" rows="22" cols="120">
+					<f:validateLength maximum="65000"/>
+				</sakai:inputRichText>
 <%--********************* Attachment *********************--%>	
 	      <h4>
 	        <h:outputText value="#{msgs.cdfm_att}" />

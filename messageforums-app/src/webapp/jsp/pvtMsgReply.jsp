@@ -72,9 +72,9 @@
 			  </h:panelGroup>
 			  <h:panelGroup>
 					<h:selectOneListbox size="1" id="viewlist" value="#{PrivateMessagesTool.selectedLabel}">
-            	  <f:selectItem itemValue="Normal" itemLabel="#{msgs.pvt_priority_normal}"/>
-            	  <f:selectItem itemValue="Low" itemLabel="#{msgs.pvt_priority_low}"/>
-            	  <f:selectItem itemValue="High" itemLabel="#{msgs.pvt_priority_high}"/>
+            	  <f:selectItem itemValue="#{msgs.pvt_priority_normal}" itemLabel="#{msgs.pvt_priority_normal}"/>
+            	  <f:selectItem itemValue="#{msgs.pvt_priority_low}" itemLabel="#{msgs.pvt_priority_low}"/>
+            	  <f:selectItem itemValue="#{msgs.pvt_priority_high}" itemLabel="#{msgs.pvt_priority_high}"/>
           	  </h:selectOneListbox> 
 				</h:panelGroup>
 				
@@ -83,7 +83,9 @@
   					<h:outputLabel for="subject" ><h:outputText value="#{msgs.pvt_subject}"  /></h:outputLabel>
   			</h:panelGroup>
   			<h:panelGroup styleClass="shorttext">
-					<h:inputText value="#{PrivateMessagesTool.replyToSubject}" id="subject" size="45" />
+					<h:inputText value="#{PrivateMessagesTool.replyToSubject}" id="subject" size="45">
+						<f:validateLength minimum="1" maximum="255"/>
+					</h:inputText>
 				</h:panelGroup>
 				
 				
@@ -92,7 +94,9 @@
 			<h4><h:outputText value="#{msgs.pvt_message}" /></h4>
 	        <sakai:panel_edit>
 	          <sakai:doc_section>
-			  <sakai:rich_text_area rows="17" columns="70"  value="#{PrivateMessagesTool.replyToBody}" />	 
+			  <sakai:inputRichText rows="22" cols="120" id="df_compose_body" value="#{PrivateMessagesTool.replyToBody}">	 
+				  <f:validateLength maximum="65000"/>
+			  </sakai:inputRichText>
 	         </sakai:doc_section>    
 	        </sakai:panel_edit>
 

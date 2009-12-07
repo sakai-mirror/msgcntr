@@ -8,12 +8,13 @@
    <jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messagecenter.bundle.Messages"/>
 </jsp:useBean>
 <f:view>
+	<sakai:view title="#{msgs.cdfm_discussion_forum_settings}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
 	<script type="text/javascript" src="/library/js/jquery.js"></script>
 	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>      
 	<script type="text/javascript" src="/sakai-messageforums-tool/js/jquery.charcounter.js"> </script>
 	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/permissions_header.js"/>
 	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
-	<sakai:view title="#{msgs.cdfm_discussion_forum_settings}" toolCssHref="/sakai-messageforums-tool/css/msgcntr.css">
+
   <!-- Y:\msgcntr\messageforums-app\src\webapp\jsp\dfReviseForumSettingsAttach.jsp -->
     <h:form id="revise">
 		  <script type="text/javascript">
@@ -39,7 +40,9 @@
 					<h:outputText id="req_star"  value="#{msgs.cdfm_info_required_sign}" styleClass="reqStar"/>	
 						<h:outputText  value="#{msgs.cdfm_forum_title}" />
 					</h:outputLabel>	
-					<h:inputText size="50" id="forum_title"  value="#{ForumTool.selectedForum.forum.title}"/>
+					<h:inputText size="50" id="forum_title"  maxlength="250" value="#{ForumTool.selectedForum.forum.title}">
+						<f:validateLength minimum="1" maximum="255"/>
+					</h:inputText>
 				</h:panelGroup>	
 			</h:panelGrid>
 			<h:panelGrid columns="1"  columnClasses="longtext">
@@ -63,7 +66,9 @@
 			<%--RTEditor area - if enabled--%>
 			<h:panelGroup rendered="#{! ForumTool.disableLongDesc}">
 				<h:outputText id="outputLabel2" value="#{msgs.cdfm_fullDescription}" style="display:block;padding:.5em 0"/>
-			<sakai:rich_text_area rows="10" columns="70" value="#{ForumTool.selectedForum.forum.extendedDescription}"/>
+			<sakai:inputRichText rows="12" cols="120" id="df_compose_description" value="#{ForumTool.selectedForum.forum.extendedDescription}">
+				<f:validateLength maximum="65000"/>
+			</sakai:inputRichText>
 	      	</h:panelGroup>
 	      	
 			
@@ -154,8 +159,24 @@
   					</h:selectOneRadio>
 				</h:panelGroup>
 			</h:panelGrid>
-			</div>
-	   <%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
+ 		</div>
+
+		<div class="instruction" style="padding: 0.5em; margin-top:0.8em;"><h4>
+       			<h:outputText value="#{msgs.cdfm_forum_mark_read}"/>
+       		</h4></div>
+         	<h:panelGrid columns="2" >
+         		<h:panelGroup styleClass="shorttext">
+           			<h:outputLabel for="autoMarkThreadsRead" value="#{msgs.cdfm_auto_mark_threads_read}" styleClass="shorttext"/>
+         		</h:panelGroup>
+         		<h:panelGroup>
+           			<h:selectOneRadio layout="lineDirection" id="autoMarkThreadsRead" value="#{ForumTool.selectedForum.autoMarkThreadsRead}" styleClass="checkbox inlineForm">
+             				<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
+             				<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
+           			</h:selectOneRadio>
+         		</h:panelGroup>
+	       </h:panelGrid>
+
+ 	 	<%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
 	      
       <div class="act">
           <h:commandButton action="#{ForumTool.processActionSaveForumSettings}" value="#{msgs.cdfm_button_bar_save_setting}"

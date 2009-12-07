@@ -1,16 +1,14 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <name>sakai-messageforums-component-impl</name>
   <parent>
-    <artifactId>msgcntr</artifactId>
     <groupId>org.sakaiproject.msgcntr</groupId>
+    <artifactId>msgcntr</artifactId>
     <version>2.7.0-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>org.sakaiproject.msgcntr</groupId>
-  <artifactId>sakai-messageforums-component-impl</artifactId>
+  <artifactId>messageforums-component-impl</artifactId>
   <organization>
     <name>Sakai Project</name>
     <url>http://sakaiproject.org/</url>
@@ -18,7 +16,7 @@
   <inceptionYear>2005</inceptionYear>
   <packaging>jar</packaging>
   <properties>
-    <deploy.target/>
+    <deploy.target />
   </properties>
   <dependencies>
     <dependency>
@@ -47,11 +45,11 @@
     </dependency>
     <dependency>
       <groupId>org.sakaiproject.msgcntr</groupId>
-      <artifactId>sakai-messageforums-api</artifactId>
+      <artifactId>messageforums-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sakaiproject.msgcntr</groupId>
-      <artifactId>sakai-messageforums-hbm</artifactId>
+      <artifactId>messageforums-hbm</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sakaiproject.entitybroker</groupId>

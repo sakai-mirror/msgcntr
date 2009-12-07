@@ -42,8 +42,8 @@
     <property name="shortDescription">
       <column name="SHORT_DESCRIPTION" length="255" not-null="false" />
     </property>
-    <property name="extendedDescription" type="text">
-      <column name="EXTENDED_DESCRIPTION" not-null="false" />
+    <property name="extendedDescription" type="text" >
+      <column name="EXTENDED_DESCRIPTION" not-null="false" length="100000000"/>
     </property>
     <set name="attachmentsSet" lazy="true" cascade="all-delete-orphan"
       sort="org.sakaiproject.component.app.messageforums.dao.hibernate.util.comparator.AttachmentByCreatedDateDesc">
@@ -63,6 +63,8 @@
 	<property name="moderated">
 		<column name="MODERATED" not-null="true" />
 	</property>
+	
+	<property name="autoMarkThreadsRead" column="AUTO_MARK_THREADS_READ" not-null="true" />
 
    	<!-- 
  	<list name="attachments" lazy="true" table="MFR_ATTACHMENT_T" cascade="all">

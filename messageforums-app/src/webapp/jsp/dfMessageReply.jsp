@@ -28,6 +28,7 @@
 			</script>
 				
        		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
+       		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
         <h:outputText styleClass="alertMessage" value="#{msgs.cdfm_reply_deleted}" rendered="#{ForumTool.errorSynch}" />
 	
 
@@ -106,10 +107,13 @@
 	   			     <h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStar"/>
 					<h:outputText value="#{msgs.cdfm_reply_title}" />
 				</h:outputLabel>
-					<h:inputText value="#{ForumTool.composeTitle}" style="width: 30em;" required="true" id="df_compose_title" />
+					<h:inputText value="#{ForumTool.composeTitle}" style="width: 30em;" maxlength="250" required="true" id="df_compose_title">
+					 <f:validateLength minimum="1" maximum="255"/>
+				   </h:inputText>
  					  </h:panelGroup>
           </h:panelGrid>
           
+	  <p><h:message for="df_compose_body" styleClass="messageAlert" id="bodyErrorMessage" /></p>
 	  <div style="padding:.5em 0;white-space:nowrap">
 			<h:outputText value="#{msgs.cdfm_message}" style="padding:.5em 0"/> 
 		    <h:inputHidden id="msgHidden" value="#{ForumTool.selectedMessage.message.body}" />
@@ -123,32 +127,9 @@
 				<span  id="counttotal" class="highlight"> </span>
 				<h:outputText value="#{msgs.cdfm_message_count_update}" styleClass="msg-updatecount skip"/>		
 		   	</div>
-            <sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
-            <script language="javascript" type="text/javascript">
-			 function countStuff() 
-			 {
-				var textInfo
-            var textareas = document.getElementsByTagName("textarea");
-	        var rteId = textareas.item(0).id;
-					var oEditor = FCKeditorAPI.GetInstance(rteId) ;
-					var oDOM = oEditor.EditorDocument ;
-					if ( document.all ) // If Internet Explorer.
-					{
-						 charCount = oDOM.body.innerText.length ;
-						 wordCount=oDOM.body.innerText.split(" ").length;
-					}
-					else // If Gecko.
-					{
-						var r = oDOM.createRange();	
-						r.selectNodeContents(oDOM.body);
-						charCount = r.toString().length;
-						wordCount = r.toString().split(" ").length;
-					}
-					msgupdatecounts = $('.msg-updatecount').text();
-					textInfo = "(" + wordCount + ")"
-					return textInfo;
-				}
-			</script>
+            <sakai:inputRichText value="#{ForumTool.composeBody}" id="df_compose_body" rows="22" cols="120">
+				<f:validateLength maximum="65000"/>
+			</sakai:inputRichText>
 			<script language="javascript" type="text/javascript">
 	        
 //	        function FCKeditor_OnComplete( editorInstance )
@@ -163,22 +144,6 @@
 
 	        var messagetext = document.forms['dfCompose'].elements['dfCompose:msgHidden'].value;
 	        var titletext = document.forms['dfCompose'].elements['dfCompose:titleHidden'].value;
-	        
-            function InsertHTML() 
-            { 
-              // These lines will write to the original textarea and makes the quoting work when FCK is not present
-			var finalhtml = '<b><i>Original Message:</i></b><br/><b><i><h:outputText value="#{msgs.cdfm_from}" /></i></b> <i><h:outputText value="#{ForumTool.selectedMessage.message.author}" /><h:outputText value=" #{msgs.cdfm_openb}" /><h:outputText value="#{ForumTool.selectedMessage.message.created}" ><f:convertDateTime pattern="#{msgs.date_format}" /></h:outputText><h:outputText value="#{msgs.cdfm_closeb}" /></i><br/><b><i><h:outputText value="#{msgs.cdfm_subject}" /></i></b> <i>' + titletext + '</i><br/><br/><i>' + messagetext + '</i><br/><br/>';
-              document.forms['dfCompose'].elements[rteId].value = finalhtml;
-              // Get the editor instance that we want to interact with.
-              var oEditor = FCKeditorAPI.GetInstance(rteId);
-              // Check the active editing mode.
-              if ( oEditor.EditMode == FCK_EDITMODE_WYSIWYG )
-              {
-              // Insert the desired HTML.
-              oEditor.InsertHtml( finalhtml );
-              }
-              else alert( 'You must be on WYSIWYG mode!' );
-            }
             </script>
             
 <%--********************* Attachment *********************--%>	

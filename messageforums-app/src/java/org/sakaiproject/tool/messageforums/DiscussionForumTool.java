@@ -994,6 +994,7 @@ public class DiscussionForumTool
     {
       DiscussionForum forum = forumManager.createForum();
       forum.setModerated(areaManager.getDiscusionArea().getModerated()); // default to template setting
+      forum.setAutoMarkThreadsRead(areaManager.getDiscusionArea().getAutoMarkThreadsRead()); // default to template setting
       selectedForum = null;
       selectedForum = new DiscussionForumBean(forum, uiPermissionsManager, forumManager);
       if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
@@ -2055,6 +2056,16 @@ public class DiscussionForumTool
 	    recursiveGetThreadedMsgsFromList(msgsList, orderedList, selectedThreadHead);
 	    selectedThread.addAll(orderedList);
 	    
+            // now process the complete list of messages in the selected thread to possibly flag as read
+            // if this topic is flagged to autoMarkThreadsRead, mark each message in the thread as read
+            if (selectedTopic.getTopic().getAutoMarkThreadsRead()) {
+                for (int i = 0; i < selectedThread.size(); i++) {
+                    messageManager.markMessageReadForUser(selectedTopic.getTopic().getId(), ((DiscussionMessageBean)selectedThread.get(i)).getMessage().getId(), true);
+                    ((DiscussionMessageBean)selectedThread.get(i)).setRead(Boolean.TRUE);
+                }
+            }
+
+
 	    return THREAD_VIEW;
   }
 /**
@@ -2088,12 +2099,12 @@ public class DiscussionForumTool
 	    threadAnchorMessageId = null;
 	    String threadId = getExternalParameterByKey(MESSAGE_ID);
 	    String topicId = getExternalParameterByKey(TOPIC_ID);
-	    if ("".equals(threadId))
+	    if ("".equals(threadId) || null == threadId || "null".equals(threadId))
 	    {
 	      setErrorMessage(getResourceBundleString(MESSAGE_REFERENCE_NOT_FOUND));
 	      return gotoMain();
 	    }
-	    if ("".equals(topicId))
+	    if ("".equals(topicId) || null == topicId || "null".equals(topicId))
 	    {
 	      setErrorMessage(getResourceBundleString(TOPC_REFERENCE_NOT_FOUND));
 	      return gotoMain();
@@ -2911,6 +2922,7 @@ public class DiscussionForumTool
     }
     
     selectedTopic.setModerated(selectedForum.getModerated()); // default to parent forum's setting
+    selectedTopic.setAutoMarkThreadsRead(selectedForum.getAutoMarkThreadsRead()); // default to parent forum's setting
 
     setNewTopicBeanAssign();
     
