@@ -1,20 +1,16 @@
 <projectDescription>
-  <name>sakai-messageforums-tool</name>
+  <name>messageforums-tool</name>
   <comment/>
   <projects>
-    <project>sakai-messageforums-api</project>
-    <project>sakai-messageforums-hbm</project>
+    <project>messageforums-api</project>
+    <project>messageforums-hbm</project>
   </projects>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
     </buildCommand>
-    <buildCommand>
-      <name>edu.umd.cs.findbugs.plugin.eclipse.findbugsBuilder</name>
-    </buildCommand>
   </buildSpec>
   <natures>
     <nature>org.eclipse.jdt.core.javanature</nature>
-    <nature>edu.umd.cs.findbugs.plugin.eclipse.findbugsNature</nature>
   </natures>
 </projectDescription>
