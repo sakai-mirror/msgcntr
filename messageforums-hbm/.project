@@ -1,8 +1,8 @@
 <projectDescription>
-  <name>sakai-messageforums-hbm</name>
+  <name>messageforums-hbm</name>
   <comment/>
   <projects>
-    <project>sakai-messageforums-api</project>
+    <project>messageforums-api</project>
   </projects>
   <buildSpec>
     <buildCommand>
