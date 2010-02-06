@@ -89,6 +89,8 @@ HIDE_ITEM NUMBER(1,0),
 primary key (SYNOPTIC_ITEM_ID),
 unique (USER_ID, SITE_ID));
 
+create sequence MFR_SYNOPTIC_ITEM_S;
+
 create index MFR_SYN_STU_I on MFR_SYNOPTIC_ITEM (USER_ID, SITE_ID);
 
 create index MRF_SYN_USER on MFR_SYNOPTIC_ITEM (USER_ID);
@@ -124,3 +126,10 @@ insert into SAKAI_SITE_TOOL
 (select SYS_GUID(), PAGE_ID, SITE_ID, 'sakai.synoptic.messagecenter', 2, 'Unread Messages and Forums', '1,1' from MSGCNTR_TMP);
 
 drop table MSGCNTR_TMP;
+
+--////////////////////////////////////////////////////
+--//  MSGCNTR-25
+--//  .UIPermissionsManagerImpl - query did not return a unique result: 4 Error in catalina.out
+--////////////////////////////////////////////////////
+
+alter table MFR_AREA_T add constraint MFR_AREA_CONTEXT_UUID_UNIQUE unique (CONTEXT_ID, TYPE_UUID);
