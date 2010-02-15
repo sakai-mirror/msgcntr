@@ -28,6 +28,7 @@ import org.sakaiproject.api.app.messageforums.Message;
 
 import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.tool.cover.SessionManager;
+import org.sakaiproject.user.cover.UserDirectoryService;
 import org.sakaiproject.api.app.messageforums.MessageForumsMessageManager;
 
 
@@ -134,7 +135,11 @@ public class DiscussionMessageBean
    * @return Returns the read.
    */
   public boolean isRead()
-  {
+  {		
+	  //messages for the anon user are always read
+	  if (UserDirectoryService.getCurrentUser().equals(UserDirectoryService.getAnonymousUser()))
+		  return true;
+	  
     return read;
   }
 
