@@ -7,14 +7,15 @@
 <jsp:useBean id="msgs" class="org.sakaiproject.util.ResourceLoader" scope="session">
    <jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messagecenter.bundle.Messages"/>
 </jsp:useBean>
-<f:view>
+<f:view>	
+	<sakai:view title="#{msgs.cdfm_discussion_topic_settings}">
+	<script type="text/javascript" src="/library/js/jquery.js"></script>
+    <sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>  
 	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/permissions_header.js"/>
 	<sakai:script contextBase="/sakai-messageforums-tool" path="/js/forum.js"/>
-  <sakai:view title="#{msgs.cdfm_discussion_topic_settings}">
+	
 <!--jsp/dfReviseTopicSettingsAttach.jsp-->
-    <h:form id="revise">
-           		<script type="text/javascript" src="/library/js/jquery.js"></script>
-       		<sakai:script contextBase="/sakai-messageforums-tool" path="/js/sak-10625.js"/>
+    <h:form id="revise">           		
       <sakai:tool_bar_message value="#{msgs.cdfm_discussion_topic_settings}" />
  			<div class="instruction">
   			<h:outputText id="instruction"  value="#{msgs.cdfm_settings_instruction}"/>
