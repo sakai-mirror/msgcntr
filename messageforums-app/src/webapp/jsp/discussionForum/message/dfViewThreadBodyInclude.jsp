@@ -79,7 +79,7 @@
 		<h:panelGroup rendered="#{(ForumTool.selectedTopic.isPostToGradebook && ForumTool.gradebookExist) || ForumTool.selectedTopic.isModeratedAndHasPerm || message.revise 
 									|| message.userCanDelete}">
 			<h:outputText value=" #{msgs.cdfm_toolbar_separator} " rendered="#{ForumTool.selectedTopic.isNewResponseToResponse && message.msgApproved}" />
-			<h:outputLink value="#" onclick="toggleDisplay('#{message.message.id}_advanced_box'); toggleHide(this); return false;">
+			 <h:outputLink value="#" onclick="toggleDisplay('#{message.message.id}_advanced_box'); toggleHide(this,'#{msgs.hide_other_actions}','#{msgs.cdfm_other_actions}'); return false;">
 				<h:graphicImage value="/../../library/image/silk/cog.png" alt="#{msgs.cdfm_other_actions}" />
 				<h:outputText value="#{msgs.cdfm_other_actions}" />
 			</h:outputLink>

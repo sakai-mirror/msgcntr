@@ -121,11 +121,11 @@ function toggleDisplay(obj) {
 }
 
 function toggleHide(obj){
-	if(obj.innerHTML.match(/hide/i)){
-		obj.innerHTML = obj.innerHTML.replace('Hide ', '');
-	} else {
-		obj.innerHTML = obj.innerHTML.replace(/(<.+>)([^<>]+)/i, "$1 Hide $2");
-	}
+    if(obj.innerHTML.match(hide)){
+        obj.innerHTML = obj.innerHTML.replace(hide + ' ', '');
+    } else {
+        obj.innerHTML = obj.innerHTML.replace(/(<.+>)([^<>]+)/i, "$1 " + hide + " $2");
+    }
 }
 function getScrollDist(obj){
 	var curtop = 0;
