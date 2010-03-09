@@ -165,6 +165,7 @@ public class ForumsEmailService {
 			attachmentList = reply.getAttachments();
 			StringBuilder content = new StringBuilder();
 			String newline = "<br/>";
+			String greaterThanHtml = FormattedText.escapeHtml(">", true);
 			Site currentSite = null;
 			String sitetitle = "";
 			BaseForum baseforum = reply.getTopic().getBaseForum();
@@ -186,17 +187,17 @@ public class ForumsEmailService {
 			content.append(DiscussionForumTool
 					.getResourceBundleString("email.body.location")
 					+ " "
-					+ sitetitle + " > "
+					+ sitetitle + " " + greaterThanHtml + " "
 					+ " <a href=\""
 					+ getRedirectURL(currentSite)
 					+ "\" target=\"_blank\" >" 
 					+ DiscussionForumTool.getResourceBundleString("cdfm_discussion_forums")
 					+ "</a>"
-					+ " > "
+					+ " " + greaterThanHtml + " "
 					+ forumtitle
-					+ " > "
+					+ " " + greaterThanHtml + " "
 					+ topictitle
-					+ " > " + threadtitle);
+					+ " " + greaterThanHtml + " " + threadtitle);
 			content.append(newline);
 			content.append(newline);
 			content.append(DiscussionForumTool
@@ -238,7 +239,7 @@ public class ForumsEmailService {
 			Multipart multipart = new MimeMultipart();
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
 			StringBuilder alertMsg = new StringBuilder();			
-			messageBodyPart.setContent(FormattedText.escapeHtmlFormattedText(content.toString()), "text/html");
+			messageBodyPart.setContent(FormattedText.escapeHtmlFormattedText(content.toString()), "text/html");			
 			messageBodyPart.addHeader("Content-Transfer-Encoding", "quoted-printable");
             multipart.addBodyPart(messageBodyPart);
 			msg.setContent(multipart);
