@@ -81,7 +81,7 @@
 		<%--rjlowe: Expanded View to show the message bodies, threaded --%>
 		<mf:hierDataTable id="expandedThreadedMessages" value="#{ForumTool.messages}" var="message" 
    	 		noarrows="true" styleClass="listHier" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
-			<h:column id="_msg_subject">
+			<h:column id="_msg_subject" rendered="#{!message.deleted}">
 				<%@include file="dfViewThreadBodyInclude.jsp" %>
 			</h:column>
 		</mf:hierDataTable>

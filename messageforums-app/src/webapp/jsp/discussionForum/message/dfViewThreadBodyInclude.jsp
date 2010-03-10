@@ -5,12 +5,6 @@
 	<f:verbatim><h4 class="textPanelHeader"></f:verbatim>
 	<f:verbatim><div class="specialLink" style="width:65%;float:left;text-align:left"></f:verbatim>
 
-	<h:panelGroup styleClass="inactive" rendered="#{message.deleted}" >
-		<f:verbatim><span></f:verbatim>
-			<h:outputText value="#{msgs.cdfm_msg_deleted_label}" />
-		<f:verbatim></span></f:verbatim>
-	</h:panelGroup>
-
 	<h:panelGroup rendered="#{!message.deleted}">
 		<h:outputText value="#{msgs.cdfm_msg_pending_label} " styleClass="highlight" rendered="#{message.msgPending}" />
 		<h:outputText value="#{msgs.cdfm_msg_denied_label} " rendered="#{message.msgDenied}" />

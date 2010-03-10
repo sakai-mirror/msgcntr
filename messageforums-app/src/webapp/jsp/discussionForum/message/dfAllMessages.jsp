@@ -126,17 +126,7 @@
 					<h:outputText value="#{msgs.cdfm_thread}" />
 				</f:facet>
 				<h:outputText escape="false" value="<a id=\"#{message.message.id}\" name=\"#{message.message.id}\"></a>" />
-				
-				<%-- Display deleted message linked if any child messages (not deleted) --%>
-				<h:panelGroup styleClass="inactive" rendered="#{message.deleted && message.depth == 0 && message.childCount > 0}" >
-					<h:commandLink action="#{ForumTool.processActionDisplayThread}" immediate="true" title="#{msgs.cdfm_msg_deleted_label}" >
-						<h:outputText value="#{msgs.cdfm_msg_deleted_label}" />
 
-       	    			<f:param value="#{message.message.id}" name="messageId"/>
-   	    		    	<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId"/>
-    			    	<f:param value="#{ForumTool.selectedTopic.topic.baseForum.id}" name="forumId"/>
-					</h:commandLink>
-				</h:panelGroup>
 				
 				<h:panelGroup rendered="#{!message.deleted}">
 					<h:outputText value="#{msgs.cdfm_msg_pending_label} " styleClass="highlight" rendered="#{message.msgPending}" />
@@ -154,13 +144,6 @@
 	    	      	</h:commandLink>
 				</h:panelGroup>
 
-
-				<%-- Rendered to view current message only --%>
-				<h:panelGroup styleClass="inactive" rendered="#{message.deleted && (message.depth != 0 || message.childCount == 0)}" >
-					<f:verbatim><span></f:verbatim>
-						<h:outputText value="#{msgs.cdfm_msg_deleted_label}" />
-					<f:verbatim></span></f:verbatim>
-				</h:panelGroup>
 
 				<h:panelGroup rendered="#{!message.deleted}">	          	
 					<h:commandLink action="#{ForumTool.processActionDisplayMessage}" immediate="true" title=" #{message.message.title}"
