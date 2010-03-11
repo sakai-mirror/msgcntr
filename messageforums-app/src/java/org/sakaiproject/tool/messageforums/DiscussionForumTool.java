@@ -5291,7 +5291,10 @@ public class DiscussionForumTool
 			  }
 			  
 		  }
-		  selectedTopic.setMessages(orderedList);
+		  //aparently this could be null
+		  if (selectedTopic != null ) {
+			  selectedTopic.setMessages(orderedList);
+		  }
 	  }
   }
   
