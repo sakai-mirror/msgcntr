@@ -49,7 +49,7 @@
 		    <h:inputHidden id="msgHidden" value="#{ForumTool.selectedMessage.message.body}" />
 		    <h:inputHidden id="titleHidden" value="#{ForumTool.selectedMessage.message.title}" />
 		    <div>
-		    	<input type="button" value="Insert Original Text" onClick="InsertHTML();" />
+          <h:commandButton value="#{msgs.cdfm_button_bar_insert_text}" onclick="InsertHTML();" type="button" />
 		   	</div>
 		   	
             <sakai:rich_text_area value="#{ForumTool.composeBody}" rows="17" columns="70"/>
