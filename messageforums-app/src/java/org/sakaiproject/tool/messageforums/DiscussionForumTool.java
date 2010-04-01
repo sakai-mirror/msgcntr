@@ -6352,7 +6352,7 @@ public class DiscussionForumTool
 			while (msgIter.hasNext())
 			{
 				DiscussionMessageBean msg = (DiscussionMessageBean) msgIter.next();
-				if ((msg.isMsgApproved() || msg.getIsOwn()) && (!msg.getDeleted()))
+				if (msg.isMsgApproved() || msg.getIsOwn())
 					viewableMsgs.add(msg);
 			}
 		}
