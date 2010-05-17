@@ -265,14 +265,6 @@ public class HierDataTableRender extends HtmlBasicRenderer
 			{
 				dmb = (DiscussionMessageBean)msgBeanList.get(rowIndex+1);
 			}
-			
-			// if this row has been deleted... skip to the next one
-			if(dmb != null) {
-				if (dmb.getDeleted()) {
-					data.setRowIndex(++rowIndex);
-				}
-			}
-			
 			//remove from manager, get hasChild from msgBeanList List hasChild = null;
 			boolean hasChildBoolean = false;
 			if(dmb != null)
