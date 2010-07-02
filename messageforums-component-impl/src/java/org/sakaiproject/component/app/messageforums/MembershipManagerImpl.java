@@ -293,22 +293,26 @@ public class MembershipManagerImpl implements MembershipManager{
                 
     /** handle users */
     Set users = realm.getMembers();
+	List userIds = getRealmIdList(users);
+	List<User> userList = userDirectoryService.getUsers(userIds);
+	Map<String, User> userMMap = getuserMap(userList);
     for (Iterator userIterator = users.iterator(); userIterator.hasNext();){
       Member member = (Member) userIterator.next();      
       String userId = member.getUserId();
       Role userRole = member.getRole();            
       
       User user = null;
-      try{
+      
       	if(realm.getMember(userId) != null && realm.getMember(userId).isActive())
       	{
-      		user = userDirectoryService.getUser(userId);
+      		if (userMMap.containsKey(member.getUserId())) {
+      			user = getUserFromList(member.getUserId(), userList);
+      		}
       	}
-      } catch (UserNotDefinedException e) {
-		// TODO Auto-generated catch block
-		// e.printStackTrace();
-    	  LOG.warn(" User " + userId + " not defined");
-	}            
+      	if (user == null){
+      		//user does not exits
+      		continue;
+      	}
       
       if(user != null)
       {
@@ -340,7 +344,36 @@ public class MembershipManagerImpl implements MembershipManager{
     return Arrays.asList(membershipArray);     
   }
   
+  private User getUserFromList(String userId, List<User> userList) {
+	  User u = null;
+	  for (int i = 0; i < userList.size(); i++) {
+		  User tu = (User) userList.get(i);
+		  if (userId.equals(tu.getId()))
+			  return tu;
+	  }
+	  
+	  return u;
+  }
     
+  private List<String> getRealmIdList(Set realmUsers) {
+	  List ret = new ArrayList();
+	  Iterator it = realmUsers.iterator();
+	  while (it.hasNext()) {
+		  Member mem = (Member)it.next();
+		  ret.add(mem.getUserId());
+	  }
+	  return ret;
+  }
+  
+  private Map<String, User>  getuserMap(List userList) {
+	  Map<String, User> ret = new HashMap<String, User>();
+	  for (int i = 0; i < userList.size(); i++) {
+		  User tu = (User) userList.get(i);
+		  ret.put(tu.getId(), tu);
+	  }
+	  return ret;
+  }
+  
   /**
    * get site reference
    * @return siteId
