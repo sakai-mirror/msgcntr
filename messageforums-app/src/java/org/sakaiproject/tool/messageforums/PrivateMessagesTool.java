@@ -2857,6 +2857,8 @@ public void processChangeSelectView(ValueChangeEvent eve)
     LOG.debug("processPvtMsgFldCreate()");
     
     String createFolder=getAddFolder() ;   
+    StringBuilder alertMsg = new StringBuilder();
+    createFolder = FormattedText.processFormattedText(createFolder, alertMsg);
     if(createFolder == null || createFolder.trim().length() == 0)
     {
     	setErrorMessage(getResourceBundleString(ENTER_FOLDER_NAME));
