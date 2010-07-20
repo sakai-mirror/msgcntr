@@ -2072,15 +2072,14 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
         else{
         	Collection siteIds = new Vector();
         	siteIds.add(getContextSiteId());        	
-        	if (AuthzGroupService.getAllowedFunctions(name, siteIds)
-        			.contains(SiteService.SECURE_UPDATE_SITE)){        			        	        	
-        		level = permissionLevelManager.getDefaultOwnerPermissionLevel();
-        	}
-        	else if(type.equals(DBMembershipItem.TYPE_GROUP))
+        	
+        	if(type.equals(DBMembershipItem.TYPE_GROUP))
         	{
         	  level = permissionLevelManager.getDefaultNonePermissionLevel();
-        	}
-        	else{
+        	}else if (AuthzGroupService.getAllowedFunctions(name, siteIds)
+        			.contains(SiteService.SECURE_UPDATE_SITE)){        			        	        	
+        		level = permissionLevelManager.getDefaultOwnerPermissionLevel();
+        	}else{
         		level = permissionLevelManager.getDefaultContributorPermissionLevel();
         	}
         	
