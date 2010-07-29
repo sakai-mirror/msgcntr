@@ -130,7 +130,7 @@
             <value>Linking to a message</value>
         </property>
         <property name="location">
-            <value>/sakai_forums/avzh.html</value>
+            <value>/sakai_forums/azvh.html</value>
         </property>
     </bean>
     <bean id="mcNotification" class="org.sakaiproject.component.app.help.model.ResourceBean">
