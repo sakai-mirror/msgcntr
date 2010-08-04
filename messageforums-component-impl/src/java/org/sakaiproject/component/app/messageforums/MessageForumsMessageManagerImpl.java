@@ -766,11 +766,6 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
     
     public void markMessageReadForUser(Long topicId, Long messageId, boolean read, String userId)
     {
-    	markMessageReadForUser(topicId, messageId, read, userId, ToolManager.getCurrentPlacement().getContext(), ToolManager.getCurrentTool().getId());
-    }
-    
-    public void markMessageReadForUser(Long topicId, Long messageId, boolean read, String userId, String context, String toolId)
-    {
     	// to only add to event log if not read
     	boolean trulyUnread;
     	boolean originalReadStatus;
@@ -802,49 +797,48 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         Message message = (Message) getMessageById(messageId);
         boolean isMessageFromForums = isMessageFromForums(message);
         if (trulyUnread) {
-        	//increment the message count 	 
-            	Integer nr = message.getNumReaders(); 	 
-            	if (nr == null) 	 
-                    nr = Integer.valueOf(0); 	 
-            	nr = Integer.valueOf(nr.intValue() + 1); 	 
-            	message.setNumReaders(nr); 	 
-            	LOG.debug("set Message readers count to: " + nr); 	 
-            	//baseForum is probably null 	 
-            	if (message.getTopic().getBaseForum()==null && message.getTopic().getOpenForum() != null) 	 
-                    message.getTopic().setBaseForum((BaseForum) message.getTopic().getOpenForum()); 	 
-	 
-            	this.saveMessage(message);
+        	//increment the message count
+        	Integer nr = message.getNumReaders();
+        	if (nr == null)
+        		nr = Integer.valueOf(0);
+        	nr = Integer.valueOf(nr.intValue() + 1);
+        	message.setNumReaders(nr);
+        	LOG.debug("set Message readers count to: " + nr);
+        	//baseForum is probably null
+        	if (message.getTopic().getBaseForum()==null && message.getTopic().getOpenForum() != null)
+        		message.getTopic().setBaseForum((BaseForum) message.getTopic().getOpenForum());
+
+        	this.saveMessage(message);
+
 
         	if (isMessageFromForums)
-        		eventTrackingService.post(eventTrackingService.newEvent(DiscussionForumService.EVENT_FORUMS_READ, getEventMessage(message, toolId, userId, context), false));
+        		eventTrackingService.post(eventTrackingService.newEvent(DiscussionForumService.EVENT_FORUMS_READ, getEventMessage(message), false));
         	else
-        		eventTrackingService.post(eventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_READ, getEventMessage(message, toolId, userId, context), false));
+        		eventTrackingService.post(eventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_READ, getEventMessage(message), false));
         }
-        	
-        getHibernateTemplate().saveOrUpdate(status);
-       
-        
-        	
-        	if (isMessageFromForums){
-        		if(!originalReadStatus && read){
-        			//status is changing from Unread to Read, so decrement unread number for Synoptic Messages
-        			decrementForumSynopticToolInfo(userId, context, SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
-        		}else if(originalReadStatus && !read){
-        			//status is changing from Read to Unread, so increment unread number for Synoptic Messages
-        			incrementForumSynopticToolInfo(userId, context, SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
-        		}
-        	}else{
-        		if(!originalReadStatus && read){
-        			//status is changing from Unread to Read, so decrement unread number for Synoptic Messages
-        			decrementMessagesSynopticToolInfo(userId, context, SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
-        		}else if(originalReadStatus && !read){
-        			//status is changing from Read to Unread, so increment unread number for Synoptic Messages
-        			incrementMessagesSynopticToolInfo(userId, context, SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
-        		}
-        	}
-        
-    }
 
+        getHibernateTemplate().saveOrUpdate(status);
+
+        
+        if (isMessageFromForums){
+        	if(!originalReadStatus && read){
+        		//status is changing from Unread to Read, so decrement unread number for Synoptic Messages
+        		decrementForumSynopticToolInfo(userId, ToolManager.getCurrentPlacement().getContext(), SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
+        	}else if(originalReadStatus && !read){
+        		//status is changing from Read to Unread, so increment unread number for Synoptic Messages
+        		incrementForumSynopticToolInfo(userId, ToolManager.getCurrentPlacement().getContext(), SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
+        	}
+        }else{
+        	if(!originalReadStatus && read){
+        		//status is changing from Unread to Read, so decrement unread number for Synoptic Messages
+        		decrementMessagesSynopticToolInfo(userId, ToolManager.getCurrentPlacement().getContext(), SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
+        	}else if(originalReadStatus && !read){
+        		//status is changing from Read to Unread, so increment unread number for Synoptic Messages
+        		incrementMessagesSynopticToolInfo(userId, ToolManager.getCurrentPlacement().getContext(), SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
+        	}
+        }
+
+    }
 
     public void decrementForumSynopticToolInfo(String userId, String siteId, int numOfAttempts) {
     	try {
@@ -1342,11 +1336,8 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
     }
 
     private String getEventMessage(Object object) {
-    	return getEventMessage(object, ToolManager.getCurrentTool().getId(), getCurrentUser(), getContextId());
-    }
-    
-    private String getEventMessage(Object object, String toolId, String userId, String contextId) {
     	String eventMessagePrefix = "";
+    	final String toolId = ToolManager.getCurrentTool().getId();
     	
     		if (toolId.equals(DiscussionForumService.MESSAGE_CENTER_ID))
     			eventMessagePrefix = "/messagesAndForums/site/";
@@ -1355,9 +1346,8 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
     		else
     			eventMessagePrefix = "/forums/site/";
     	
-    	return eventMessagePrefix + contextId + "/" + object.toString() + "/" + userId;
+    	return eventMessagePrefix + getContextId() + "/" + object.toString() + "/" + getCurrentUser();
     }
-
         
     public List getAllRelatedMsgs(final Long messageId)
     {
