@@ -1046,6 +1046,12 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         
 
         getHibernateTemplate().saveOrUpdate(message);
+
+				try {
+            getSession().flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     
         if (logEvent) {
         	if (isNew) {
