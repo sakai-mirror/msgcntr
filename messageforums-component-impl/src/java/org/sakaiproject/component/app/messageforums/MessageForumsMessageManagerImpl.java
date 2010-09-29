@@ -851,7 +851,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         	if (message.getTopic().getBaseForum()==null && message.getTopic().getOpenForum() != null)
         		message.getTopic().setBaseForum((BaseForum) message.getTopic().getOpenForum());
 
-        	this.saveMessage(message);
+        	this.saveMessage(message, true, true);
 
 
         	if (isMessageFromForums)
@@ -1061,9 +1061,13 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
     }
 
     public void saveMessage(Message message, boolean logEvent) {
+			saveMessage(message, logEvent, false);
+		}
+
+    public void saveMessage(Message message, boolean logEvent, boolean ignoreLockedTopicForum) {
         boolean isNew = message.getId() == null;
         
-        if (!(message instanceof PrivateMessage)){                  
+        if (!ignoreLockedTopicForum && !(message instanceof PrivateMessage)){                  
           if (isForumOrTopicLocked(message.getTopic().getBaseForum().getId(), message.getTopic().getId())) {
               LOG.info("saveMessage executed [messageId: " + (isNew ? "new" : message.getId().toString()) + "] but forum is locked -- save aborted");
               throw new LockedException("Message could not be saved [messageId: " + (isNew ? "new" : message.getId().toString()) + "]");
@@ -1127,7 +1131,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
             	m.getTopic().setBaseForum(bf);
             	m.setThreadLastPost(message.getId());
             	m.setDateThreadlastUpdated(new Date());
-            	this.saveMessage(m, false);
+            	this.saveMessage(m, false, ignoreLockedTopicForum);
             }
             
         }
