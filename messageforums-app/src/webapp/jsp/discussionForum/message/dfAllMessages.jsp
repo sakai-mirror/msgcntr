@@ -14,6 +14,12 @@
   		<script type="text/javascript" src="/library/js/jquery.js"></script>
   		<sakai:script contextBase="/messageforums-tool" path="/js/sak-10625.js"/>
 		<sakai:script contextBase="/messageforums-tool" path="/js/forum.js"/>
+ 		<script language="JavaScript">
+ 		jQuery(document).ready(function(){
+			//add handles to list for thread operat
+			instrumentThreads('msgForum\\:messagesInHierDataTable');
+ 		});
+ 		</script>
 	<%--//
 		//plugin required below
 		<sakai:script contextBase="/messageforums-tool" path="/js/pxToEm.js"/>
@@ -265,9 +271,9 @@
 					<h:outputText value=" cu: #{message.childUnread }" />
 					<h:outputText value= " mr: #{message.read}" />
 					--%>
-					<h:outputText escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount ==0}"  value="#{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msg} - #{(message.childUnread) + (message.read ? 0 : 1)} #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
-					<h:outputText escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount ==1}"  value="#{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs} - #{(message.childUnread) + (message.read ? 0 : 1)} #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
-					<h:outputText  escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount > 1}" value=" #{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs} - #{(message.childUnread) + (message.read ? 0 : 1)} #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
+					<h:outputText escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount ==0}"  value=" #{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msg} - <em>#{(message.childUnread) + (message.read ? 0 : 1)}</em> #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
+					<h:outputText escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount ==1}"  value=" #{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs} - <em>#{(message.childUnread) + (message.read ? 0 : 1)}</em> #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
+					<h:outputText  escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount > 1}" value=" #{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs} - <em>#{(message.childUnread) + (message.read ? 0 : 1)}</em> #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
 					<h:outputText  value="#{msgs.cdfm_newflagresponses}" styleClass="childrenNew childrenNewThread" rendered="#{message.depth == 0 && ((message.childUnread) + (message.read ? 0 : 1)) > 0}"/>							
 			</h:column>
 				<%-- author column --%>
