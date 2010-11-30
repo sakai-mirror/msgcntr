@@ -1685,7 +1685,7 @@ public class DiscussionForumTool
     	topic.setShortDescription(shortDescFormatted);
     	topic.setExtendedDescription(FormattedText.processFormattedText(topic.getExtendedDescription(), alertMsg));
     	
-    	if (topic.getExtendedDescription().equals("<br/>"))
+    	if ("<br/>".equals(topic.getExtendedDescription()))
     	{
     		topic.setExtendedDescription("");
     	}
@@ -1734,7 +1734,7 @@ public class DiscussionForumTool
 		  LOG.debug("processActionTopicSettings()");
 
 		  DiscussionTopic topic = null;
-		  if(getExternalParameterByKey(TOPIC_ID) != "" && getExternalParameterByKey(TOPIC_ID) != null){
+		  if(getExternalParameterByKey(TOPIC_ID) != null && !"".equals(getExternalParameterByKey(TOPIC_ID))){
 			  topic = (DiscussionTopic) forumManager.getTopicByIdWithAttachments(Long.valueOf(getExternalParameterByKey(TOPIC_ID)));
 		  } else if(selectedTopic != null) {
 			  topic = selectedTopic.getTopic();
@@ -2590,13 +2590,11 @@ public class DiscussionForumTool
     {
       DiscussionTopic topic = (DiscussionTopic) iter.next();
 //    TODO: put this logic in database layer
-      if (topic.getDraft().equals(Boolean.FALSE)
+      if (topic != null && topic.getDraft().equals(Boolean.FALSE)
               ||isInstructor()
               ||SecurityService.isSuperUser()
               ||forumManager.isTopicOwner(topic))
       { 
-        if (topic != null)
-        {
           DiscussionTopicBean decoTopic = new DiscussionTopicBean(topic, forum,
               uiPermissionsManager, forumManager);
           if("true".equalsIgnoreCase(ServerConfigurationService.getString("mc.defaultLongDescription")))
@@ -2631,7 +2629,6 @@ public class DiscussionForumTool
           
           decoForum.addTopic(decoTopic);
         }
-      } 
     }
     return decoForum;
   }
@@ -2872,7 +2869,7 @@ public class DiscussionForumTool
     					isOwn = decoMsg.getMessage().getCreatedBy().equals(getUserId());
     				}
     				else if(getUserId()==null&&this.forumManager.getAnonRole()==true){
-    					isOwn = decoMsg.getMessage().getCreatedBy().equals(".anon");
+    					isOwn = ".anon".equals(decoMsg.getMessage().getCreatedBy());
     				}
     				decoMsg.setRevise(decoTopicGetIsReviseAny 
     						|| (decoTopicGetIsReviseOwn && isOwn));
