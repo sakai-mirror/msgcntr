@@ -16,16 +16,23 @@
 	<sakai:script contextBase="/messageforums-tool" path="/js/forum.js"/>
 	
 	<sakai:script contextBase="/messageforums-tool" path="/js/datetimepicker.js"/>             		             		
-	
+	<%
+	  	String thisId = request.getParameter("panel");
+  		if (thisId == null) 
+  		{
+    		thisId = "Main" + org.sakaiproject.tool.cover.ToolManager.getCurrentPlacement().getId();
+  		}
+	%>
+	<script type="text/javascript">
+		function resize(){
+  			mySetMainFrameHeight('<%= org.sakaiproject.util.Web.escapeJavascript(thisId)%>');
+  		}
+	</script> 
 	<script type="text/javascript">
 	function setDatesEnabled(radioButton){
-		if(radioButton.value == "true"){
-			document.getElementById("revise:openDateSpan").style.display='';
-			document.getElementById("revise:closeDateSpan").style.display='';
-		}else{
-			document.getElementById("revise:openDateSpan").style.display='none';
-			document.getElementById("revise:closeDateSpan").style.display='none';
-		}
+		$(".openDateSpan").toggle();
+		$(".closeDateSpan").toggle();
+		resize();
 	}
 
 	function openDateCal(){
@@ -178,7 +185,7 @@
                   <f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_forum_avail_date}"/>
                </h:selectOneRadio>
                </h:panelGroup>
-               <h:panelGroup id="openDateSpan" styleClass="indnt2" style="display: #{ForumTool.selectedTopic.availabilityRestricted ? '' : 'none'}">
+               <h:panelGroup id="openDateSpan" styleClass="indnt2 openDateSpan" style="display: #{ForumTool.selectedTopic.availabilityRestricted ? '' : 'none'}">
                	   <h:outputText value="#{msgs.openDate}: "/>
 	               <h:inputText id="openDate" value="#{ForumTool.selectedTopic.openDate}"/>
 	               <f:verbatim>
@@ -189,7 +196,7 @@
 	               </a>
 	               </f:verbatim>
               	</h:panelGroup>
-              	<h:panelGroup id="closeDateSpan" styleClass="indnt2" style="display: #{ForumTool.selectedTopic.availabilityRestricted ? '' : 'none'}">
+              	<h:panelGroup id="closeDateSpan" styleClass="indnt2 closeDateSpan" style="display: #{ForumTool.selectedTopic.availabilityRestricted ? '' : 'none'}">
               		<h:outputText value="#{msgs.closeDate}: "/>
 	               <h:inputText id="closeDate" value="#{ForumTool.selectedTopic.closeDate}"/>
 	               <f:verbatim>
