@@ -1094,12 +1094,6 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
 
         getHibernateTemplate().saveOrUpdate(message);
 
-				try {
-            getSession().flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    
         if (logEvent) {
         	if (isNew) {
         		if (isMessageFromForums(message))
@@ -1111,29 +1105,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         			eventTrackingService.post(eventTrackingService.newEvent(DiscussionForumService.EVENT_FORUMS_RESPONSE, getEventMessage(message), false));
         		else
         			eventTrackingService.post(eventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_RESPONSE, getEventMessage(message), false));
-        	}
-            
-        	//we don't need to do this on non log events
-        	message.setDateThreadlastUpdated(new Date());
-            if (message.getInReplyTo() != null) {
-            	message.setThreadId(message.getInReplyTo().getThreadId());
-            }
-            if (message.getInReplyTo() != null) {
-            	Message m = null;
-            	if (message.getThreadId() != null)
-            		m = this.getMessageById(message.getThreadId());
-            	else 
-            		m = message.getInReplyTo();
-            	//otherwise we get an NPE when we try to save this message
-            	Topic topic = message.getTopic();
-            	BaseForum bf  = topic.getBaseForum();
-            	m.setTopic(topic);
-            	m.getTopic().setBaseForum(bf);
-            	m.setThreadLastPost(message.getId());
-            	m.setDateThreadlastUpdated(new Date());
-            	this.saveMessage(m, false, ignoreLockedTopicForum);
-            }
-            
+	        }
         }
         
         LOG.info("message " + message.getId() + " saved successfully");
