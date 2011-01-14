@@ -4165,8 +4165,7 @@ public class DiscussionForumTool
 		DiscussionForum dfForum = selectedForum.getForum();
 
 		Message dMsg = selectedMessage.getMessage();
-
-		messageManager.markMessageReadForUser(dfTopic.getId(), dMsg.getId(), true);
+	
 
 		if(!uiPermissionsManager.isReviseAny(dfTopic, dfForum) && !(selectedMessage.getIsOwn() && uiPermissionsManager.isReviseOwn(dfTopic, dfForum)))
 		{
@@ -4245,8 +4244,15 @@ public class DiscussionForumTool
 		//    Topic currentTopic = forumManager.getTopicByIdWithMessagesAndAttachments(dMsg.getTopic().getId());
 		//    dMsg.getTopic().setBaseForum(currentTopic.getBaseForum());
 		//dMsg.getTopic().setBaseForum(selectedTopic.getTopic().getBaseForum());
+		
+		if (dMsg.getInReplyTo() != null) {
+			//grab a fresh copy of the message incase it has changes (staleobjectexception)
+			dMsg.setInReplyTo(forumManager.getMessageById(dMsg.getInReplyTo().getId()));
+		}
 
 		forumManager.saveMessage(dMsg);
+		
+		messageManager.markMessageReadForUser(dfTopic.getId(), dMsg.getId(), true);
 
 		List messageList = selectedTopic.getMessages();
 		for (int i = 0; i < messageList.size(); i++)
