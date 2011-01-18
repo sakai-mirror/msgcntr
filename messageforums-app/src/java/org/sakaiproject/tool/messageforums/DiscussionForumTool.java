@@ -7697,8 +7697,13 @@ public class DiscussionForumTool
 		LOG.info("context: " + context);
 		
 		developerHelperService = getDevelperHelperService();
-		String url = developerHelperService.getToolViewURL("sakai.forums", path, params, context);
-		LOG.info("url: " + url);
+		String url = "";
+		try{
+			url = developerHelperService.getToolViewURL("sakai.forums", path, params, context);
+			LOG.info("url: " + url);
+		}catch (Exception e) {
+			LOG.info(e);
+		}
 		return url;
 	}
 	
