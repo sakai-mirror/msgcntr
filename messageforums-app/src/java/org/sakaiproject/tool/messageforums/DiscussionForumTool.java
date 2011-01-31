@@ -67,6 +67,7 @@ import org.sakaiproject.api.app.messageforums.PermissionsMask;
 import org.sakaiproject.api.app.messageforums.SynopticMsgcntrManager;
 import org.sakaiproject.api.app.messageforums.Topic;
 import org.sakaiproject.api.app.messageforums.UserPreferencesManager;
+import org.sakaiproject.api.app.messageforums.cover.ForumScheduleNotificationCover;
 import org.sakaiproject.api.app.messageforums.cover.SynopticMsgcntrManagerCover;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager;
@@ -1389,7 +1390,16 @@ public class DiscussionForumTool
       return null;
     }
     
-    boolean isNew = forum.getId() == null;    
+    boolean isNew = forum.getId() == null;
+    boolean updateCounts = false;
+    if(!isNew){
+    	updateCounts = needToUpdateSynopticOnForumSave(forum, draft);    	
+    }   
+    //refresh synoptic counts if availability has changed:
+    HashMap<String, Integer> beforeChangeHM = null;
+    if(updateCounts){
+    	beforeChangeHM = SynopticMsgcntrManagerCover.getUserToNewMessagesForForumMap(getSiteId(), forum.getId(), null);
+    }
     
     StringBuilder alertMsg = new StringBuilder();
     forum.setExtendedDescription(FormattedText.processFormattedText(forum.getExtendedDescription(), alertMsg));
@@ -1419,26 +1429,49 @@ public class DiscussionForumTool
       String forumUuid = forum.getUuid();
       forum = null;
       forum = forumManager.getForumByUuid(forumUuid);
+    }else{    	
+    	if(beforeChangeHM != null){    		
+    		updateSynopticMessagesForForumComparingOldMessagesCount(getSiteId(), forum.getId(), null, beforeChangeHM, SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
+    	}        
     }
     
     return forum;
   }
 
+  private boolean availabilityChanged(Object newTarget, Object oldTarget){
+	  if (newTarget instanceof DiscussionForum && oldTarget instanceof DiscussionForum){
+		  DiscussionForum forum = ((DiscussionForum) newTarget);
+		  DiscussionForum oldForum = ((DiscussionForum) oldTarget);
+		  boolean newAvailable = ForumScheduleNotificationCover.makeAvailableHelper(forum.getAvailabilityRestricted(), forum.getOpenDate(), forum.getCloseDate());
+		  boolean oldAvailable = ForumScheduleNotificationCover.makeAvailableHelper(oldForum.getAvailabilityRestricted(), oldForum.getOpenDate(), oldForum.getCloseDate());
+		  return newAvailable != oldAvailable;			
+	  }else if (newTarget instanceof Topic && oldTarget instanceof Topic){
+		  DiscussionTopic topic = ((DiscussionTopic) newTarget);
+		  DiscussionTopic oldTopic = ((DiscussionTopic) oldTarget);
+		  boolean newAvailable = ForumScheduleNotificationCover.makeAvailableHelper(topic.getAvailabilityRestricted(), topic.getOpenDate(), topic.getCloseDate());
+		  boolean oldAvailable = ForumScheduleNotificationCover.makeAvailableHelper(oldTopic.getAvailabilityRestricted(), oldTopic.getOpenDate(), oldTopic.getCloseDate());
+		  return newAvailable != oldAvailable;	
+	  }
+	  return false;
+  }
+  
   private boolean needToUpdateSynopticOnForumSave(Object target, boolean isDraft){
 	  boolean update = false;
 	  
 	  boolean isModerated = false;
 	  boolean isModeratedOld = false;
 	  boolean isDraftOld = false;
+	  boolean availabilityChanged = false;
+
 	  Set oldMembershipItemSet = null;
 	  
 	  if (target instanceof DiscussionForum){
 		  DiscussionForum forum = ((DiscussionForum) target);
-		  isModerated = forum.getModerated();
 		  
 		  DiscussionForum oldForum = forumManager.getForumById(forum.getId());
-		  isModeratedOld = oldForum.getModerated();
-		  isDraftOld = oldForum.getDraft();
+		  isDraftOld = oldForum.getDraft();		  
+
+		  availabilityChanged = availabilityChanged(forum, oldForum);
 	  }
 	  else if (target instanceof Topic){
 		  DiscussionTopic topic = ((DiscussionTopic) target);
@@ -1447,15 +1480,17 @@ public class DiscussionForumTool
 		  DiscussionTopic oldTopic = forumManager.getTopicById(topic.getId());
 		  isModeratedOld = oldTopic.getModerated();
 		  isDraftOld = oldTopic.getDraft();
+		  
+		  availabilityChanged = availabilityChanged(topic, oldTopic);
 	  }
 	  
 	  
 	  if(isModerated != isModeratedOld ||
-			  isDraft != isDraftOld){
+			  isDraft != isDraftOld || availabilityChanged){
 		  update = true;
 	  }
 	  
-	  if(!update && isModerated && permissions != null){
+	  if(!update && isModerated && permissions != null && target instanceof Topic){
 		  //only need to look up permission changes for moderate postings if it is moderated
 
 		  if (target instanceof DiscussionForum){
