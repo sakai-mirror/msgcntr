@@ -89,6 +89,7 @@ import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.site.api.Group;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.cover.SiteService;
+import org.sakaiproject.thread_local.cover.ThreadLocalManager;
 import org.sakaiproject.tool.api.ToolSession;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
@@ -1324,11 +1325,7 @@ public class DiscussionForumTool
       return null;
     }
     
-    boolean isNew = forum.getId() == null;
-    HashMap<String, Integer> beforeChangeHM = null;
-    if(!isNew){
-    	beforeChangeHM = SynopticMsgcntrManagerCover.getUserToNewMessagesForForumMap(getSiteId(), forum.getId(), null);
-    }
+    boolean isNew = forum.getId() == null;    
     
     StringBuilder alertMsg = new StringBuilder();
     forum.setExtendedDescription(FormattedText.processFormattedText(forum.getExtendedDescription(), alertMsg));
@@ -1358,16 +1355,77 @@ public class DiscussionForumTool
       String forumUuid = forum.getUuid();
       forum = null;
       forum = forumManager.getForumByUuid(forumUuid);
-    }else{   
-    	//anytime a forum settings change, we should update synoptic info for forums
-    	//since permissions could have changed.
-    	if(beforeChangeHM != null)
-    		updateSynopticMessagesForForumComparingOldMessagesCount(getSiteId(), forum.getId(), null, beforeChangeHM, SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
     }
     
     return forum;
   }
 
+  private boolean needToUpdateSynopticOnForumSave(Object target, boolean isDraft){
+	  boolean update = false;
+	  
+	  boolean isModerated = false;
+	  boolean isModeratedOld = false;
+	  boolean isDraftOld = false;
+	  Set oldMembershipItemSet = null;
+	  
+	  if (target instanceof DiscussionForum){
+		  DiscussionForum forum = ((DiscussionForum) target);
+		  isModerated = forum.getModerated();
+		  
+		  DiscussionForum oldForum = forumManager.getForumById(forum.getId());
+		  isModeratedOld = oldForum.getModerated();
+		  isDraftOld = oldForum.getDraft();
+	  }
+	  else if (target instanceof Topic){
+		  DiscussionTopic topic = ((DiscussionTopic) target);
+		  isModerated = topic.getModerated();
+		  
+		  DiscussionTopic oldTopic = forumManager.getTopicById(topic.getId());
+		  isModeratedOld = oldTopic.getModerated();
+		  isDraftOld = oldTopic.getDraft();
+	  }
+	  
+	  
+	  if(isModerated != isModeratedOld ||
+			  isDraft != isDraftOld){
+		  update = true;
+	  }
+	  
+	  if(!update && isModerated && permissions != null){
+		  //only need to look up permission changes for moderate postings if it is moderated
+
+		  if (target instanceof DiscussionForum){
+			  oldMembershipItemSet = uiPermissionsManager.getForumItemsSet((DiscussionForum) target);
+		  }else  if (target instanceof DiscussionTopic){
+			  oldMembershipItemSet = uiPermissionsManager.getTopicItemsSet((DiscussionTopic) target);
+		  }
+		  
+		  if(oldMembershipItemSet != null){
+			  Iterator iter = permissions.iterator();
+		      while (iter.hasNext())
+		      {
+		        PermissionBean permBean = (PermissionBean) iter.next();
+		        Iterator iter2 = oldMembershipItemSet.iterator();
+				while(iter2.hasNext())
+				{
+					DBMembershipItem oldItem = (DBMembershipItem) iter2.next();
+					if(permBean.getItem().getId().equals(oldItem.getId())){
+						if(permBean.getModeratePostings() != oldItem.getPermissionLevel().getModeratePostings()){
+							update = true;
+							break;
+						}
+					}
+				}
+				if(update){
+					break;
+				}
+		      }
+		  }
+	  }
+		  
+	  
+	  return update;
+  }
   
   
 
@@ -1671,9 +1729,14 @@ public class DiscussionForumTool
       DiscussionTopic topic = selectedTopic.getTopic();
       if (selectedForum != null)
       {
-	boolean isNew = topic.getId() == null;
+    	boolean isNew = topic.getId() == null;
+    	boolean permissionsUpdated = false;
+	if(!isNew){
+		permissionsUpdated = needToUpdateSynopticOnForumSave(topic, draft);
+    	}
+	boolean synopticUpdate = isNew ? false : permissionsUpdated;
         HashMap<String, Integer> beforeChangeHM = null;
-        if(!isNew){
+        if(!isNew && synopticUpdate){
 		beforeChangeHM = SynopticMsgcntrManagerCover.getUserToNewMessagesForForumMap(getSiteId(), topic.getBaseForum().getId(), topic.getId());
         }
 
@@ -1713,8 +1776,13 @@ public class DiscussionForumTool
 	//anytime a forum settings change, we should update synoptic info for forums
         //since permissions could have changed.
         if(!isNew){
-        	if(beforeChangeHM != null)
-			updateSynopticMessagesForForumComparingOldMessagesCount(getSiteId(), topic.getBaseForum().getId(), topic.getId(), beforeChangeHM, SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
+        	if(beforeChangeHM != null){
+        		if(permissionsUpdated){
+        			//need to reset permissions cache to get the correct counts:
+        			ThreadLocalManager.set("message_center_permission_set", false);
+        		}
+        		updateSynopticMessagesForForumComparingOldMessagesCount(getSiteId(), topic.getBaseForum().getId(), topic.getId(), beforeChangeHM, SynopticMsgcntrManager.NUM_OF_ATTEMPTS);
+        	}
         }        
         //forumManager
         //    .saveTopicControlPermissions(topic, topicControlPermissions);
