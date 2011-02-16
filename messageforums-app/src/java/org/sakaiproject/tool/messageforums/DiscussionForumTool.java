@@ -4298,7 +4298,7 @@ public class DiscussionForumTool
 		dMsg.setModified(new Date());
 
 		dMsg.setModifiedBy(getUserNameOrEid());
-		if (!selectedTopic.isTopicModerated() || !selectedTopic.getIsModeratedAndHasPerm())
+		if (!selectedTopic.isTopicModerated() || selectedTopic.getIsModeratedAndHasPerm())
 		{
 			dMsg.setApproved(Boolean.TRUE);
 		}
