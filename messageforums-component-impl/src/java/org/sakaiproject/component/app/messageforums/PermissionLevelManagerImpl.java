@@ -220,7 +220,7 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 			  PropertyUtils.setSimpleProperty(newPermissionLevel, key, value);
 			}
 			catch (Exception e){
-				throw new Error(e);
+				throw new RuntimeException(e);
 			}
 		}										
 				
@@ -256,7 +256,7 @@ public class PermissionLevelManagerImpl extends HibernateDaoSupport implements P
 			  PropertyUtils.setSimpleProperty(newPermissionLevel, key, value);
 			}
 			catch (Exception e){
-				throw new Error(e);
+				throw new RuntimeException(e);
 			}
 		}										
 				

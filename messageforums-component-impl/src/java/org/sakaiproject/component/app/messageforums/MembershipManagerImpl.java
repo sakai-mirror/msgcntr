@@ -202,7 +202,7 @@ public class MembershipManagerImpl implements MembershipManager{
       realm = authzGroupService.getAuthzGroup(realmId);
       currentSite = siteService.getSite(toolManager.getCurrentPlacement().getContext());
       if (currentSite == null) // SAK-12988
-				throw new Error("Could not obtain Site object!");
+				throw new RuntimeException("Could not obtain Site object!");
     }
     catch (IdUnusedException e){
 		//FIXME Is this expected behavior?  If so it should be documented - LDS
@@ -250,7 +250,7 @@ public class MembershipManagerImpl implements MembershipManager{
 			throw new IllegalStateException("AuthzGroup realm == null!");
     Set users = realm.getMembers();
     if (users == null)
-			throw new Error("Could not obtain members from realm!");
+			throw new RuntimeException("Could not obtain members from realm!");
     
     /** create our HashSet of user ids */
     for (Iterator userIterator = users.iterator(); userIterator.hasNext();){
@@ -321,7 +321,7 @@ public class MembershipManagerImpl implements MembershipManager{
     List<User> userList = userDirectoryService.getUsers(userIds);
     Map<String, User> userMMap = getuserMap(userList);
     if (users == null)
-		throw new Error("Could not obtain members from realm!");
+		throw new RuntimeException("Could not obtain members from realm!");
 
     for (Iterator userIterator = users.iterator(); userIterator.hasNext();){
       Member member = (Member) userIterator.next();      
