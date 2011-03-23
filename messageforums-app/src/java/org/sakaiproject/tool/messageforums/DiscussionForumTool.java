@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.faces.application.FacesMessage;
@@ -65,6 +66,7 @@ import org.sakaiproject.api.app.messageforums.PermissionLevelManager;
 import org.sakaiproject.api.app.messageforums.PermissionsMask;
 import org.sakaiproject.api.app.messageforums.SynopticMsgcntrManager;
 import org.sakaiproject.api.app.messageforums.Topic;
+import org.sakaiproject.api.app.messageforums.UserPreferencesManager;
 import org.sakaiproject.api.app.messageforums.cover.SynopticMsgcntrManagerCover;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager;
@@ -307,7 +309,7 @@ public class DiscussionForumTool
   private PermissionLevelManager permissionLevelManager; 
   private EmailNotificationManager emailNotificationManager;
   private SynopticMsgcntrManager synopticMsgcntrManager;
-  
+  private UserPreferencesManager userPreferencesManager;
   
   private Boolean instructor = null;
   private Boolean sectionTA = null;
@@ -7062,7 +7064,9 @@ public class DiscussionForumTool
   	  return getUserId();
 	}
 	
- 	
+ 	public TimeZone getUserTimeZone() {
+ 		return userPreferencesManager.getTimeZone();
+ 	}
 
 
 	public boolean isDisableLongDesc()
@@ -7626,6 +7630,10 @@ public class DiscussionForumTool
 	public void setSynopticMsgcntrManager(
 			SynopticMsgcntrManager synopticMsgcntrManager) {
 		this.synopticMsgcntrManager = synopticMsgcntrManager;
+	}
+	
+	public void setUserPreferencesManager(UserPreferencesManager userPreferencesManager) {
+		this.userPreferencesManager = userPreferencesManager;
 	}
 }
 
