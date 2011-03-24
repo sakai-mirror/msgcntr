@@ -62,7 +62,7 @@
 		<dependency>
 			<groupId>org.sakaiproject.edu-services.gradebook</groupId>
 			<artifactId>gradebook-service-api</artifactId>
-            <version>1.0.7</version>
+            <version>${sakai.edu-services.version}</version>
             <scope>provided</scope>
 		</dependency>
 		<dependency>
