@@ -2495,5 +2495,9 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   		  
   	  return usersAllowed;
     }
+
+	public List<Attachment> getTopicAttachments(Long topicId) {
+		return forumManager.getTopicAttachments(topicId);
+	}
        
 }
