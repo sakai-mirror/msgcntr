@@ -1,4 +1,4 @@
-<%@ page import="java.util.*,javax.faces.context.*,javax.faces.application.*,javax.faces.el.*,org.sakaiproject.tool.messageforums.*,org.sakaiproject.api.app.messageforums.*,org.sakaiproject.site.cover.SiteService,org.sakaiproject.tool.cover.ToolManager;"%>
+<%@ page import="java.util.*,javax.faces.context.*,javax.faces.application.*,javax.faces.el.*,org.sakaiproject.tool.messageforums.*,org.sakaiproject.api.app.messageforums.*,org.sakaiproject.site.cover.SiteService,org.sakaiproject.tool.cover.ToolManager" %>
 <%
 	FacesContext context = FacesContext.getCurrentInstance();
 	Application app = context.getApplication();
