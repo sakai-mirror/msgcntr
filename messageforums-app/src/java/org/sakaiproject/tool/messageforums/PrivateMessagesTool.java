@@ -74,6 +74,7 @@ import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.cover.SiteService;
 import org.sakaiproject.time.cover.TimeService;
 import org.sakaiproject.tool.api.ToolSession;
+import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.tool.messageforums.ui.DecoratedAttachment;
@@ -4564,5 +4565,12 @@ private   int   getNum(char letter,   String   a)
 	
 	public void setUserPreferencesManager(UserPreferencesManager userPreferencesManager) {
 		this.userPreferencesManager = userPreferencesManager;
+	}
+	
+	public String getMobileSession()
+	{
+		Session session = SessionManager.getCurrentSession();
+		String rv = session.getAttribute("is_wireless_device") != null && ((Boolean) session.getAttribute("is_wireless_device")).booleanValue()?"true":"false"; 
+		return rv;
 	}
 }
