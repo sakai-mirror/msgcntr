@@ -46,7 +46,22 @@
 
 <!--jsp/dfReviseTopicSettingsAttach.jsp-->
     <h:form id="revise">
-      <sakai:tool_bar_message value="#{msgs.cdfm_discussion_topic_settings}" />
+			<h3 class="specialLink">
+	      <h:commandLink action="#{ForumTool.processActionHome}" value="#{msgs.cdfm_message_forums}" title=" #{msgs.cdfm_message_forums}"
+	      		rendered="#{ForumTool.messagesandForums}" />
+	      <h:commandLink action="#{ForumTool.processActionHome}" value="#{msgs.cdfm_discussion_forums}" title=" #{msgs.cdfm_discussion_forums}"
+	      		rendered="#{ForumTool.forumsTool}" />
+  			  <f:verbatim><h:outputText value=" " /><h:outputText value=" / " /><h:outputText value=" " /></f:verbatim>
+			  <h:commandLink action="#{ForumTool.processActionDisplayForum}" value="#{ForumTool.selectedForum.forum.title}" title=" #{ForumTool.selectedForum.forum.title}" rendered="#{ForumTool.showForumLinksInNav}">
+				  <f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
+			  </h:commandLink>
+			  <h:outputText value="#{ForumTool.selectedForum.forum.title}" rendered="#{!ForumTool.showForumLinksInNav}"/>
+			  <f:verbatim><h:outputText value=" " /><h:outputText value=" / " /><h:outputText value=" " /></f:verbatim>
+			  <h:outputText value="#{ForumTool.selectedTopic.topic.title}" />
+				<h:outputText value="#{msgs.cdfm_discussion_topic_settings}" />
+
+			</h3>
+
  			<div class="instruction">
   			<h:outputText id="instruction"  value="#{msgs.cdfm_settings_instruction}"/>
 			 	<h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStarInline" />
