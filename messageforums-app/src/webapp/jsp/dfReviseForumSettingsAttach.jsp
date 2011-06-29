@@ -48,6 +48,10 @@
     <h:form id="revise">
 		  <script type="text/javascript">
             $(document).ready(function(){
+				$('.displayMore').click(function(e){
+						e.preventDefault();
+						$('.displayMorePanel').fadeIn('slow')
+				})
 				var charRemFormat = $('.charRemFormat').text();
 				$(".forum_shortDescriptionClass").charCounter(255, {
 					container: ".charsRemaining",
@@ -276,7 +280,29 @@
 	       </h:panelGrid>
 
  	 	<%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
-	      
+
+				
+
+	      <%--designNote: gradebook assignment - need to finesse this - make aware that functionality exists, but flag that there are no gb assignmetns to select --%>
+				<%--designNote:  How is this a "permission" item? --%>  
+				<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'forum'}" style="margin-top:.5em;clear:both">
+			    <h:panelGroup styleClass="shorttext">
+						<h:outputLabel for="forum_assignments" value="#{msgs.perm_choose_assignment}"></h:outputLabel>  
+			      </h:panelGroup>
+				  <h:panelGroup  styleClass="itemAction actionItem">
+						<h:selectOneMenu id="forum_assignments" value="#{ForumTool.selectedForum.gradeAssign}" disabled="#{not ForumTool.editMode}">
+			   	    <f:selectItems value="#{ForumTool.assignments}" />
+			      </h:selectOneMenu>
+						<h:outputText value=" #{msgs.perm_choose_instruction_forum} "/>
+						<h:outputLink value="#" style="text-decoration:none"><h:outputText styleClass="displayMore" value="#{msgs.perm_choose_instruction_more_link}"/></h:outputLink>
+			    </h:panelGroup>
+						<h:panelGroup>
+			    </h:panelGroup>
+					<h:panelGroup styleClass="itemAction actionItem">
+
+						<h:outputText styleClass="displayMorePanel" style="display:none" value="#{msgs.perm_choose_instruction_forum_more}"/>
+			    </h:panelGroup>
+			  </h:panelGrid>
       <div class="act">
           <h:commandButton action="#{ForumTool.processActionSaveForumSettings}" value="#{msgs.cdfm_button_bar_save_setting}"
           								 rendered="#{!ForumTool.selectedForum.markForDeletion}" accesskey="s"> 

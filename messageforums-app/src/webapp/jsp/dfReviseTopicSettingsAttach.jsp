@@ -257,6 +257,32 @@
       </h:panelGrid>
 
       <%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
+
+
+			<p class="instruction"><h:outputText value="#{msgs.perm_choose_instruction_topic}"/></p>
+			
+
+      <%--designNote: gradebook assignment - need to finesse this - make aware that functionality exists, but flag that there are no gb assignmetns to select --%>
+			<%--designNote:  How is this a "permission" item? --%>  
+			<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'topic' && !ForumTool.selectedForum.markForDeletion}" style="margin-top:.5em;clear:both">
+		    <h:panelGroup>  	
+					<h:outputLabel for="topic_assignments"  value="#{msgs.perm_choose_assignment}"  ></h:outputLabel>
+		  	</h:panelGroup>		
+		  	<h:panelGroup styleClass="itemAction actionItem">
+					<h:selectOneMenu value="#{ForumTool.selectedTopic.gradeAssign}" id="topic_assignments" disabled="#{not ForumTool.editMode}">
+		     	    <f:selectItems value="#{ForumTool.assignments}" />
+		  	    </h:selectOneMenu>
+							<h:outputText value=" #{msgs.perm_choose_instruction_topic} "/>
+							<h:outputLink value="#" style="text-decoration:none"><h:outputText styleClass="displayMore" value="#{msgs.perm_choose_instruction_more_link}"/></h:outputLink>
+				    </h:panelGroup>
+							<h:panelGroup>
+				    </h:panelGroup>
+							<h:panelGroup styleClass="itemAction actionItem">
+
+							<h:outputText styleClass="displayMorePanel" style="display:none" value="#{msgs.perm_choose_instruction_topic_more}"/>
+				    </h:panelGroup>
+		  </h:panelGrid>
+
 	  <%--
       <mf:forumHideDivision title="#{msgs.cdfm_access}" id="access_perm" hideByDefault="true">
 	  	<p class="shorttext">
@@ -369,6 +395,11 @@
 	 </h:form>
 			  <script type="text/javascript">
             $(document).ready(function(){
+							$('.displayMore').click(function(e){
+									e.preventDefault();
+									$('.displayMorePanel').fadeIn('slow')
+							})
+		
 				var charRemFormat = $('.charRemFormat').text();
 				$(".forum_shortDescriptionClass").charCounter(255, {
 					container: ".charsRemaining",

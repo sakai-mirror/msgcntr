@@ -120,27 +120,5 @@
 		--%>
     </h:column>
   </h:dataTable>
-  	<%--designNote: gradebook assignment - need to finesse this - make aware that functionality exists, but flag that there are no gb assignmetns to select --%>
-	<%--designNote:  How is this a "permission" item? --%>  
-	<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'forum'}" style="margin-top:.5em;clear:both">
-    <h:panelGroup styleClass="shorttext">
-			<h:outputLabel for="forum_assignments" value="#{msgs.perm_choose_assignment}"></h:outputLabel>  
-      </h:panelGroup>
-	  <h:panelGroup>
-			<h:selectOneMenu id="forum_assignments" value="#{ForumTool.selectedForum.gradeAssign}" disabled="#{not ForumTool.editMode}">
-   	    <f:selectItems value="#{ForumTool.assignments}" />
-      </h:selectOneMenu>
-    </h:panelGroup>
-  </h:panelGrid>
-	<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'topic' && !ForumTool.selectedForum.markForDeletion}" style="margin-top:.5em;clear:both">
-    <h:panelGroup>  	
-			<h:outputLabel for="topic_assignments"  value="#{msgs.perm_choose_assignment}"  ></h:outputLabel>
-  	</h:panelGroup>		
-  	<h:panelGroup>
-			<h:selectOneMenu value="#{ForumTool.selectedTopic.gradeAssign}" id="topic_assignments" disabled="#{not ForumTool.editMode}">
-     	    <f:selectItems value="#{ForumTool.assignments}" />
-  	    </h:selectOneMenu>
-  	  </h:panelGroup>
-  </h:panelGrid>
   <sakai:script contextBase="/messageforums-tool" path="/js/permissions_footer.js"/>	 	
 </mf:forumHideDivision>
