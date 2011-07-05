@@ -80,7 +80,9 @@
 				</h:inputText>
 			</h:panelGroup>	
 			</h:panelGrid>
-			<h:panelGrid columns="1"  columnClasses="longtext">
+			<%-- //designNote: rendered attr below should resolve to false only if there is no prior short description
+			 		and if there is server property (TBD) saying not to use it  - below just checking for pre-existing short description--%>
+			<h:panelGrid columns="1"  columnClasses="longtext" rendered="#{! empty ForumTool.selectedTopic.topic.shortDescription }">
 				<h:panelGroup>
 					<h:outputLabel id="outputLabel1" for="topic_shortDescription"  value="#{msgs.cdfm_shortDescription}" />
 

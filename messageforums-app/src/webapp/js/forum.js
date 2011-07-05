@@ -1,275 +1,242 @@
 var panelId;
-function setPanelId(thisid)
-{
-  panelId = thisid;
+function setPanelId(thisid){
+    panelId = thisid;
 }
 
 
-function showHideDivBlock(hideDivisionNo, context)
-{
-  var tmpdiv = hideDivisionNo + "__hide_division_";
-  var tmpimg = hideDivisionNo + "__img_hide_division_";
-  var divisionNo = getTheElement(tmpdiv);
-  var imgNo = getTheElement(tmpimg);
-  if(divisionNo)
- 
-  {
-    if(divisionNo.style.display =="block")
-    {
-      divisionNo.style.display="none";
-      if (imgNo)
-      {
-        imgNo.src = context + "/images/right_arrow.gif";
-       }
+function showHideDivBlock(hideDivisionNo, context){
+    var tmpdiv = hideDivisionNo + "__hide_division_";
+    var tmpimg = hideDivisionNo + "__img_hide_division_";
+    var divisionNo = getTheElement(tmpdiv);
+    var imgNo = getTheElement(tmpimg);
+    if (divisionNo) {
+        if (divisionNo.style.display == "block") {
+            divisionNo.style.display = "none";
+            if (imgNo) {
+                imgNo.src = context + "/images/right_arrow.gif";
+            }
+        }
+        else {
+            divisionNo.style.display = "block";
+            if (imgNo) {
+                imgNo.src = context + "/images/down_arrow.gif";
+            }
+        }
+        if (panelId != null) {
+            resizeFrame('grow');
+        }
     }
-    else
-    {
-      divisionNo.style.display="block";
-      if(imgNo)
-      {
-        imgNo.src = context + "/images/down_arrow.gif";
-      }
-    }
-    if(panelId != null)
-    {
-      resizeFrame('grow');
-    }
-  }
 }
 
 
 //this function needs jquery 1.1.2 or later - it resizes the parent iframe without bringing the scroll to the top
-	function resizeFrame(updown)
-	{
-		if (top.location != self.location) 	 {
-			var frame = parent.document.getElementById(window.name);
-		}
-			if( frame )
-		{
-			if(updown=='shrink')
-			{
-				var clientH = document.body.clientHeight - 30;
-			}
-			else
-			{
-				var clientH = document.body.clientHeight + 90;
-			}
-			$( frame ).height( clientH );
-		}
-		else
-		{
-			throw( "resizeFrame did not get the frame (using name=" + window.name + ")" );
-		}
-	}
+function resizeFrame(updown){
+    if (top.location != self.location) {
+        var frame = parent.document.getElementById(window.name);
+    }
+    if (frame) {
+        if (updown == 'shrink') {
+            var clientH = document.body.clientHeight - 30;
+        }
+        else {
+            var clientH = document.body.clientHeight + 90;
+        }
+        $(frame).height(clientH);
+    }
+    else {
+        throw ("resizeFrame did not get the frame (using name=" + window.name + ")");
+    }
+}
 
 
 /*
-
-function showHideDivBlock(hideDivisionNo, context){
-
-  var tmpdiv = hideDivisionNo + "__hide_division_";
-  var tmpimg = hideDivisionNo + "__img_hide_division_";
-  var divisionNo = getTheElement(tmpdiv);
-  var imgNo = getTheElement(tmpimg);
-
-
-	if (divisionNo.style.display == "block") {
-		imgNo.src = context + "/images/right_arrow.gif";
-	}
-	else {
-		imgNo.src = context + "/images/down_arrow.gif";
-	}
+ function showHideDivBlock(hideDivisionNo, context){
+ var tmpdiv = hideDivisionNo + "__hide_division_";
+ var tmpimg = hideDivisionNo + "__img_hide_division_";
+ var divisionNo = getTheElement(tmpdiv);
+ var imgNo = getTheElement(tmpimg);
+ if (divisionNo.style.display == "block") {
+ imgNo.src = context + "/images/right_arrow.gif";
+ }
+ else {
+ imgNo.src = context + "/images/down_arrow.gif";
+ }
+ }
+ */
+function showHideDiv(hideDivisionNo, context){
+    var tmpdiv = hideDivisionNo + "__hide_division_";
+    var tmpimg = hideDivisionNo + "__img_hide_division_";
+    var divisionNo = getTheElement(tmpdiv);
+    var imgNo = getTheElement(tmpimg);
+    
+    if (divisionNo) {
+        if (divisionNo.style.display == "block" || divisionNo.style.display == "table-row") {
+            divisionNo.style.display = "none";
+            if (imgNo) {
+                imgNo.src = context + "/images/collapse.gif";
+            }
+        }
+        else {
+            if (navigator.product == "Gecko") {
+                divisionNo.style.display = "table-row";
+            }
+            else {
+                divisionNo.style.display = "block";
+            }
+            if (imgNo) {
+                imgNo.src = context + "/images/expand.gif";
+            }
+        }
+    }
 }
 
-*/
-function showHideDiv(hideDivisionNo, context)
-{
-  var tmpdiv = hideDivisionNo + "__hide_division_";
-  var tmpimg = hideDivisionNo + "__img_hide_division_";
-  var divisionNo = getTheElement(tmpdiv);
-  var imgNo = getTheElement(tmpimg);
+function getTheElement(thisid){
 
-  if(divisionNo)
-  {
-    if(divisionNo.style.display =="block" || divisionNo.style.display =="table-row")
-    {
-      divisionNo.style.display="none";
-      if (imgNo)
-      {
-        imgNo.src = context + "/images/collapse.gif";
-      }
+    var thiselm = null;
+    
+    if (document.getElementById) {
+        thiselm = document.getElementById(thisid);
     }
-    else
-    {
-      if(navigator.product == "Gecko")
-      {
-        divisionNo.style.display="table-row";
-      }
-      else
-      {
-        divisionNo.style.display="block";
-      }
-      if(imgNo)
-      {
-        imgNo.src = context + "/images/expand.gif";
-      }
+    else 
+        if (document.all) {
+            thiselm = document.all[thisid];
+        }
+        else 
+            if (document.layers) {
+                thiselm = document.layers[thisid];
+            }
+    
+    if (thiselm) {
+        if (thiselm == null) {
+            return;
+        }
+        else {
+            return thiselm;
+        }
     }
-  }
 }
 
-function getTheElement(thisid)
-{
-
-  var thiselm = null;
-
-  if (document.getElementById)
-  {
-    thiselm = document.getElementById(thisid);
-  }
-  else if (document.all)
-  {
-    thiselm = document.all[thisid];
-  }
-  else if (document.layers)
-  {
-    thiselm = document.layers[thisid];
-  }
-
-  if(thiselm)   
-  {
-    if(thiselm == null)
-    {
-      return;
-    }
-    else
-    {
-      return thiselm;
-    }
-  }
-}
-
-function check(field)
- {
-    for (i = 0; i < field.length; i++) 
-    {
+function check(field){
+    for (i = 0; i < field.length; i++) {
         field[i].checked = true;
     }
- }
-function unCheck(field)
-{
-    for (i = 0; i < field.length; i++) 
-    {
-        field[i].checked = false; 
+}
+
+function unCheck(field){
+    for (i = 0; i < field.length; i++) {
+        field[i].checked = false;
     }
 }
 
-function toggleDisplay(obj) {
-	resize();
-	$("#" + obj).slideToggle("normal", resize);
-	return;    
+function toggleDisplay(obj){
+    resize();
+    $("#" + obj).slideToggle("normal", resize);
+    return;
 }
 
 
-jQuery.fn.fadeToggle = function(speed, easing, callback) {
-   return this.animate({opacity: 'toggle'}, speed, easing, callback);
-
-}; 
-function toggleDisplayInline(obj) {
-//	resize();
-//		$("#" + obj).slideToggle("normal", resize);
-		$("#" + obj).fadeToggle();
-
-	return;
+jQuery.fn.fadeToggle = function(speed, easing, callback){
+    return this.animate({
+        opacity: 'toggle'
+    }, speed, easing, callback);
+    
+};
+function toggleDisplayInline(obj){
+    //	resize();
+    //		$("#" + obj).slideToggle("normal", resize);
+    $("#" + obj).fadeToggle();
+    
+    return;
 }
 
 function toggleHide(obj){
-	if(obj.innerHTML.match(/hide/i)){
-		obj.innerHTML = obj.innerHTML.replace('Hide ', '');
-	} else {
-		obj.innerHTML = obj.innerHTML.replace(/(<.+>)([^<>]+)/i, "$1 Hide $2");
-	}
+    if (obj.innerHTML.match(/hide/i)) {
+        obj.innerHTML = obj.innerHTML.replace('Hide ', '');
+    }
+    else {
+        obj.innerHTML = obj.innerHTML.replace(/(<.+>)([^<>]+)/i, "$1 Hide $2");
+    }
 }
 
 function getScrollDist(obj){
-	var curtop = 0;
-	if (obj.offsetParent) {
-		curtop = obj.offsetTop
-		while (obj = obj.offsetParent) {
-			curtop += obj.offsetTop
-		}
-	}
-	return curtop;
+    var curtop = 0;
+    if (obj.offsetParent) {
+        curtop = obj.offsetTop
+        while (obj = obj.offsetParent) {
+            curtop += obj.offsetTop
+        }
+    }
+    return curtop;
 }
-function selectDeselectCheckboxes(mainCheckboxId, myForm) {   
-	var el = getTheElement(mainCheckboxId);
-	var isChecked = el.checked;           
-	for ( i = 0; i < myForm.elements.length; i++ ) {
-		if (myForm.elements[i].type == 'checkbox' ) {
-			myForm.elements[i].checked  = isChecked;                                               
-		}
-	}
+
+function selectDeselectCheckboxes(mainCheckboxId, myForm){
+    var el = getTheElement(mainCheckboxId);
+    var isChecked = el.checked;
+    for (i = 0; i < myForm.elements.length; i++) {
+        if (myForm.elements[i].type == 'checkbox') {
+            myForm.elements[i].checked = isChecked;
+        }
+    }
 }
-function resetMainCheckbox(checkboxId) {
-  mainCheckboxEl = getTheElement(checkboxId);
-  if (mainCheckboxEl.checked = true) {
-  	mainCheckboxEl.checked = false;
-  }                                                  
+
+function resetMainCheckbox(checkboxId){
+    mainCheckboxEl = getTheElement(checkboxId);
+    if (mainCheckboxEl.checked = true) {
+        mainCheckboxEl.checked = false;
+    }
 }
+
 // if the containing frame is small, then offsetHeight is pretty good for all but ie/xp.
 // ie/xp reports clientHeight == offsetHeight, but has a good scrollHeight
-function mySetMainFrameHeight(id)
-{
-	// run the script only if this window's name matches the id parameter
-	// this tells us that the iframe in parent by the name of 'id' is the one who spawned us
-	if (typeof window.name != "undefined" && id != window.name) return;
-
-	var frame = parent.document.getElementById(id);
-	if (frame)
-	{
-
-		var objToResize = (frame.style) ? frame.style : frame;
-
-		var height; 
-		
-		var scrollH = document.body.scrollHeight;
-		var offsetH = document.body.offsetHeight;
-		var clientH = document.body.clientHeight;
-		var innerDocScrollH = null;
-
-		if (typeof(frame.contentDocument) != 'undefined' || typeof(frame.contentWindow) != 'undefined')
-		{
-			// very special way to get the height from IE on Windows!
-			// note that the above special way of testing for undefined variables is necessary for older browsers
-			// (IE 5.5 Mac) to not choke on the undefined variables.
- 			var innerDoc = (frame.contentDocument) ? frame.contentDocument : frame.contentWindow.document;
-			innerDocScrollH = (innerDoc != null) ? innerDoc.body.scrollHeight : null;
-		}
-
-		if (document.all && innerDocScrollH != null)
-		{
-			// IE on Windows only
-			height = innerDocScrollH;
-		}
-		else
-		{
-			// every other browser!
-			height = offsetH;
-		}
-
-		// here we fudge to get a little bigger
-		//gsilver: changing this from 50 to 10, and adding extra bottom padding to the portletBody		
-		var newHeight = height + 150;
-		//contributed patch from hedrick@rutgers.edu (for very long documents)
-		if (newHeight > 32760)
-		newHeight = 32760;
-
-		// no need to be smaller than...
-		//if (height < 200) height = 200;
-		objToResize.height=newHeight + "px";
-	
-		var s = " scrollH: " + scrollH + " offsetH: " + offsetH + " clientH: " + clientH + " innerDocScrollH: " + innerDocScrollH + " Read height: " + height + " Set height to: " + newHeight;
-
-	}
+function mySetMainFrameHeight(id){
+    // run the script only if this window's name matches the id parameter
+    // this tells us that the iframe in parent by the name of 'id' is the one who spawned us
+    if (typeof window.name != "undefined" && id != window.name) 
+        return;
+    
+    var frame = parent.document.getElementById(id);
+    if (frame) {
+    
+        var objToResize = (frame.style) ? frame.style : frame;
+        
+        var height;
+        
+        var scrollH = document.body.scrollHeight;
+        var offsetH = document.body.offsetHeight;
+        var clientH = document.body.clientHeight;
+        var innerDocScrollH = null;
+        
+        if (typeof(frame.contentDocument) != 'undefined' || typeof(frame.contentWindow) != 'undefined') {
+            // very special way to get the height from IE on Windows!
+            // note that the above special way of testing for undefined variables is necessary for older browsers
+            // (IE 5.5 Mac) to not choke on the undefined variables.
+            var innerDoc = (frame.contentDocument) ? frame.contentDocument : frame.contentWindow.document;
+            innerDocScrollH = (innerDoc != null) ? innerDoc.body.scrollHeight : null;
+        }
+        
+        if (document.all && innerDocScrollH != null) {
+            // IE on Windows only
+            height = innerDocScrollH;
+        }
+        else {
+            // every other browser!
+            height = offsetH;
+        }
+        
+        // here we fudge to get a little bigger
+        //gsilver: changing this from 50 to 10, and adding extra bottom padding to the portletBody		
+        var newHeight = height + 150;
+        //contributed patch from hedrick@rutgers.edu (for very long documents)
+        if (newHeight > 32760) 
+            newHeight = 32760;
+        
+        // no need to be smaller than...
+        //if (height < 200) height = 200;
+        objToResize.height = newHeight + "px";
+        
+        var s = " scrollH: " + scrollH + " offsetH: " + offsetH + " clientH: " + clientH + " innerDocScrollH: " + innerDocScrollH + " Read height: " + height + " Set height to: " + newHeight;
+        
+    }
 }
 
 
@@ -298,9 +265,9 @@ var instrumentThreads = function(target){
 }
 
 function setupMessageNav(messageType){
-	$('.messagesThreaded tr').each(function(rowIndex){
-		$(this).attr('rowCount',rowIndex)
-		});
+    $('.messagesThreaded tr').each(function(rowIndex){
+        $(this).attr('rowCount', rowIndex)
+    });
     if ($("." + messageType).size() >= 1) {
         if (messageType == "messageNew") {
             tofirst = $("#firstNewItemTitleHolder").text();
@@ -312,13 +279,13 @@ function setupMessageNav(messageType){
             tonext = $("#nextPendingItemTitleHolder").text();
             last = $("#lastPendingItemTitleHolder").text();
         }
-		//go to first new or pending message
+        //go to first new or pending message
         $('#messNavHolder').append("<span class='jumpToNew specialLink'><a href='#" + messageType + "newMess0'>" + tofirst + "</a></span>");
         //instrument link targets (clicking on "New" goes to next one, same with "Pending")
-		$("." + messageType).each(function(intIndex){
+        $("." + messageType).each(function(intIndex){
             var parentRow = $(this).parents('tr');
-			var parentTable = $(this).parents('table');
-			var totalTableRows =$(parentTable).find('tr').size()
+            var parentTable = $(this).parents('table');
+            var totalTableRows = $(parentTable).find('tr').size()
             $(parentRow).addClass(messageType + 'Next');
             $(this).after("<a class=\"messageNewAnchor\" name='" + messageType + "newMess" + intIndex + "'> </a>");
             if (intIndex !== ($("." + messageType).size() - 1)) {
@@ -327,20 +294,20 @@ function setupMessageNav(messageType){
                 });
                 $(this).attr("title", tonext);
                 $(this).click(function(){
-					//in message type is "New" find next new by crawling the DOM
-					// (real next one may have been marked as read, so no longer news)
-					if (messageType === 'messageNew') {
-						//var thisIndex = $('tr').index(parentRow);
-						var thisIndex = parseInt($(parentRow).attr('rowCount')) + 1;
-						// jq1.2 version 
-						//document.location = "#" + $(parentRow).nextAll('.' + messageType + 'Next').eq(0).find('a.messageNewAnchor').attr('name');
-						//jq1.1 version
-						document.location = "#" + $(parentTable).find('tr').slice(thisIndex, totalTableRows).filter('.messageNewNext').eq(0).find('a.messageNewAnchor').attr('name');
-					}
-					// if "Pending" just link directly to next one
-					else{
-						document.location = "#" + messageType + "newMess" + (intIndex + 1);
-					}
+                    //in message type is "New" find next new by crawling the DOM
+                    // (real next one may have been marked as read, so no longer news)
+                    if (messageType === 'messageNew') {
+                        //var thisIndex = $('tr').index(parentRow);
+                        var thisIndex = parseInt($(parentRow).attr('rowCount')) + 1;
+                        // jq1.2 version 
+                        //document.location = "#" + $(parentRow).nextAll('.' + messageType + 'Next').eq(0).find('a.messageNewAnchor').attr('name');
+                        //jq1.1 version
+                        document.location = "#" + $(parentTable).find('tr').slice(thisIndex, totalTableRows).filter('.messageNewNext').eq(0).find('a.messageNewAnchor').attr('name');
+                    }
+                    // if "Pending" just link directly to next one
+                    else {
+                        document.location = "#" + messageType + "newMess" + (intIndex + 1);
+                    }
                 });
             }
             else {
@@ -369,19 +336,19 @@ function doAjax(messageId, topicId, self){
                         var thisTheadClassArr = $(thisRow).attr('class').split(' ');
                         var thisThread = thisTheadClassArr[thisTheadClassArr.length - 1];
                         $('.' + thisThread).find('em').text($('.' + thisThread).find('em').text() - 1);
-						//hide "New Messages" in thread seed if all messages have been marked as "read"
+                        //hide "New Messages" in thread seed if all messages have been marked as "read"
                         if ($('.' + thisThread).find('span.messageNew').size() === 1) {
                             $('.' + thisThread).find('span.childrenNewThread').css('visibility', 'hidden');
                         }
-						// remove this "New" flag if this message has been marked as read
+                        // remove this "New" flag if this message has been marked as read
                         $(thisRow).children("td").children("span").children("span.messageNew").remove();
                     }
                     else {
-						//in dfFlatView - remove "New" flag, as well as link target for the thread navigator
-						$(self).parents('tr').removeClass('messageNewNext')
+                        //in dfFlatView - remove "New" flag, as well as link target for the thread navigator
+                        $(self).parents('tr').removeClass('messageNewNext')
                         $(self).parents("div").parents("div").children('a.messageNewAnchor').remove()
                         $(self).parents("div").parents("div").children("span.messageNew").remove()
-						// remove "Go to first new message" link if all messages have been marked as "read"
+                        // remove "Go to first new message" link if all messages have been marked as "read"
                         if ($('.messagesThreaded').find('a.messageNewAnchor').size() === 0) {
                             $('.jumpToNew').remove();
                         }
@@ -414,7 +381,7 @@ function doAjax(messageId, topicId, self){
 // content causes addition tags with class 'toggle' to be in
 // markup, causing errors on display.
 // Found multiple versions of this fix, so centralizing it here
-function toggleExtendedDescription(hideShowEl, parent, element) {
+function toggleExtendedDescription(hideShowEl, parent, element){
     resize();
     hideShowEl.toggle();
     parent.slideToggle(resize);
@@ -424,64 +391,101 @@ function toggleExtendedDescription(hideShowEl, parent, element) {
 //fix for double click stack traces in IE - SAK-10625
 //add Jquery if necessary
 /*if(typeof($) == "undefined"){
-   js = document.createElement('script');
-   js.setAttribute('language', 'javascript');
-   js.setAttribute('type', 'text/javascript');
-   js.setAttribute('src','/library/js/jquery.js');
-   document.getElementsByTagName('head').item(0).appendChild(js);
-//document.write('<script type="text/javascript" src="/library/js/jquery.js"></script>');}
-}
-js = document.createElement('script');
-js.setAttribute('language', 'javascript');
-js.setAttribute('type', 'text/javascript');
-js.setAttribute('src','/messageforums-tool/js/sak-10625.js');
-document.getElementsByTagName('head').item(0).appendChild(js);*/
-
+ js = document.createElement('script');
+ js.setAttribute('language', 'javascript');
+ js.setAttribute('type', 'text/javascript');
+ js.setAttribute('src','/library/js/jquery.js');
+ document.getElementsByTagName('head').item(0).appendChild(js);
+ //document.write('<script type="text/javascript" src="/library/js/jquery.js"></script>');}
+ }
+ js = document.createElement('script');
+ js.setAttribute('language', 'javascript');
+ js.setAttribute('type', 'text/javascript');
+ js.setAttribute('src','/messageforums-tool/js/sak-10625.js');
+ document.getElementsByTagName('head').item(0).appendChild(js);*/
 // open print preview in another browser window so can size approx what actual
 // print out will look like
-function printFriendly(url) {
-	newwindow=window.open(url,'mywindow','width=960,height=1100,scrollbars=yes,resizable=yes');
-	if (window.focus) {newwindow.focus()}
+function printFriendly(url){
+    newwindow = window.open(url, 'mywindow', 'width=960,height=1100,scrollbars=yes,resizable=yes');
+    if (window.focus) {
+        newwindow.focus()
+    }
 }
 
-function FCKeditor_OnComplete(editorInstance) {
-	   
+function FCKeditor_OnComplete(editorInstance){
+
     fckeditor_word_count(editorInstance);
     editorInstance.Events.AttachEvent('OnSelectionChange', fckeditor_word_count);
-   
+    
 }
 
-function fckeditor_word_count(editorInstance) {
-     document.getElementById('counttotal').innerHTML = "<span class='highlight'>(" + getWordCount(editorInstance.GetData()) + ")</span>";
+function fckeditor_word_count(editorInstance){
+    document.getElementById('counttotal').innerHTML = "<span class='highlight'>(" + getWordCount(editorInstance.GetData()) + ")</span>";
 }
-  
- function fckeditor_word_count_fromMessage(msgStr, countSpan){
- 	document.getElementById(countSpan).innerHTML = "<span class='highlight'>(" + getWordCount(msgStr) + ")</span>";
- }
- 
- function getWordCount(msgStr) {
- 
-     var matches = msgStr.replace(/<[^<|>]+?>|&nbsp;/gi,' ').match(/\b/g);
+
+function fckeditor_word_count_fromMessage(msgStr, countSpan){
+    document.getElementById(countSpan).innerHTML = "<span class='highlight'>(" + getWordCount(msgStr) + ")</span>";
+}
+
+function getWordCount(msgStr){
+
+    var matches = msgStr.replace(/<[^<|>]+?>|&nbsp;/gi, ' ').match(/\b/g);
     var count = 0;
-    if(matches) {
-        count = matches.length/2;
+    if (matches) {
+        count = matches.length / 2;
     }
-
+    
     return count;
 }
 
-function InsertHTML(header) { 
-	// These lines will write to the original textarea and makes the quoting work when FCK is not present
-	var finalhtml = header + ' <i>' + titletext + '</i><br/><br/><i>' + messagetext + '</i><br/><br/>';
-
-	document.forms['dfCompose'].elements[rteId].value = finalhtml;
-	// Get the editor instance that we want to interact with.
-	var oEditor = FCKeditorAPI.GetInstance(rteId);
-	// Check the active editing mode.
-	if ( oEditor.EditMode == FCK_EDITMODE_WYSIWYG )
-	{
-	// Insert the desired HTML.
-		oEditor.InsertHtml( finalhtml );
-	}
-	else alert( 'You must be in WYSIWYG mode!' );
+function InsertHTML(header){
+    // These lines will write to the original textarea and makes the quoting work when FCK is not present
+    var finalhtml = header + ' <i>' + titletext + '</i><br/><br/><i>' + messagetext + '</i><br/><br/>';
+    
+    document.forms['dfCompose'].elements[rteId].value = finalhtml;
+    // Get the editor instance that we want to interact with.
+    var oEditor = FCKeditorAPI.GetInstance(rteId);
+    // Check the active editing mode.
+    if (oEditor.EditMode == FCK_EDITMODE_WYSIWYG) {
+        // Insert the desired HTML.
+        oEditor.InsertHtml(finalhtml);
+    }
+    else 
+        alert('You must be in WYSIWYG mode!');
 }
+
+
+var setupLongDesc = function(){
+    var showMoreText = $('.showMoreText').text();
+    $('.show').hide();
+    $('.textPanel').each(function(i){
+        var trimmed = $(this).text().substring(0, 100) + '... <a class=\"moreDescription\")" href=\"#\">' + showMoreText + '</a>';
+        var insertPoint = $(this).parent('.toggle');
+        $('<p class=\"trimmedPanelTop\">' + trimmed + '</p>').insertBefore(insertPoint);
+    });
+    $('.moreDescription').live('click', function(e){
+        e.preventDefault();
+        var trimmedText = $(this).parent();
+        var textPanel = $(this).parent('p').next('div.toggle');
+        $(trimmedText).fadeOut('slow', function(){
+            $(textPanel).fadeIn('slow');
+        });
+        resizeFrame('grow')
+        
+    });
+    
+}
+
+/*
+ * in case cannot use newer jquery
+ 
+function getMore(targ){
+    var trimmedText = $('#more-' + targ).parent();
+        var textPanel = $('#more-' + targ).parent('p').next('div.toggle');
+    $(trimmedText).fadeOut('slow', function(){
+        $(textPanel).fadeIn('slow');
+    });
+    resizeFrame('grow')
+}
+
+*/

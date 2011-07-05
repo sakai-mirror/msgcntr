@@ -39,8 +39,11 @@ $(document).ready(function() {
 	if (forumLen ===0 && accessCheck === 0 && noForums ===0){
 		$('.noForumsAccess').show();
 	}
+	setupLongDesc()
 });
 </script>
+			<h:outputText styleClass="showMoreText"  style="display:none" value="#{msgs.cdfm_show_more_full_description}"  />
+
 	<p class="instruction noForumsAccess"  style="display:none;">
 			<h:outputText styleClass="instruction"  value="#{msgs.cdfm_forum_inf_no_forum_access}"  />
 	</p>
@@ -145,7 +148,7 @@ $(document).ready(function() {
 					<h:outputText value=" #{msgs.cdfm_and}"  rendered="#{!empty forum.attachList && forum.forum.extendedDescription != '' && forum.forum.extendedDescription != null && forum.forum.extendedDescription != '<br/>'}"/>
 					<h:outputText value=" #{msgs.cdfm_attach}"  rendered="#{!empty forum.attachList}"/>
 			  </h:outputLink>
-				<f:verbatim><div class="toggle" style="display:none;padding-left:1em"></f:verbatim>
+				<f:verbatim><div class="toggle" style="display:none;"></f:verbatim>
 					<mf:htmlShowArea value="#{forum.forum.extendedDescription}"  hideBorder="true" />
 					<%-- attachs --%>
 					<h:dataTable  value="#{forum.attachList}" var="eachAttach" rendered="#{!empty forum.attachList}" columnClasses="attach,bogus" style="font-size:.9em;width:auto;margin-left:1em" border="0" cellpadding="3" cellspacing="0">
@@ -266,7 +269,7 @@ $(document).ready(function() {
 
 				 </h:panelGroup>
 						<h:panelGroup>
-							<f:verbatim><div class="toggle" style="display:none;padding-left:1em"></f:verbatim>
+							<f:verbatim><div class="toggle" style="display:none;"></f:verbatim>
 					<mf:htmlShowArea  id="topic_fullDescription" hideBorder="true"	 value="#{topic.topic.extendedDescription}" />
 								<%--//desNote:attach list --%>
 								<h:dataTable  value="#{topic.attachList}" var="eachAttach" rendered="#{!empty topic.attachList}" cellpadding="3" cellspacing="0" columnClasses="attach,bogus" style="font-size:.9em;width:auto;margin-left:1em" border="0">

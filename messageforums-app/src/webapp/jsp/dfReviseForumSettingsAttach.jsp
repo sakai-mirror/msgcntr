@@ -104,8 +104,10 @@
 					</h:inputText>
 				</h:panelGroup>	
 			</h:panelGrid>
-			<h:panelGrid columns="1"  columnClasses="longtext">
-				<h:panelGroup>
+			<%-- //designNote: rendered attr below should resolve to false only if there is no prior short description
+			 		and if there is server property (TBD) saying not to use it  - below just checking for pre-existing short description--%>
+			<h:panelGrid columns="1"  columnClasses="longtext" rendered="#{! empty ForumTool.selectedForum.forum.shortDescription}">
+				<h:panelGroup >
 					<h:outputText value="" />
 					<%-- //designNote: this label should alert that textarea has a 255 max chars limit --%>
 					<h:outputLabel id="outputLabel1" for="forum_shortDescription"  value="#{msgs.cdfm_shortDescription}"/>	
