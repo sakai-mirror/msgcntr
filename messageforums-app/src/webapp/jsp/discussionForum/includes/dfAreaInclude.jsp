@@ -39,9 +39,10 @@ $(document).ready(function() {
 	if (forumLen ===0 && accessCheck === 0 && noForums ===0){
 		$('.noForumsAccess').show();
 	}
-	setupLongDesc()
 });
 </script>
+<h:outputText escape="false" value="<script type='text/javascript'>$(document).ready(function() {setupLongDesc()});</script>"  rendered="#{!ForumTool.showShortDescription}"/>
+
 			<h:outputText styleClass="showMoreText"  style="display:none" value="#{msgs.cdfm_show_more_full_description}"  />
 
 	<p class="instruction noForumsAccess"  style="display:none;">
