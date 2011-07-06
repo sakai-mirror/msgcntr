@@ -254,6 +254,7 @@ public class DiscussionForumTool
   private String userId;
   
   private boolean showForumLinksInNav = true;
+  private boolean showShortDescription = true;
 
   // compose
   private MessageForumsMessageManager messageManager;
@@ -374,6 +375,8 @@ public class DiscussionForumTool
     }
     
     showForumLinksInNav = ServerConfigurationService.getBoolean("mc.showForumLinksInNav", true);
+    showShortDescription = ServerConfigurationService.getBoolean("mc.showShortDescription", true);
+
   }
 
   // Is Gradebook defined for the site?
@@ -1428,7 +1431,7 @@ public class DiscussionForumTool
     forum.setExtendedDescription(FormattedText.processFormattedText(forum.getExtendedDescription(), alertMsg));
     forum.setTitle(FormattedText.processFormattedText(forum.getTitle(), alertMsg));
     String shortDescFormatted = FormattedText.processFormattedText(forum.getShortDescription(), alertMsg);
-	if(shortDescFormatted.length() > 255){
+	if(shortDescFormatted!=null && shortDescFormatted.length() > 255){
 		shortDescFormatted = shortDescFormatted.substring(0, 255);
 	}
     forum.setShortDescription(shortDescFormatted);
@@ -1908,7 +1911,7 @@ public class DiscussionForumTool
     	StringBuilder alertMsg = new StringBuilder();
     	topic.setTitle(FormattedText.processFormattedText(topic.getTitle(), alertMsg));
     	String shortDescFormatted = FormattedText.processFormattedText(topic.getShortDescription(), alertMsg);
-    	if(shortDescFormatted.length() > 255){
+    	if(shortDescFormatted!=null && shortDescFormatted.length() > 255){
     		shortDescFormatted = shortDescFormatted.substring(0, 255);
     	}
     	topic.setShortDescription(shortDescFormatted);
@@ -7691,8 +7694,41 @@ public class DiscussionForumTool
 	 public boolean getShowForumLinksInNav() {
 		 return showForumLinksInNav;
 	 }
+	 
+	 //Returns if the property mc.showShortDescription is set to true or false. Default value is true
+	 public boolean getShowShortDescription() {
+		 return showShortDescription;
+	 }
+	 
+	 //Checks for the showShortDescription property and existence of forum's short description
+	 public boolean getShowForumShortDescription() {
 
+		 String shortDescription= this.selectedForum.getForum().getShortDescription();
+		 if (shortDescription!=null){
+			 if (!showShortDescription && shortDescription.isEmpty()){
+				 return false;
+			 }
+			 else{
+				 return true;
+			 }
+		 }
+		 return showShortDescription;
+	 }
+	 
+	 //Checks for the showShortDescription property and existence of topic's short description
+	 public boolean getShowTopicShortDescription() {
 
+		 String shortDescription= this.selectedTopic.getTopic().getShortDescription();
+		 if (shortDescription!=null){
+			 if (!showShortDescription && shortDescription.isEmpty()){
+				 return false;
+			 }
+			 else{
+				 return true;
+			 }
+		 }
+		 return showShortDescription;
+	 }
 	 
 	 public String processActionShowFullTextForAll() {
 		 return "dfStatisticsAllAuthoredMessageForOneUser";
