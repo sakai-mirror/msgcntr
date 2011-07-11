@@ -13,7 +13,7 @@
 <sakai:script contextBase="/messageforums-tool" path="/js/forum.js"/>
 --%>
 <!--jsp/discussionForum/permissions/permissions_include.jsp-->
-<mf:forumHideDivision title="#{msgs.cdfm_permissions}" id="cntrl_perm" hideByDefault="false" >
+<mf:forumHideDivision title="#{msgs.cdfm_permissions}" id="cntrl_perm" hideByDefault="#{ForumTool.collapsePermissionPanel}">
 	<%--role picker pane--%>
 	<h:panelGrid  columns="2" style="margin:.5em 0;" styleClass="jsfFormTable">
 	  <h:panelGroup styleClass="shorttext">

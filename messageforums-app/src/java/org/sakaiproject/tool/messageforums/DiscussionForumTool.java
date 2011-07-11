@@ -255,6 +255,7 @@ public class DiscussionForumTool
   
   private boolean showForumLinksInNav = true;
   private boolean showShortDescription = true;
+  private boolean collapsePermissionPanel = false;
 
   // compose
   private MessageForumsMessageManager messageManager;
@@ -376,6 +377,7 @@ public class DiscussionForumTool
     
     showForumLinksInNav = ServerConfigurationService.getBoolean("mc.showForumLinksInNav", true);
     showShortDescription = ServerConfigurationService.getBoolean("mc.showShortDescription", true);
+    collapsePermissionPanel = ServerConfigurationService.getBoolean("mc.collapsePermissionPanel", false);
 
   }
 
@@ -7728,6 +7730,14 @@ public class DiscussionForumTool
 			 }
 		 }
 		 return showShortDescription;
+	 }
+	 
+	//Returns property value of mc.collapsePermissionPanel, default is false
+	 public String getCollapsePermissionPanel() {
+		 if(collapsePermissionPanel){
+			 return "true";
+		 }
+		 return "false";
 	 }
 	 
 	 public String processActionShowFullTextForAll() {
