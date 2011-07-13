@@ -24,7 +24,7 @@
         <url.localsite>scp://source.sakaiproject.org/var/www/html/release/msgcntr/${project.version}</url.localsite>
         <sakai.common.version>1.0.6</sakai.common.version>
         <sakai.edu-services.version>1.0.8</sakai.edu-services.version>
-        <sakai.jsf.version>2.7.8</sakai.jsf.version>
+        <sakai.jsf.version>2.7.9</sakai.jsf.version>
         <sakai.search.version>1.2.7</sakai.search.version>
     </properties>
     <scm>
