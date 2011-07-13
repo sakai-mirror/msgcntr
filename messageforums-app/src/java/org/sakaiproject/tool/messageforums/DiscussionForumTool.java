@@ -1729,7 +1729,7 @@ public class DiscussionForumTool
     
     // if the topic is not moderated (and already exists), all of the pending messages must be approved
     if (selectedTopic != null && selectedTopic.getTopic() != null &&
-    		!selectedTopic.isTopicModerated() && selectedTopic.getTopic().getId() != null)
+    		!selectedTopic.getTopicModerated() && selectedTopic.getTopic().getId() != null)
     {
     	forumManager.approveAllPendingMessages(selectedTopic.getTopic().getId());
     }
@@ -1801,7 +1801,7 @@ public class DiscussionForumTool
 	  
     // if the topic is not moderated, all of the messages must be approved
     if (selectedTopic != null && selectedTopic.getTopic().getId() != null &&
-    		!selectedTopic.isTopicModerated())
+    		!selectedTopic.getTopicModerated())
     {
     	forumManager.approveAllPendingMessages(selectedTopic.getTopic().getId());
     }
@@ -3691,7 +3691,7 @@ public class DiscussionForumTool
     	LOG.debug("selectedTopic is null in constructMessage()");
     	return null;
     }
-	  if (!selectedTopic.isTopicModerated() || selectedTopic.getIsModeratedAndHasPerm())
+	  if (!selectedTopic.getTopicModerated() || selectedTopic.getIsModeratedAndHasPerm())
 	  {
 		  aMsg.setApproved(Boolean.TRUE);
 	  }
@@ -4552,7 +4552,7 @@ public class DiscussionForumTool
 		dMsg.setModified(new Date());
 
 		dMsg.setModifiedBy(getUserNameOrEid());
-		if (!selectedTopic.isTopicModerated() || selectedTopic.getIsModeratedAndHasPerm())
+		if (!selectedTopic.getTopicModerated() || selectedTopic.getIsModeratedAndHasPerm())
 		{
 			dMsg.setApproved(Boolean.TRUE);
 		}
@@ -4687,7 +4687,7 @@ public class DiscussionForumTool
 
 		  //  if the topic is moderated, we want to leave approval null.
 		  // if the topic is not moderated, all msgs are approved
-		  if (!selectedTopic.isTopicModerated())
+		  if (!selectedTopic.getTopicModerated())
 		  {
 			  dMsg.setApproved(Boolean.TRUE);
 		  }
@@ -7403,9 +7403,9 @@ public class DiscussionForumTool
 		else if (PERMISSION_MODE_TEMPLATE.equals(permissionMode) && template != null)
 			return !template.isAreaModerated();
 		else if (PERMISSION_MODE_FORUM.equals(permissionMode) && selectedForum != null)
-			return !selectedForum.isForumModerated();
+			return !selectedForum.getForumModerated();
 		else if (PERMISSION_MODE_TOPIC.equals(permissionMode) && selectedTopic != null)
-			return !selectedTopic.isTopicModerated();
+			return !selectedTopic.getTopicModerated();
 		else
 			return true;
 	}

@@ -197,40 +197,23 @@
 			</p>	
 			</div>		
 			<%--general posting  forum settings --%>
-			<h4 style="margin:0"><h:outputText  value="#{msgs.cdfm_forum_posting}"/></h4>
-			<div style="padding-left:1em">
-			<h:panelGrid columns="2" styleClass="jsfFormTable" style="margin-top:0">
-   			<h:panelGroup>
-					<h:outputText  value="#{msgs.cdfm_lock_forum}" />	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="forum_locked"  value="#{ForumTool.selectedForum.locked}"  styleClass="selectOneRadio">
-    					<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-    					<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-  					</h:selectOneRadio>
-				</h:panelGroup>
-   			<h:panelGroup styleClass="shorttext">
-					<h:outputText   value="#{msgs.cdfm_moderate_forum}" />	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="moderated"  value="#{ForumTool.selectedForum.moderated}" 
-						onclick="javascript:disableOrEnableModeratePerm();"  styleClass="selectOneRadio">
-    					<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-    					<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-  					</h:selectOneRadio>
-				</h:panelGroup>
-				<h:panelGroup styleClass="shorttext">
-					<h:outputText   value="#{msgs.cdfm_postFirst}" />	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="postFirst"  value="#{ForumTool.selectedForum.postFirst}" styleClass="selectOneRadio">
-    					<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-    					<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-  					</h:selectOneRadio>
-				</h:panelGroup>
-			</h:panelGrid>
+			<h4 style="margin: 0"><h:outputText
+				value="#{msgs.cdfm_forum_posting}" /></h4>
+			<div style="padding-left: 1em"><h:selectBooleanCheckbox
+				title="ForumLocked" value="#{ForumTool.selectedForum.forumLocked}"
+				id="forum_locked">
+			</h:selectBooleanCheckbox> <h:outputLabel for="forum_locked" value="#{msgs.cdfm_lock_forum}" />
 			</div>
-			
+			<div style="padding-left: 1em"><h:selectBooleanCheckbox
+				title="Moderated" value="#{ForumTool.selectedForum.forumModerated}"
+				id="moderated">
+			</h:selectBooleanCheckbox> <h:outputLabel for="moderated" value="#{msgs.cdfm_moderate_forum}" />
+			</div>
+			<div style="padding-left: 1em"><h:selectBooleanCheckbox
+				title="postFirst" value="#{ForumTool.selectedForum.forumPostFirst}"
+				id="postFirst">
+			</h:selectBooleanCheckbox> <h:outputLabel for="postFirst" value="#{msgs.cdfm_postFirst}" /></div>
+
 			<h4><h:outputText  value="#{msgs.cdfm_forum_availability}" /></h4>
 			
 			<div style="padding-left:1em">
@@ -269,19 +252,15 @@
 		<div class="instruction" style="padding: 0.5em; margin-top:0.8em;"><h4>
        			<h:outputText value="#{msgs.cdfm_forum_mark_read}"/>
        		</h4></div>
-         	<h:panelGrid columns="2" >
-         		<h:panelGroup styleClass="shorttext">
-           			<h:outputLabel for="autoMarkThreadsRead" value="#{msgs.cdfm_auto_mark_threads_read}" styleClass="shorttext"/>
-         		</h:panelGroup>
-         		<h:panelGroup>
-           			<h:selectOneRadio layout="lineDirection" id="autoMarkThreadsRead" value="#{ForumTool.selectedForum.autoMarkThreadsRead}" styleClass="checkbox inlineForm">
-             				<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-             				<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-           			</h:selectOneRadio>
-         		</h:panelGroup>
-	       </h:panelGrid>
+			<div style="padding-left: 1em"><h:selectBooleanCheckbox
+				title="autoMarkThreadsRead"
+				value="#{ForumTool.selectedForum.forumAutoMarkThreadsRead}"
+				id="autoMarkThreadsRead">
+			</h:selectBooleanCheckbox> <h:outputLabel for="autoMarkThreadsRead"
+				value="#{msgs.cdfm_auto_mark_threads_read}" /></div>
 
- 	 	<%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
+
+			<%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
 
 				
 

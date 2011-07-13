@@ -170,38 +170,23 @@
 			</div>                                                                                  
 			<%--general posting  forum settings --%>
 			<h4><h:outputText  value="#{msgs.cdfm_topic_posting}"/></h4>
-			<div style="padding-left:1em">
-			<h:panelGrid columns="2"  styleClass="jsfFormTable">
-				<h:panelGroup>
-				  <h:outputLabel for="topic_locked"  value="#{msgs.cdfm_lock_topic}" styleClass="shorttext"/>	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="topic_locked"  value="#{ForumTool.selectedTopic.locked}" styleClass="checkbox inlineForm">
-    					<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-    					<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-  					</h:selectOneRadio>
-				</h:panelGroup>
-				<h:panelGroup>
-				  <h:outputLabel for="moderated"  value="#{msgs.cdfm_moderate_topic}" styleClass="shorttext"/>	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="moderated"  value="#{ForumTool.selectedTopic.moderated}" styleClass="checkbox inlineForm"
-								onclick="javascript:disableOrEnableModeratePerm();" >
-    					<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-    					<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-  					</h:selectOneRadio>
-				</h:panelGroup>
-				<h:panelGroup>
-				  <h:outputLabel for="postFirst"  value="#{msgs.cdfm_postFirst}" styleClass="shorttext"/>	
-				</h:panelGroup>
-				<h:panelGroup>
-					<h:selectOneRadio layout="lineDirection"  id="postFirst"  value="#{ForumTool.selectedTopic.postFirst}" styleClass="checkbox inlineForm">
-    					<f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-    					<f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-  					</h:selectOneRadio>
-				</h:panelGroup>
-			</h:panelGrid>
+
+			<div style="padding-left: 1em"><h:selectBooleanCheckbox
+				title="topicLocked" value="#{ForumTool.selectedTopic.topicLocked}"
+				id="topic_locked">
+			</h:selectBooleanCheckbox> <h:outputLabel for="topic_locked" value="#{msgs.cdfm_lock_topic}" />
 			</div>
+			<div style="padding-left: 1em"><h:selectBooleanCheckbox
+				title="Moderated" value="#{ForumTool.selectedTopic.topicModerated}"
+				id="topic_moderated">
+			</h:selectBooleanCheckbox> <h:outputLabel for="topic_moderated"
+				value="#{msgs.cdfm_moderate_topic}" /></div>
+			<div style="padding-left: 1em"><h:selectBooleanCheckbox
+				title="postFirst" value="#{ForumTool.selectedTopic.topicPostFirst}"
+				id="topic_postFirst">
+			</h:selectBooleanCheckbox> <h:outputLabel for="topic_postFirst" value="#{msgs.cdfm_postFirst}" /></div>
+
+
 			<h4><h:outputText  value="#{msgs.cdfm_forum_availability}" /></h4>
 			<div style="padding-left:1em">
 				<h:panelGrid columns="1" columnClasses="longtext,checkbox">
@@ -261,19 +246,15 @@
       <div class="instruction" style="padding: 0.5em; margin-top:0.8em;"><h4>
         <h:outputText value="#{msgs.cdfm_forum_mark_read}"/>
       </h4></div>
-   	  <h:panelGrid columns="2" >
-        <h:panelGroup styleClass="shorttext">
-          <h:outputLabel for="autoMarkThreadsRead" value="#{msgs.cdfm_auto_mark_threads_read}" styleClass="shorttext"/>	
-        </h:panelGroup>
-        <h:panelGroup>
-          <h:selectOneRadio layout="lineDirection" id="autoMarkThreadsRead" value="#{ForumTool.selectedTopic.autoMarkThreadsRead}" styleClass="checkbox inlineForm">
-            <f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_yes}"/>
-            <f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_no}"/>
-          </h:selectOneRadio>
-        </h:panelGroup>
-      </h:panelGrid>
 
-      <%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
+			<div style="padding-left: 1em"><h:selectBooleanCheckbox
+				title="autoMarkThreadsRead"
+				value="#{ForumTool.selectedTopic.topicAutoMarkThreadsRead}"
+				id="autoMarkThreadsRead">
+			</h:selectBooleanCheckbox> <h:outputLabel for="autoMarkThreadsRead"
+				value="#{msgs.cdfm_auto_mark_threads_read}" /></div>
+
+			<%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
 
 
 			<p class="instruction"><h:outputText value="#{msgs.perm_choose_instruction_topic}"/></p>
