@@ -30,9 +30,7 @@
 	</script> 
 	<script type="text/javascript">
 	function setDatesEnabled(radioButton){
-		$(".openDateSpan").toggle();
-		$(".closeDateSpan").toggle();
-		resize();		
+		$(".calWidget").fadeToggle('slow');
 	}
 
 	function openDateCal(){
@@ -199,33 +197,38 @@
 			<%--general posting  forum settings --%>
 			<h4 style="margin: 0"><h:outputText
 				value="#{msgs.cdfm_forum_posting}" /></h4>
-			<div style="padding-left: 1em"><h:selectBooleanCheckbox
-				title="ForumLocked" value="#{ForumTool.selectedForum.forumLocked}"
-				id="forum_locked">
-			</h:selectBooleanCheckbox> <h:outputLabel for="forum_locked" value="#{msgs.cdfm_lock_forum}" />
+			<div class="indnt1">
+				<p class="checkbox">
+					<h:selectBooleanCheckbox
+						title="ForumLocked" value="#{ForumTool.selectedForum.forumLocked}"
+						id="forum_locked">
+					</h:selectBooleanCheckbox> <h:outputLabel for="forum_locked" value="#{msgs.cdfm_lock_forum}" />
+				</p>
+				<p class="checkbox">
+					<h:selectBooleanCheckbox
+						title="Moderated" value="#{ForumTool.selectedForum.forumModerated}"
+						id="moderated">
+					</h:selectBooleanCheckbox> <h:outputLabel for="moderated" value="#{msgs.cdfm_moderate_forum}" />
+				</p>
+				<p class="checkbox">
+					<h:selectBooleanCheckbox
+						title="postFirst" value="#{ForumTool.selectedForum.forumPostFirst}"
+						id="postFirst">
+					</h:selectBooleanCheckbox> <h:outputLabel for="postFirst" value="#{msgs.cdfm_postFirst}" />
+				</p>
 			</div>
-			<div style="padding-left: 1em"><h:selectBooleanCheckbox
-				title="Moderated" value="#{ForumTool.selectedForum.forumModerated}"
-				id="moderated">
-			</h:selectBooleanCheckbox> <h:outputLabel for="moderated" value="#{msgs.cdfm_moderate_forum}" />
-			</div>
-			<div style="padding-left: 1em"><h:selectBooleanCheckbox
-				title="postFirst" value="#{ForumTool.selectedForum.forumPostFirst}"
-				id="postFirst">
-			</h:selectBooleanCheckbox> <h:outputLabel for="postFirst" value="#{msgs.cdfm_postFirst}" /></div>
-
 			<h4><h:outputText  value="#{msgs.cdfm_forum_availability}" /></h4>
 			
-			<div style="padding-left:1em">
-			<h:panelGrid columns="1" columnClasses="longtext,checkbox">
+			<div class="indnt1">
+			<h:panelGrid columns="1" columnClasses="longtext,checkbox" cellpadding="0" cellspacing="0">
               <h:panelGroup>
                  <h:selectOneRadio layout="pageDirection" onclick="this.blur()" onchange="setDatesEnabled(this);" disabled="#{not ForumTool.editMode}" id="availabilityRestricted"  value="#{ForumTool.selectedForum.availabilityRestricted}">
                   <f:selectItem itemValue="false" itemLabel="#{msgs.cdfm_forum_avail_show}"/>
                   <f:selectItem itemValue="true" itemLabel="#{msgs.cdfm_forum_avail_date}"/>
                </h:selectOneRadio>
                </h:panelGroup>
-               <h:panelGroup id="openDateSpan" styleClass="indnt2 openDateSpan" style="display: #{ForumTool.selectedForum.availabilityRestricted ? '' : 'none'}">
-               	   <h:outputText value="#{msgs.openDate}: "/>
+               <h:panelGroup id="openDateSpan" styleClass="indnt2 openDateSpan calWidget" style="display: #{ForumTool.selectedForum.availabilityRestricted ? '' : 'none'}">
+               	   <h:outputLabel value="#{msgs.openDate}: " for="openDate"/>
 	               <h:inputText id="openDate" value="#{ForumTool.selectedForum.openDate}"/>
 	               <f:verbatim>
 	               	<a id="openCal" href="javascript:openDateCal();">
@@ -234,9 +237,7 @@
 	               <f:verbatim>
 	               </a>
 	               </f:verbatim>
-              	</h:panelGroup>
-              	<h:panelGroup id="closeDateSpan" styleClass="indnt2 closeDateSpan" style="display: #{ForumTool.selectedForum.availabilityRestricted ? '' : 'none'}">
-              		<h:outputText value="#{msgs.closeDate}: "/>
+              		<h:outputLabel value="#{msgs.closeDate}: " for="closeDate" />
 	               <h:inputText id="closeDate" value="#{ForumTool.selectedForum.closeDate}"/>
 	               <f:verbatim>
 	               	<a id="closeCal" href="javascript:closeDateCal();">
@@ -249,16 +250,15 @@
            </h:panelGrid>
  		</div>
 
-		<div class="instruction" style="padding: 0.5em; margin-top:0.8em;"><h4>
-       			<h:outputText value="#{msgs.cdfm_forum_mark_read}"/>
-       		</h4></div>
-			<div style="padding-left: 1em"><h:selectBooleanCheckbox
+		<h4><h:outputText value="#{msgs.cdfm_forum_mark_read}"/></h4>
+			<table><tr><td>
+			<p class="indnt1 checkbox"><h:selectBooleanCheckbox
 				title="autoMarkThreadsRead"
 				value="#{ForumTool.selectedForum.forumAutoMarkThreadsRead}"
 				id="autoMarkThreadsRead">
 			</h:selectBooleanCheckbox> <h:outputLabel for="autoMarkThreadsRead"
-				value="#{msgs.cdfm_auto_mark_threads_read}" /></div>
-
+				value="#{msgs.cdfm_auto_mark_threads_read}" /></p>
+				</td></tr></table>
 
 			<%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
 

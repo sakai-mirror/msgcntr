@@ -486,3 +486,10 @@ form{margin-bottom:0;}
 }
 .messageCommentBody{
 }
+.calWidget{
+    vertical-align:middle;
+}
+.calWidget img{
+     vertical-align:middle;
+     margin-right:3em
+}
