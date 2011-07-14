@@ -46,6 +46,11 @@
     <h:form id="revise">
 		  <script type="text/javascript">
             $(document).ready(function(){
+				if ($('.gradeSelector').find('option').length ===1){
+					$('.gradeSelector').find('select').hide();
+					$('.gradeSelector').find('.instrWithGrades').hide();
+					$('.gradeSelector').find('.instrWOGrades').show();
+				}
 				$('.displayMore').click(function(e){
 						e.preventDefault();
 						$('.displayMorePanel').fadeIn('slow')
@@ -266,16 +271,17 @@
 
 	      <%--designNote: gradebook assignment - need to finesse this - make aware that functionality exists, but flag that there are no gb assignmetns to select --%>
 				<%--designNote:  How is this a "permission" item? --%>  
-				<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'forum'}" style="margin-top:.5em;clear:both">
-			    <h:panelGroup styleClass="shorttext">
+				<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'forum'}" style="margin-top:.5em;clear:both" styleClass="itemSummary">
+			    <h:panelGroup style="white-space:nowrap;">
 						<h:outputLabel for="forum_assignments" value="#{msgs.perm_choose_assignment}"></h:outputLabel>  
 			      </h:panelGroup>
-				  <h:panelGroup  styleClass="itemAction actionItem">
+				  <h:panelGroup  styleClass="gradeSelector  itemAction actionItem"> 
 						<h:selectOneMenu id="forum_assignments" value="#{ForumTool.selectedForum.gradeAssign}" disabled="#{not ForumTool.editMode}">
 			   	    <f:selectItems value="#{ForumTool.assignments}" />
 			      </h:selectOneMenu>
-						<h:outputText value=" #{msgs.perm_choose_instruction_forum} "/>
-						<h:outputLink value="#" style="text-decoration:none"><h:outputText styleClass="displayMore" value="#{msgs.perm_choose_instruction_more_link}"/></h:outputLink>
+						<h:outputText value="#{msgs.perm_choose_assignment_none_f}" styleClass="instrWOGrades" style="display:none;margin-left:0"/>
+						<h:outputText value=" #{msgs.perm_choose_instruction_forum} " styleClass="instrWithGrades" style="margin-left:0;"/>
+						<h:outputLink value="#" style="text-decoration:none" styleClass="instrWithGrades"><h:outputText styleClass="displayMore" value="#{msgs.perm_choose_instruction_more_link}"/></h:outputLink>
 			    </h:panelGroup>
 						<h:panelGroup>
 			    </h:panelGroup>

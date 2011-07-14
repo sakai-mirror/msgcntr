@@ -261,16 +261,17 @@
 
       <%--designNote: gradebook assignment - need to finesse this - make aware that functionality exists, but flag that there are no gb assignmetns to select --%>
 			<%--designNote:  How is this a "permission" item? --%>  
-			<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'topic' && !ForumTool.selectedForum.markForDeletion}" style="margin-top:.5em;clear:both">
-		    <h:panelGroup>  	
+			<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'topic' && !ForumTool.selectedForum.markForDeletion}" style="margin-top:.5em;clear:both"  styleClass="itemSummary">
+		    <h:panelGroup  style="white-space:nowrap;">
 					<h:outputLabel for="topic_assignments"  value="#{msgs.perm_choose_assignment}"  ></h:outputLabel>
 		  	</h:panelGroup>		
-		  	<h:panelGroup styleClass="itemAction actionItem">
+				  <h:panelGroup  styleClass="gradeSelector   itemAction actionItem"> 
 					<h:selectOneMenu value="#{ForumTool.selectedTopic.gradeAssign}" id="topic_assignments" disabled="#{not ForumTool.editMode}">
 		     	    <f:selectItems value="#{ForumTool.assignments}" />
 		  	    </h:selectOneMenu>
-							<h:outputText value=" #{msgs.perm_choose_instruction_topic} "/>
-							<h:outputLink value="#" style="text-decoration:none"><h:outputText styleClass="displayMore" value="#{msgs.perm_choose_instruction_more_link}"/></h:outputLink>
+								<h:outputText value="#{msgs.perm_choose_assignment_none_t}" styleClass="instrWOGrades" style="display:none;margin-left:0"/>
+							<h:outputText value=" #{msgs.perm_choose_instruction_topic} " styleClass="instrWithGrades" style="margin-left:0;"/>
+							<h:outputLink value="#" style="text-decoration:none"  styleClass="instrWithGrades"><h:outputText styleClass="displayMore" value="#{msgs.perm_choose_instruction_more_link}"/></h:outputLink>
 				    </h:panelGroup>
 							<h:panelGroup>
 				    </h:panelGroup>
@@ -314,6 +315,12 @@
 									e.preventDefault();
 									$('.displayMorePanel').fadeIn('slow')
 							})
+							if ($('.gradeSelector').find('option').length ===1){
+								$('.gradeSelector').find('select').hide();
+								$('.gradeSelector').find('.instrWithGrades').hide();
+								$('.gradeSelector').find('.instrWOGrades').show();
+							}
+							
 		
 				var charRemFormat = $('.charRemFormat').text();
 				$(".forum_shortDescriptionClass").charCounter(255, {
