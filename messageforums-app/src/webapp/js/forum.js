@@ -444,6 +444,23 @@ function printFriendly(url) {
 	if (window.focus) {newwindow.focus()}
 }
 
+var sakaiCKEditorName;
+$(document).ready(function () {
+    if (typeof(CKEDITOR) != 'undefined') {
+        for (instance in CKEDITOR.instances) {
+            // there should only be one ckeditor per page
+            // save the instance name for other functions to use
+            sakaiCKEditorName = instance;
+
+            // bind to the keyup and paste to update the word count
+            CKEDITOR.instances[instance].on("instanceReady", function () {
+                    this.document.on("keyup", ckeditor_word_count);
+                    this.document.on("paste", ckeditor_word_count);
+            });
+        }
+    }
+});
+
 function FCKeditor_OnComplete(editorInstance) {
 	   
     fckeditor_word_count(editorInstance);
@@ -451,18 +468,28 @@ function FCKeditor_OnComplete(editorInstance) {
    
 }
 
-function fckeditor_word_count(editorInstance) {
+function ckeditor_word_count() {
+     msgcntr_word_count(CKEDITOR.instances[sakaiCKEditorName].getData());
+}
 
-    var matches = editorInstance.GetData().replace(/<[^<|>]+?>|&nbsp;/gi,' ').match(/\b/g);
+function fckeditor_word_count(editorInstance) {
+    msgcntr_word_count(editorInstance.GetData());
+}
+
+
+function msgcntr_word_count(forumHtml) {
+    document.getElementById('counttotal').innerHTML = "<span class='highlight'>(" + getWordCount(forumHtml) + ")</span>";
+}
+
+function getWordCount(msgStr) {
+ 
+    var matches = msgStr.replace(/<[^<|>]+?>|&nbsp;/gi,' ').match(/\b/g);
     var count = 0;
     if(matches) {
         count = matches.length/2;
     }
 
-	if(document.getElementById('counttotal')){
-    	document.getElementById('counttotal').innerHTML = "<span class='highlight'>(" + count + ")</span>";
-    }
-
+    return count;
 }
 
 function InsertHTML(header) { 
