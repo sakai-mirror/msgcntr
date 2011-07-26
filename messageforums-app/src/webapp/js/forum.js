@@ -459,7 +459,12 @@ var setupLongDesc = function(){
     var showMoreText = $('.showMoreText').text();
     $('.show').hide();
     $('.textPanel').each(function(i){
-        var trimmed = $(this).text().substring(0, 100) + '... <a class=\"moreDescription\")" href=\"#\">' + showMoreText + '</a>';
+        if ($(this).text().length > 200) {
+            var trimmed = $(this).text().substring(0, 200) + '... <a class=\"moreDescription\")" href=\"#\">' + showMoreText + '</a>';
+        }
+        else{
+            var trimmed = $(this).text();
+        }
         var insertPoint = $(this).parent('.toggle');
         $('<p class=\"trimmedPanelTop\">' + trimmed + '</p>').insertBefore(insertPoint);
     });
