@@ -463,7 +463,7 @@ var setupLongDesc = function(){
             var trimmed = $(this).text().substring(0, 200) + '... <a class=\"moreDescription\")" href=\"#\">' + showMoreText + '</a>';
         }
         else{
-            var trimmed = $(this).text();
+            var trimmed = $(this).html();
         }
         var insertPoint = $(this).parent('.toggle');
         $('<p class=\"trimmedPanelTop\">' + trimmed + '</p>').insertBefore(insertPoint);
