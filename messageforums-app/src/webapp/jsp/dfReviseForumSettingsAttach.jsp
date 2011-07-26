@@ -266,13 +266,9 @@
 				value="#{msgs.cdfm_auto_mark_threads_read}" /></p>
 				</td></tr></table>
 
-			<%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
-
-				
-
 	      <%--designNote: gradebook assignment - need to finesse this - make aware that functionality exists, but flag that there are no gb assignmetns to select --%>
 				<%--designNote:  How is this a "permission" item? --%>  
-				<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist &&  ForumTool.permissionMode == 'forum'}" style="margin-top:.5em;clear:both" styleClass="itemSummary">
+				<h:panelGrid columns="2" rendered="#{ForumTool.gradebookExist}" style="margin-top:.5em;clear:both" styleClass="itemSummary">
 			    <h:panelGroup style="white-space:nowrap;">
 						<h:outputLabel for="forum_assignments" value="#{msgs.perm_choose_assignment}"></h:outputLabel>  
 			      </h:panelGroup>
@@ -284,13 +280,18 @@
 						<h:outputText value=" #{msgs.perm_choose_instruction_forum} " styleClass="instrWithGrades" style="margin-left:0;"/>
 						<h:outputLink value="#" style="text-decoration:none" styleClass="instrWithGrades"><h:outputText styleClass="displayMore" value="#{msgs.perm_choose_instruction_more_link}"/></h:outputLink>
 			    </h:panelGroup>
-						<h:panelGroup>
+						<h:panelGroup styleClass="displayMorePanel" style="display:none" >
 			    </h:panelGroup>
-					<h:panelGroup styleClass="itemAction actionItem">
+					<h:panelGroup styleClass="itemAction actionItem displayMorePanel" style="display:none" >
 
-						<h:outputText styleClass="displayMorePanel" style="display:none" value="#{msgs.perm_choose_instruction_forum_more}"/>
+						<h:outputText styleClass="displayMorePanel" value="#{msgs.perm_choose_instruction_forum_more}"/>
 			    </h:panelGroup>
 			  </h:panelGrid>
+
+			<%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
+
+				
+
       <div class="act">
           <h:commandButton action="#{ForumTool.processActionSaveForumSettings}" value="#{msgs.cdfm_button_bar_save_setting}"
           								 rendered="#{!ForumTool.selectedForum.markForDeletion}" accesskey="s"> 
