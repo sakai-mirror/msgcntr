@@ -404,7 +404,7 @@ td div.title{
 	height: 1.75em;
 }
 .permissionRow .ui-accordion-header:hover { 
-	border: 1px solid #C03;
+	border: 1px solid #666;
 }
 .permissionRow .ui-accordion-header.ui-state-active {
 	border-radius: 4px 4px 0 0;
