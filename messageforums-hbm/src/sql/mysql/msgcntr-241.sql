@@ -1,0 +1,23 @@
+-- MSGCNTR-241 Move messages to another topic
+
+DROP INDEX MFR_MOVE_HISTORY_MESSAGE_I;
+DROP TABLE MFR_MOVE_HISTORY_T;
+
+CREATE TABLE  `MFR_MOVE_HISTORY_T` (
+  `ID` bigint(20) NOT NULL auto_increment,
+  `VERSION` int(11) NOT NULL,
+  `UUID` varchar(36) NOT NULL,
+  `CREATED` datetime NOT NULL,
+  `CREATED_BY` varchar(36) NOT NULL,
+  `MODIFIED` datetime NOT NULL,
+  `MODIFIED_BY` varchar(36) NOT NULL,
+  `MESSAGE_ID` bigint(20) NOT NULL,
+  `REMINDER` bit(1) default NULL,
+  `FROM_TOPIC_ID` bigint(20) NOT NULL,
+  `TO_TOPIC_ID` bigint(20) NOT NULL,
+  PRIMARY KEY  (`ID`)
+);
+
+
+create index MFR_MOVE_HISTORY_MESSAGE_I on MFR_MOVE_HISTORY_T (MESSAGE_ID);
+

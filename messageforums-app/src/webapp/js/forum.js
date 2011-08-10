@@ -485,3 +485,21 @@ function InsertHTML(header) {
 	}
 	else alert( 'You must be in WYSIWYG mode!' );
 }
+
+
+function resizeFrameForDialog()
+        {
+                if (top.location != self.location)       {
+                        var frame = parent.document.getElementById(window.name);
+                }
+                        if( frame )
+                {
+                        var clientH = document.body.clientHeight + 400;
+                        $( frame ).height( clientH );
+                }
+                else
+                {
+                        throw( "resizeFrame did not get the frame (using name=" + window.name + ")" );
+                }
+        }
+
