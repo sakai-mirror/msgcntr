@@ -30,9 +30,9 @@
         <sakai.search.version>1.3.4</sakai.search.version>
     </properties>
     <scm>
-      <connection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/trunk</connection>
-    <developerConnection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/trunk</developerConnection>
-    <url>https://source.sakaiproject.org/svn/msgcntr/trunk</url>
+      <connection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-3.0.x</connection>
+    <developerConnection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-3.0.x</developerConnection>
+    <url>https://source.sakaiproject.org/svn/msgcntr/msgcntr-3.0.x</url>
   </scm>
     <distributionManagement>
         <downloadUrl>http://source.sakaiproject.org/maven2/
