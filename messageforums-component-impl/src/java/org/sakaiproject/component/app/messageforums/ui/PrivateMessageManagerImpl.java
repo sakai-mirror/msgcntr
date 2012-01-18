@@ -1625,6 +1625,12 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     LOG.debug("isInstructor()");
     return isInstructor(UserDirectoryService.getCurrentUser());
   }
+  
+  public boolean isSectionTA()
+  {
+    LOG.debug("isSectionTA()");
+    return isSectionTA(UserDirectoryService.getCurrentUser());
+  }
 
   /**
    * Check if the given user has site.upd access
@@ -1642,6 +1648,13 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       return SecurityService.unlock(user, "site.upd", getContextSiteId());
     else
       return false;
+  }
+  
+  private boolean isSectionTA(User user) {
+      if (user != null)
+          return SecurityService.unlock(user, "section.role.ta", getContextSiteId());
+        else
+          return false;
   }
   
   public boolean isEmailPermit() {
