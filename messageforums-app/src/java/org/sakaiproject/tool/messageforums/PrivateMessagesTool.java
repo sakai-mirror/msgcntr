@@ -2070,7 +2070,7 @@ private   int   getNum(char letter,   String   a)
       }
       else {
     	  sendToHiddenString.delete(sendToHiddenString.length()-2, sendToHiddenString.length()); //remove last comma and space
-    	  aMsg.setRecipientsAsText(sendToString.toString() + " (" + sendToHiddenString.toString() + ")");
+    	  aMsg.setRecipientsAsText(sendToString.toString() + " " + PrivateMessage.HIDDEN_RECIPIENTS_START + sendToHiddenString.toString() + PrivateMessage.HIDDEN_RECIPIENTS_END);
       }
       
     }
@@ -2576,7 +2576,7 @@ private   int   getNum(char letter,   String   a)
     	}
     	else {
     		sendToHiddenString.delete(sendToHiddenString.length()-2, sendToHiddenString.length()); //remove last comma and space    
-    		rrepMsg.setRecipientsAsText(sendToString.toString() + " (" + sendToHiddenString.toString() + ")");
+    		rrepMsg.setRecipientsAsText(sendToString.toString() + " " + PrivateMessage.HIDDEN_RECIPIENTS_START + sendToHiddenString.toString() + PrivateMessage.HIDDEN_RECIPIENTS_END);
     	}    
 
     	//Add attachments
