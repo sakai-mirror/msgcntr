@@ -29,11 +29,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.text.SimpleDateFormat;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIData;
@@ -4416,8 +4418,10 @@ public class DiscussionForumTool
 		revisedInfo += getUserNameOrEid();
 
 		revisedInfo  += " " + getResourceBundleString(LAST_REVISE_ON);
-		Date now = new Date();
-		revisedInfo += now.toString() + " </p> ";
+		SimpleDateFormat formatter = new SimpleDateFormat(getResourceBundleString("date_format"), getUserLocale());
+                formatter.setTimeZone(getUserTimeZone());
+                Date now = new Date();
+                revisedInfo += formatter.format(now) + " </p> ";
 
 		/*    if(currentBody != null && currentBody.length()>0 && currentBody.startsWith("Last Revised By "))
     {
@@ -7856,6 +7860,10 @@ public class DiscussionForumTool
         }
         
         return threadHead;
+	}
+	
+	public Locale getUserLocale(){
+	    return new ResourceLoader().getLocale();
 	}
 }
 
