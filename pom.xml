@@ -21,9 +21,9 @@
         <module>messageforums-assembly</module>
     </modules>
     <scm>
-      <connection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-3.0.0-b02</connection>
-    <developerConnection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-3.0.0-b02</developerConnection>
-    <url>https://source.sakaiproject.org/svn/msgcntr/msgcntr-3.0.x/branches/msgcntr-3.0.0-b02</url>
+      <connection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-3.0.x</connection>
+    <developerConnection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-3.0.x</developerConnection>
+    <url>https://source.sakaiproject.org/svn/msgcntr/msgcntr-3.0.x</url>
   </scm>
     <distributionManagement>
         <site>
