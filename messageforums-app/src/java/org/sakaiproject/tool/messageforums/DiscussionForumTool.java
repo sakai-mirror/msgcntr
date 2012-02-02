@@ -873,7 +873,7 @@ public class DiscussionForumTool
     if (component != null) {
       component.setSubmittedValue(null);
     }
-  return gotoMain();
+    return processActionHome();
   }
 
   /**
