@@ -25,13 +25,6 @@
     <developerConnection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-3.0.x</developerConnection>
     <url>https://source.sakaiproject.org/svn/msgcntr/msgcntr-3.0.x</url>
   </scm>
-    <distributionManagement>
-        <site>
-            <id>sakai-site</id>
-            <name>Sakai release Site</name>
-            <url>scpexe://source.sakaiproject.org/var/www/html/release/msgcntr/${project.version}</url>
-        </site>
-    </distributionManagement>
     <dependencyManagement>
         <dependencies>
             <dependency>
