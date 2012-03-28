@@ -21,7 +21,6 @@
         <module>messageforums-assembly</module>
     </modules>
     <properties>
-        <url.localsite>scp://source.sakaiproject.org/var/www/html/release/msgcntr/${project.version}</url.localsite>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sakai.jsf.version>2.8.3</sakai.jsf.version>
         <sakai.scheduler.version>2.8.2</sakai.scheduler.version>
@@ -29,31 +28,14 @@
     </properties>
     <scm>
       <connection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-2.8.x</connection>
-    <developerConnection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-2.8.x</developerConnection>
-    <url>https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-2.8.x</url>
-  </scm>
+      <developerConnection>scm:svn:https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-2.8.x</developerConnection>
+      <url>https://source.sakaiproject.org/svn/msgcntr/branches/msgcntr-2.8.x</url>
+    </scm>
     <distributionManagement>
-        <downloadUrl>http://source.sakaiproject.org/maven2/
-        </downloadUrl>
-        <snapshotRepository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>sakai-maven-snapshots-scp</id>
-            <name>Sakai snapshot Repo</name>
-            <url>scp://source.sakaiproject.org/var/www/html/maven2-snapshots
-            </url>
-            <layout>default</layout>
-        </snapshotRepository>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>sakai-maven2-scp</id>
-            <name>Sakai maven2 repository</name>
-            <url>scp://source.sakaiproject.org/var/www/html/maven2</url>
-            <layout>default</layout>
-        </repository>
         <site>
             <id>sakai-site</id>
             <name>Sakai release Site</name>
-            <url>${url.localsite}</url>
+            <url>scpexe://source.sakaiproject.org/var/www/html/release/msgcntr/${project.version}</url>
         </site>
     </distributionManagement>
     <pluginRepositories>
