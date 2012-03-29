@@ -534,3 +534,13 @@ function InsertHTML(header) {
 		else alert( 'You must be in WYSIWYG mode!' );
 	}
 }
+
+var clicked = 'false';
+function disable() {
+    if (clicked == 'false') {
+        clicked = 'true'
+    }
+    else {
+        document.forms[0].elements['dfCompose:post'].disabled=true;
+    }
+}
