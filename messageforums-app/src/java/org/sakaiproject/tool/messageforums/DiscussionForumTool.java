@@ -7080,7 +7080,7 @@ public class DiscussionForumTool
            while (iter.hasNext())
            {
              String level = (String) iter.next();
-             levels.add(new SelectItem(level));
+             levels.add(new SelectItem(level, getResourceBundleString("perm_level_" + level.replaceAll(" ", "_").toLowerCase())));
              if("Custom".equals(level))
                  {
                    hasCustom =true;
@@ -7089,7 +7089,7 @@ public class DiscussionForumTool
          }
          if(!hasCustom)
          {
-           levels.add(new SelectItem("Custom"));
+           levels.add(new SelectItem("Custom", getResourceBundleString("perm_level_custom")));
          }
        }       
        return levels;
