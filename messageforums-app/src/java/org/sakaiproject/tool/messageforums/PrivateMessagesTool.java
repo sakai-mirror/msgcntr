@@ -842,6 +842,23 @@ public class PrivateMessagesTool
   public void setBooleanEmailOut(boolean booleanEmailOut) {
 	  this.booleanEmailOut= booleanEmailOut;
   }
+  
+  /**
+   * 
+   * @return true if the Messages tool setting in combination with the author-defined
+   * {@link #getBooleanEmailOut()} setting requires a copy of the message to be sent to 
+   * recipient(s) email
+   */
+  public boolean isSendEmail() {
+      boolean sendEmail;
+      if (getBooleanEmailOut() && getPvtSendEmailOut()) {
+          sendEmail = true;
+      } else {
+          sendEmail = false;
+      }
+
+      return sendEmail;
+  }
 
   public String getComposeSendAsPvtMsg()
   {
@@ -1942,13 +1959,7 @@ private   int   getNum(char letter,   String   a)
     
     Map<User, Boolean> recipients = getRecipients();
     
-    if(!getBooleanEmailOut())
-    {
-      prtMsgManager.sendPrivateMessage(pMsg, recipients, false); 
-    }
-    else{
-      prtMsgManager.sendPrivateMessage(pMsg, recipients, true);
-    }
+    prtMsgManager.sendPrivateMessage(pMsg, recipients, isSendEmail()); 
     
     //update synopticLite tool information:
     
@@ -2053,13 +2064,8 @@ private   int   getNum(char letter,   String   a)
     }
     dMsg.setDraft(Boolean.TRUE);
     dMsg.setDeleted(Boolean.FALSE);
-    
-    if(!getBooleanEmailOut())
-    {
-      prtMsgManager.sendPrivateMessage(dMsg, getRecipients(), false); 
-    }else{
-      prtMsgManager.sendPrivateMessage(dMsg, getRecipients(), true);
-    }
+
+    prtMsgManager.sendPrivateMessage(dMsg, getRecipients(), isSendEmail()); 
 
     //reset contents
     resetComposeContents();
@@ -2561,13 +2567,7 @@ private   int   getNum(char letter,   String   a)
 
     	Map<User, Boolean> recipients = getRecipients();
 
-    	if(!getBooleanEmailOut())
-    	{
-    		prtMsgManager.sendPrivateMessage(rrepMsg, recipients, false);
-    	}
-    	else{
-    		prtMsgManager.sendPrivateMessage(rrepMsg, recipients, true);
-    	}
+    	prtMsgManager.sendPrivateMessage(rrepMsg, recipients, isSendEmail());
     	
     	if(!rrepMsg.getDraft()){
     		incrementSynopticToolInfo(recipients.keySet(), false);
@@ -2913,13 +2913,7 @@ private   int   getNum(char letter,   String   a)
     private void processPvtMsgForwardSendHelper(PrivateMessage rrepMsg){
     	Map<User, Boolean> recipients = getRecipients();
     	
-    	if(!getBooleanEmailOut())
-    	{
-    		prtMsgManager.sendPrivateMessage(rrepMsg, recipients, false);
-    	}
-    	else{
-    		prtMsgManager.sendPrivateMessage(rrepMsg, recipients, true);
-    	}
+    	prtMsgManager.sendPrivateMessage(rrepMsg, recipients, isSendEmail());
 
     	if(!rrepMsg.getDraft()){
     		//update Synoptic tool info
@@ -3175,14 +3169,7 @@ private   int   getNum(char letter,   String   a)
 		  }
 	  }
 	  if(!preview){
-		  if(!getBooleanEmailOut())
-		  {
-
-			  prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, false);//getRecipients()  replyalllist
-		  }
-		  else{
-			  prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, true);//getRecipients()  replyalllist
-		  }
+	          prtMsgManager.sendPrivateMessage(rrepMsg, returnSet, isSendEmail());
 
 		  if(!rrepMsg.getDraft()){
 			  //update Synoptic tool info
