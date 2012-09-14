@@ -1816,7 +1816,8 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     	}    	
     }   
 
-    if ((t.getDraft().equals(Boolean.FALSE) && !nonePermission)
+    if ((t.getDraft().equals(Boolean.FALSE) && !nonePermission && 
+            t.getAvailability() != null && t.getAvailability())
     		|| isInstructor()
             || securityService.isSuperUser()
             || isTopicOwner(t))
