@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -536,7 +536,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     for (Iterator iter = recipients.iterator(); iter.hasNext();)
     {
       PrivateMessageRecipient element = (PrivateMessageRecipient) iter.next();
-      LOG.info("element.getTypeUuid(): "+element.getTypeUuid()+", oldTopicTypeUuid: "+oldTopicTypeUuid+", element.getUserId(): "+element.getUserId()+ ", getCurrentUser(): "+getCurrentUser());
+      LOG.debug("element.getTypeUuid(): "+element.getTypeUuid()+", oldTopicTypeUuid: "+oldTopicTypeUuid+", element.getUserId(): "+element.getUserId()+ ", getCurrentUser(): "+getCurrentUser());
       if (element.getTypeUuid().equals(oldTopicTypeUuid) && (element.getUserId().equals(getCurrentUser())))
       {
         element.setTypeUuid(newTopicTypeUuid);
@@ -557,7 +557,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     message.setCreated(new Date());
     message.setCreatedBy(getCurrentUser());
 
-    LOG.info("message " + message.getUuid() + " created successfully");
+    LOG.debug("message " + message.getUuid() + " created successfully");
     return message;
   }
 
@@ -1154,9 +1154,17 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     
     	currentArea = getAreaByContextIdAndTypeId(typeManager.getPrivateMessageAreaType());
 
-    	//this is fairly inneficient and should realy be a convenience method to lookup
-    	// the users who want to forward their messages
-    	privateForums = currentArea.getPrivateForums();
+    	// make sure the site-wide email copy preference is respected in case an invalid
+    	// value slipped in
+    	if (currentArea.getSendToEmail() == Area.EMAIL_COPY_ALWAYS) {
+    	    asEmail = true;
+    	} else if (currentArea.getSendToEmail() == Area.EMAIL_COPY_NEVER) {
+    	    asEmail = false;
+    	}
+    	
+        //this is fairly inneficient and should realy be a convenience method to lookup
+        // the users who want to forward their messages
+        privateForums = currentArea.getPrivateForums();
 
     	//create a map for efficient lookup for large sites
     	pfMap = new HashMap<String, PrivateForum>();
@@ -1254,12 +1262,52 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
 
 	  body.insert(0, "From: " + currentUser.getDisplayName() + "<p/>"); 
 
-	  // need to filter out hidden users if there are any and:
-	  //   a non-instructor (! site.upd)
-	  //   instructor but not the author
+	  // need to determine if there are "hidden" recipients to this message.
+	  // If so, we need to replace them with "Undisclosed Recipients"
+	  // Identifying them is tricky now because hidden users are identified by having their
+	  // names in parentheses at the end of the list. At some point, the usernames were also added to
+	  // this in parentheses (although this may be overridden via a property). 
+	  // So to fix this going forward, the hidden users will be indicated by brackets [],
+	  // but we still need to handle the old data with hidden users in parens
 	  String sendToString = message.getRecipientsAsText();
-	  if (sendToString.indexOf("(") > 0 && (! isInstructor() || !isEmailPermit()|| (!message.getAuthor().equals(getAuthorString()))) ) {
-		  sendToString = sendToString.substring(0, sendToString.indexOf("("));
+	  
+	  if (sendToString.indexOf(PrivateMessage.HIDDEN_RECIPIENTS_START) > 0) {
+	      sendToString = sendToString.substring(0, sendToString.indexOf(PrivateMessage.HIDDEN_RECIPIENTS_START));
+	      
+	      // add "Undisclosed Recipients" in place of the hidden users
+	      sendToString = sendToString.trim();
+	      if (sendToString.length() > 0) {
+	          sendToString += "; ";
+	      } 
+	      sendToString += getResourceBundleString("pvt_HiddenRecipients");
+	  } else {
+	      // we may have parens around a list of names with eid in parens
+	      if (ServerConfigurationService.getBoolean("msg.displayEid", true)) {
+	          String originalSendTo = sendToString;
+	          sendToString = sendToString.replaceAll("\\([^)]+\\(.*", "");
+	          
+	          // add "Undisclosed Recipients" in place of the hidden users
+	          if (!sendToString.equals(originalSendTo)) {
+	              sendToString = sendToString.trim();
+	              if (sendToString.length() > 0) {
+	                  sendToString += "; ";
+	              }
+	              sendToString += getResourceBundleString("pvt_HiddenRecipients");
+	          }
+	      } else {
+	          // the old data just has the hidden users in parens
+	          if (sendToString.indexOf("(") > 0) {
+	              sendToString = sendToString.substring(0, sendToString.indexOf("("));
+	              
+	              // add "Undisclosed Recipients" in place of the hidden users
+	              sendToString = sendToString.trim();
+	              if (sendToString.length() > 0) {
+	                  sendToString += "; ";
+	              }
+	              sendToString += getResourceBundleString("pvt_HiddenRecipients");
+	          }
+	          
+	      }
 	  }
 
 	  body.insert(0, "To: " + sendToString + "<p/>");
@@ -1296,7 +1344,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
 	  }
 
 	  String footer = "<p>----------------------<br>" +
-	  getResourceBundleString(EMAIL_FOOTER1) + " " + ServerConfigurationService.getString("ui.service") +
+	      getResourceBundleString(EMAIL_FOOTER1) + " " + ServerConfigurationService.getString("ui.service","Sakai") +
 	  " " + getResourceBundleString(EMAIL_FOOTER2) + " \"" +
 	  siteTitle + "\" " + getResourceBundleString(EMAIL_FOOTER3) + "\n" +
 	  getResourceBundleString(EMAIL_FOOTER4) +
@@ -1585,6 +1633,12 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     LOG.debug("isInstructor()");
     return isInstructor(UserDirectoryService.getCurrentUser());
   }
+  
+  public boolean isSectionTA()
+  {
+    LOG.debug("isSectionTA()");
+    return isSectionTA(UserDirectoryService.getCurrentUser());
+  }
 
   /**
    * Check if the given user has site.upd access
@@ -1602,6 +1656,13 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
       return SecurityService.unlock(user, "site.upd", getContextSiteId());
     else
       return false;
+  }
+  
+  private boolean isSectionTA(User user) {
+      if (user != null)
+          return SecurityService.unlock(user, "section.role.ta", getContextSiteId());
+        else
+          return false;
   }
   
   public boolean isEmailPermit() {
@@ -1672,6 +1733,23 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
     else
       return false;
   }
+  
+  public boolean isAllowToViewHiddenGroups() {
+	  LOG.debug("isAllowToViewHiddenGroups()");
+	  return isAllowToViewHiddenGroups(UserDirectoryService.getCurrentUser());
+  }
+  
+  private boolean isAllowToViewHiddenGroups(User user)
+  {
+    if (LOG.isDebugEnabled())
+    {
+      LOG.debug("isAllowToViewHiddenGroups(User " + user + ")");
+    }
+    if (user != null)
+      return SecurityService.unlock(user, DefaultPermissionsManager.MESSAGE_FUNCTION_VIEW_HIDDEN_GROUPS, getContextSiteId());
+    else
+      return false;
+  } 
   
 
   /**

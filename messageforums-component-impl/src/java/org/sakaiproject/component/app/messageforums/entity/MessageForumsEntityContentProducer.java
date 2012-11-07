@@ -10,12 +10,10 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sakaiproject.api.app.messageforums.Attachment;
 import org.sakaiproject.api.app.messageforums.DiscussionForum;
 import org.sakaiproject.api.app.messageforums.DiscussionTopic;
 import org.sakaiproject.api.app.messageforums.Message;
 import org.sakaiproject.api.app.messageforums.MessageForumsMessageManager;
-import org.sakaiproject.api.app.messageforums.OpenForum;
 
 import org.sakaiproject.api.app.messageforums.Topic;
 
@@ -27,13 +25,14 @@ import org.sakaiproject.entitybroker.EntityBroker;
 import org.sakaiproject.entitybroker.EntityReference;
 import org.sakaiproject.event.api.Event;
 import org.sakaiproject.search.api.EntityContentProducer;
+import org.sakaiproject.search.api.PortalUrlEnabledProducer;
 import org.sakaiproject.search.api.SearchIndexBuilder;
 import org.sakaiproject.search.api.SearchService;
 import org.sakaiproject.search.model.SearchBuilderItem;
 import org.sakaiproject.util.FormattedText;
 
 public class MessageForumsEntityContentProducer implements
-		EntityContentProducer {
+		EntityContentProducer, PortalUrlEnabledProducer {
 
 	
 	private static Log log = LogFactory.getLog(MessageForumsEntityContentProducer.class);
@@ -162,8 +161,10 @@ public class MessageForumsEntityContentProducer implements
 		Topic topic = m.getTopic();
 		boolean canRead = false;
 		DiscussionTopic dt = discussionForumManager.getTopicById(topic.getId());
-		DiscussionForum df = discussionForumManager.getForumById(dt.getOpenForum().getId());
-		canRead = uIPermissionManager.isRead(dt, df);
+		if(dt != null){
+			DiscussionForum df = discussionForumManager.getForumById(dt.getOpenForum().getId());
+			canRead = uIPermissionManager.isRead(dt, df);
+		}
 		return canRead;
 	}
 
@@ -323,16 +324,17 @@ public class MessageForumsEntityContentProducer implements
 		
 		//seems not to work "/discussionForum/message/dfViewMessage"
 		String path = "/discussionForum/message/dfViewThreadDirect";
-		
+		String url = null;
 		try {
-		String url = developerHelperService.getToolViewURL("sakai.forums", path, params, context);
+		url = developerHelperService.getToolViewURL("sakai.forums", path, params, context);
 		log.debug("got url" + url);
+		return url;
 		}
 		catch (Exception e) {
 			//MSGCNTR this could happen if there is no tool placement
 			log.warn("swallowing exception", e);
 		}
-		return null;
+		return url;
 	}
 
 	public boolean isContentFromReader(String reference) {
@@ -352,14 +354,20 @@ public class MessageForumsEntityContentProducer implements
 	}
 
 	public boolean matches(String reference) {
-		if (reference == null) {
+		if (reference == null || "".equals(reference)) {
 			return false;
 		}
-		String prefix = EntityReference.getPrefix(reference);
-		log.debug("checkin if " + prefix + " matches");
-		if (toolName.equals(prefix))
-			return true;
-		
+		try {
+			String prefix = EntityReference.getPrefix(reference);
+			log.debug("checking if " + prefix + " matches");
+			if (toolName.equals(prefix))
+				return true;
+		} catch (Exception e) {
+			log.warn("unable to parse reference: " + reference +", " + e);
+			if (log.isDebugEnabled()) {
+				log.debug(e);
+			}
+		}
 		return false;
 	}
 

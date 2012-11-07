@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -226,7 +226,8 @@ public class MessageForumsFilePickerServlet extends JsfTool  implements HttpServ
         ////String helperId = parts[2].substring(0, posEnd);
         ActiveTool helperTool = ActiveToolManager.getActiveTool(helperId);
 
-        if (toolSession.getAttribute(helperTool.getId() + Tool.HELPER_DONE_URL) == null) {
+        if (toolSession.getAttribute(helperTool.getId() + Tool.HELPER_DONE_URL) == null
+                && !target.equals("/sakai.filepicker.helper")) {
             toolSession.setAttribute(helperTool.getId() + Tool.HELPER_DONE_URL, req.getContextPath() + req.getServletPath() + computeDefaultTarget(true));
         }
 

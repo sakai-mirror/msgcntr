@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -662,7 +662,7 @@ public class MessageForumStatisticsBean {
 
 		// now process the users from the list of site members to add display information
 		// this will also prune the list of members so only the papropriate ones are displayed
-		courseMemberMap = membershipManager.getAllCourseMembers(true,false,false);
+		courseMemberMap = membershipManager.getAllCourseMembers(true,false,false,null);
 		List members = membershipManager.convertMemberMapToList(courseMemberMap);
 		final List<DecoratedCompiledMessageStatistics> statistics = new ArrayList<DecoratedCompiledMessageStatistics>();
 
@@ -696,36 +696,40 @@ public class MessageForumStatisticsBean {
 		return statistics;
 	}
 
+	Map<String, List> userAuthoredStatisticsCache = new HashMap<String, List>();
 	public List getUserAuthoredStatistics(){
-		final List<DecoratedCompiledUserStatistics> statistics = new ArrayList<DecoratedCompiledUserStatistics>();
+		if(!userAuthoredStatisticsCache.containsKey(selectedSiteUserId)){
+			final List<DecoratedCompiledUserStatistics> statistics = new ArrayList<DecoratedCompiledUserStatistics>();
 
-		List<Message> messages;
-		if((selectedAllTopicsTopicId == null || "".equals(selectedAllTopicsTopicId))
-				&& (selectedAllTopicsForumId != null && !"".equals(selectedAllTopicsForumId))){
-			messages = messageManager.findAuthoredMessagesForStudentByForumId(selectedSiteUserId, Long.parseLong(selectedAllTopicsForumId));
-		}else if(selectedAllTopicsTopicId != null && !"".equals(selectedAllTopicsTopicId)){
-			messages = messageManager.findAuthoredMessagesForStudentByTopicId(selectedSiteUserId, Long.parseLong(selectedAllTopicsTopicId));
-		}else{
-			messages = messageManager.findAuthoredMessagesForStudent(selectedSiteUserId);	
+			List<Message> messages;
+			if((selectedAllTopicsTopicId == null || "".equals(selectedAllTopicsTopicId))
+					&& (selectedAllTopicsForumId != null && !"".equals(selectedAllTopicsForumId))){
+				messages = messageManager.findAuthoredMessagesForStudentByForumId(selectedSiteUserId, Long.parseLong(selectedAllTopicsForumId));
+			}else if(selectedAllTopicsTopicId != null && !"".equals(selectedAllTopicsTopicId)){
+				messages = messageManager.findAuthoredMessagesForStudentByTopicId(selectedSiteUserId, Long.parseLong(selectedAllTopicsTopicId));
+			}else{
+				messages = messageManager.findAuthoredMessagesForStudent(selectedSiteUserId);	
+			}
+			if (messages != null){
+				for (Message msg: messages) {
+					userAuthoredInfo = new DecoratedCompiledUserStatistics();
+					userAuthoredInfo.setSiteUserId(selectedSiteUserId);
+					userAuthoredInfo.setForumTitle(msg.getTopic().getOpenForum().getTitle());
+					userAuthoredInfo.setTopicTitle(msg.getTopic().getTitle());
+					userAuthoredInfo.setForumDate(msg.getCreated());
+					userAuthoredInfo.setForumSubject(msg.getTitle());
+					userAuthoredInfo.setMsgId(Long.toString(msg.getId()));
+					userAuthoredInfo.setTopicId(Long.toString(msg.getTopic().getId()));
+					userAuthoredInfo.setForumId(Long.toString(msg.getTopic().getOpenForum().getId()));
+					userAuthoredInfo.setMessage(msg.getBody());
+					statistics.add(userAuthoredInfo);
+				}
+
+				sortStatisticsByUser(statistics);
+			}
+			userAuthoredStatisticsCache.put(selectedSiteUserId, statistics);
 		}
-		if (messages == null) return statistics;
-
-		for (Message msg: messages) {
-			userAuthoredInfo = new DecoratedCompiledUserStatistics();
-			userAuthoredInfo.setSiteUserId(selectedSiteUserId);
-			userAuthoredInfo.setForumTitle(msg.getTopic().getOpenForum().getTitle());
-			userAuthoredInfo.setTopicTitle(msg.getTopic().getTitle());
-			userAuthoredInfo.setForumDate(msg.getCreated());
-			userAuthoredInfo.setForumSubject(msg.getTitle());
-			userAuthoredInfo.setMsgId(Long.toString(msg.getId()));
-			userAuthoredInfo.setTopicId(Long.toString(msg.getTopic().getId()));
-			userAuthoredInfo.setForumId(Long.toString(msg.getTopic().getOpenForum().getId()));
-			userAuthoredInfo.setMessage(msg.getBody());
-			statistics.add(userAuthoredInfo);
-		}
-
-		sortStatisticsByUser(statistics);
-		return statistics;
+		return userAuthoredStatisticsCache.get(selectedSiteUserId);
 	}
 	
 	public List getTopicStatistics(){
@@ -786,7 +790,7 @@ public class MessageForumStatisticsBean {
 
 			// now process the users from the list of site members to add display information
 			// this will also prune the list of members so only the papropriate ones are displayed
-			courseMemberMap = membershipManager.getAllCourseMembers(true,false,false);
+			courseMemberMap = membershipManager.getAllCourseMembers(true,false,false,null);
 			Map convertedMap = convertMemberMapToUserIdMap(courseMemberMap);
 			Map<String, DecoratedGradebookAssignment> studentGradesMap = getGradebookAssignment();
 			List<DecoratedUser> dUsers = new ArrayList();
@@ -1012,33 +1016,38 @@ public class MessageForumStatisticsBean {
 		return statistics;
 	}
 
+	Map<String, List> userReadStatisticsCache = new HashMap<String, List>();
 	public List getUserReadStatistics(){
-		final List<DecoratedCompiledUserStatistics> statistics = new ArrayList();
+		if(!userReadStatisticsCache.containsKey(selectedSiteUserId)){
+			final List<DecoratedCompiledUserStatistics> statistics = new ArrayList();
 
-		List<Message> messages;
-		
-		if((selectedAllTopicsTopicId == null || "".equals(selectedAllTopicsTopicId))
-				&& (selectedAllTopicsForumId != null && !"".equals(selectedAllTopicsForumId))){
-			messages = messageManager.findReadMessagesForStudentByForumId(selectedSiteUserId, Long.parseLong(selectedAllTopicsForumId));
-		}else if(selectedAllTopicsTopicId != null && !"".equals(selectedAllTopicsTopicId)){
-			messages = messageManager.findReadMessagesForStudentByTopicId(selectedSiteUserId, Long.parseLong(selectedAllTopicsTopicId));
-		}else{
-			messages = messageManager.findReadMessagesForStudent(selectedSiteUserId);	
+			List<Message> messages;
+
+			if((selectedAllTopicsTopicId == null || "".equals(selectedAllTopicsTopicId))
+					&& (selectedAllTopicsForumId != null && !"".equals(selectedAllTopicsForumId))){
+				messages = messageManager.findReadMessagesForStudentByForumId(selectedSiteUserId, Long.parseLong(selectedAllTopicsForumId));
+			}else if(selectedAllTopicsTopicId != null && !"".equals(selectedAllTopicsTopicId)){
+				messages = messageManager.findReadMessagesForStudentByTopicId(selectedSiteUserId, Long.parseLong(selectedAllTopicsTopicId));
+			}else{
+				messages = messageManager.findReadMessagesForStudent(selectedSiteUserId);	
+			}
+			if (messages != null){
+				for (Message msg: messages) {
+					userAuthoredInfo = new DecoratedCompiledUserStatistics();
+					userAuthoredInfo.setSiteUserId(selectedSiteUserId);
+					userAuthoredInfo.setForumTitle(msg.getTopic().getOpenForum().getTitle());
+					userAuthoredInfo.setTopicTitle(msg.getTopic().getTitle());
+					userAuthoredInfo.setForumDate(msg.getCreated());
+					userAuthoredInfo.setForumSubject(msg.getTitle());
+					statistics.add(userAuthoredInfo);
+				}
+
+				sortStatisticsByUser2(statistics);
+			}
+
+			userReadStatisticsCache.put(selectedSiteUserId, statistics);
 		}
-		if (messages == null) return statistics;
-
-		for (Message msg: messages) {
-			userAuthoredInfo = new DecoratedCompiledUserStatistics();
-			userAuthoredInfo.setSiteUserId(selectedSiteUserId);
-			userAuthoredInfo.setForumTitle(msg.getTopic().getOpenForum().getTitle());
-			userAuthoredInfo.setTopicTitle(msg.getTopic().getTitle());
-			userAuthoredInfo.setForumDate(msg.getCreated());
-			userAuthoredInfo.setForumSubject(msg.getTitle());
-			statistics.add(userAuthoredInfo);
-		}
-
-		sortStatisticsByUser2(statistics);
-		return statistics;
+		return userReadStatisticsCache.get(selectedSiteUserId);
 	}
 	
 	public class dMessageStatusInfo{
@@ -1599,7 +1608,14 @@ public class MessageForumStatisticsBean {
 			public int compare(Object item, Object anotherItem){
 				int authored1 = ((DecoratedCompiledMessageStatistics) item).getAuthoredForumsAmt();
 				int authored2 = ((DecoratedCompiledMessageStatistics) anotherItem).getAuthoredForumsAmt();
-				return authored1 - authored2;
+				if(authored1 - authored2 == 0){
+					//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+					//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+					//the user enters the data and when it gets submitted in JSP (behind the scenes)
+					return nameComparatorAsc.compare(item, anotherItem);
+				}else{
+					return authored1 - authored2;
+				}
 			}
 		};
 		
@@ -1607,7 +1623,14 @@ public class MessageForumStatisticsBean {
 			public int compare(Object item, Object anotherItem){
 				int read1 = ((DecoratedCompiledMessageStatistics) item).getReadForumsAmt();
 				int read2 = ((DecoratedCompiledMessageStatistics) anotherItem).getReadForumsAmt();
-				return read1 - read2;
+				if(read1 - read2 == 0){
+					//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+					//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+					//the user enters the data and when it gets submitted in JSP (behind the scenes)
+					return nameComparatorAsc.compare(item, anotherItem);
+				}else{
+					return read1 - read2;
+				}
 			}
 		};
 		
@@ -1615,7 +1638,14 @@ public class MessageForumStatisticsBean {
 			public int compare(Object item, Object anotherItem){
 				int unread1 = ((DecoratedCompiledMessageStatistics) item).getUnreadForumsAmt();
 				int unread2 = ((DecoratedCompiledMessageStatistics) anotherItem).getUnreadForumsAmt();
-				return unread1 - unread2;
+				if(unread1 - unread2 == 0){
+					//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+					//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+					//the user enters the data and when it gets submitted in JSP (behind the scenes)
+					return nameComparatorAsc.compare(item, anotherItem);
+				}else{
+					return unread1 - unread2;
+				}
 			}
 		};
 		
@@ -1624,7 +1654,10 @@ public class MessageForumStatisticsBean {
 				double percentRead1 = ((DecoratedCompiledMessageStatistics) item).getPercentReadForumsAmt();
 				double percentRead2 = ((DecoratedCompiledMessageStatistics) anotherItem).getPercentReadForumsAmt();
 				if(percentRead1 == percentRead2){
-					return 0;
+					//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+					//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+					//the user enters the data and when it gets submitted in JSP (behind the scenes)
+					return nameComparatorAsc.compare(item, anotherItem);
 				}
 				else if(percentRead1 < percentRead2){
 					return -1;
@@ -1678,7 +1711,14 @@ public class MessageForumStatisticsBean {
 			public int compare(Object item, Object anotherItem){
 				int authored1 = ((DecoratedCompiledMessageStatistics) item).getAuthoredForumsAmt();
 				int authored2 = ((DecoratedCompiledMessageStatistics) anotherItem).getAuthoredForumsAmt();
-				return authored2 - authored1;
+				if(authored1 - authored2 == 0){
+					//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+					//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+					//the user enters the data and when it gets submitted in JSP (behind the scenes)
+					return nameComparatorAsc.compare(item, anotherItem);
+				}else{
+					return authored2 - authored1;
+				}
 			}
 		};
 		
@@ -1686,7 +1726,14 @@ public class MessageForumStatisticsBean {
 			public int compare(Object item, Object anotherItem){
 				int read1 = ((DecoratedCompiledMessageStatistics) item).getReadForumsAmt();
 				int read2 = ((DecoratedCompiledMessageStatistics) anotherItem).getReadForumsAmt();
-				return read2 - read1;
+				if(read1 - read2 == 0){
+					//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+					//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+					//the user enters the data and when it gets submitted in JSP (behind the scenes)
+					return nameComparatorAsc.compare(item, anotherItem);
+				}else{
+					return read2 - read1;
+				}
 			}
 		};
 		
@@ -1694,7 +1741,14 @@ public class MessageForumStatisticsBean {
 			public int compare(Object item, Object anotherItem){
 				int unread1 = ((DecoratedCompiledMessageStatistics) item).getUnreadForumsAmt();
 				int unread2 = ((DecoratedCompiledMessageStatistics) anotherItem).getUnreadForumsAmt();
-				return unread2 - unread1;
+				if(unread1 - unread2 == 0){
+					//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+					//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+					//the user enters the data and when it gets submitted in JSP (behind the scenes)
+					return nameComparatorAsc.compare(item, anotherItem);
+				}else{
+					return unread2 - unread1;
+				}
 			}
 		};
 		
@@ -1703,7 +1757,10 @@ public class MessageForumStatisticsBean {
 				double percentRead1 = ((DecoratedCompiledMessageStatistics) item).getPercentReadForumsAmt();
 				double percentRead2 = ((DecoratedCompiledMessageStatistics) anotherItem).getPercentReadForumsAmt();
 				if(percentRead1 == percentRead2){
-					return 0;
+					//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+					//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+					//the user enters the data and when it gets submitted in JSP (behind the scenes)
+					return nameComparatorAsc.compare(item, anotherItem);
 				}
 				else if(percentRead1 < percentRead2){
 					return 1;
@@ -1871,7 +1928,10 @@ public class MessageForumStatisticsBean {
 				}catch(NumberFormatException e){					
 				}
 				
-				return 0;
+				//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+				//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+				//the user enters the data and when it gets submitted in JSP (behind the scenes)
+				return nameComparatorAsc.compare(item, anotherItem);
 			}
 		};
 		
@@ -1908,7 +1968,11 @@ public class MessageForumStatisticsBean {
 				}catch(NumberFormatException e){
 				}
 				
-				return 0;
+				//we can't have descrepancies on how the order happens, otherwise jsf will scramble the scores
+				//with other scores that are equal to this (jsp submits twice, causing "sort" to happen between when
+				//the user enters the data and when it gets submitted in JSP (behind the scenes)
+				return nameComparatorAsc.compare(item, anotherItem);
+				
 			}
 		};
 	}
@@ -1925,6 +1989,9 @@ public class MessageForumStatisticsBean {
 		LOG.debug("processActionStatisticsUser");
 		
 		selectedSiteUserId = getExternalParameterByKey(SITE_USER_ID);
+		//reset cache
+		userReadStatisticsCache = new HashMap<String, List>();
+		userAuthoredStatisticsCache = new HashMap<String, List>();
 		
 		return processActionStatisticsUserHelper();
 	}
@@ -2074,7 +2141,7 @@ public class MessageForumStatisticsBean {
 	public Map<String, String> getUserIdName() {
 		Map<String, String> idNameMap = new LinkedHashMap<String, String>();
 		
-		Map courseMemberMap = membershipManager.getAllCourseMembers(true,false,false);
+		Map courseMemberMap = membershipManager.getAllCourseMembers(true,false,false,null);
 		List members = membershipManager.convertMemberMapToList(courseMemberMap);		
 
 		for (Iterator i = members.iterator(); i.hasNext();) {

@@ -115,7 +115,7 @@
             	 <h:outputText value="#{PrivateMessagesTool.detailMsg.recipientsAsText}" />
             </td>
           </tr>
-          <f:subview id="bccRecipients" rendered="#{PrivateMessagesTool.detailMsg.recipientsAsTextBcc != null && PrivateMessagesTool.detailMsg.recipientsAsTextBcc != ''}">
+          <f:subview id="bccRecipients" rendered="#{ForumTool.userId == PrivateMessagesTool.detailMsg.msg.createdBy && PrivateMessagesTool.detailMsg.recipientsAsTextBcc != null && PrivateMessagesTool.detailMsg.recipientsAsTextBcc != ''}">
 	          <f:verbatim>
 	          <tr>
 	            <th>
@@ -147,7 +147,7 @@
             	<h:outputText value="#{PrivateMessagesTool.detailMsg.msg.author}" />  
             	<h:outputText value="#{msgs.pvt_openb}" />  
             	<h:outputText value="#{PrivateMessagesTool.detailMsg.msg.created}" >
-                	<f:convertDateTime pattern="#{msgs.date_format}" timeZone="#{PrivateMessagesTool.userTimeZone}" />  
+                	<f:convertDateTime pattern="#{msgs.date_format}" timeZone="#{PrivateMessagesTool.userTimeZone}" locale="#{PrivateMessagesTool.userLocale}"/>  
                 </h:outputText>
             	<h:outputText value=" #{msgs.pvt_closeb}" /> 
             </td>

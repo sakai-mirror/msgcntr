@@ -20,7 +20,8 @@
        		<script type="text/javascript" language="JavaScript" src="/library/js/jquery-ui-latest/js/jquery.min.js"></script>
        		<script type="text/javascript" language="JavaScript" src="/library/js/jquery-ui-latest/js/jquery-ui.min.js"></script>
   			<sakai:script contextBase="/messageforums-tool" path="/js/dialog.js"/>
-  			<link rel="stylesheet" type="text/css" href="/messageforums-tool/css/dialog.css" />
+			<sakai:script contextBase="/messageforums-tool" path="/js/jquery.qtip.js"/>
+  			<link rel="stylesheet" type="text/css" href="/messageforums-tool/css/dialog.css" />	
        		<sakai:script contextBase="/messageforums-tool" path="/js/sak-10625.js"/>
 		<sakai:script contextBase="/messageforums-tool" path="/js/forum.js"/>
 		
@@ -60,6 +61,9 @@
  			$(document).ready(function() {
 				setupMessageNav('messagePending');
 				setupMessageNav('messageNew');
+				if ($('div.hierItemBlock').length > 2){
+					$('.itemNav').clone().addClass('specialLink').appendTo('form')
+				}
 			});
 </script>		
 		<sakai:tool_bar separator="#{msgs.cdfm_toolbar_separator}">
@@ -127,7 +131,7 @@
 	    	</div>
 		</f:verbatim>
 		
-				 <%@include file="dfViewSearchBarThread.jsp"%>
+				 <%@ include file="dfViewSearchBarThread.jsp"%>
 		
 		<h:outputText value="#{msgs.cdfm_postFirst_warning}" rendered="#{ForumTool.needToPostFirst}" styleClass="messageAlert"/>
 		<h:outputText value="#{msgs.cdfm_no_unread_messages}" rendered="#{empty ForumTool.selectedThread && !ForumTool.needToPostFirst}" styleClass="instruction" style="display:block;"/>
@@ -137,7 +141,7 @@
    	 		styleClass="listHier messagesFlat specialLink" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
 			<h:column>
 			
-				<%@include file="dfViewThreadBodyInclude.jsp" %>
+				<%@ include file="dfViewThreadBodyInclude.jsp" %>
 			</h:column>
 		</h:dataTable>
 		
@@ -145,7 +149,7 @@
 		<mf:hierDataTable id="expandedThreadedMessages" value="#{ForumTool.selectedThread}" var="message" rendered="#{ForumTool.threaded}"
    	 		noarrows="true" styleClass="listHier messagesThreaded specialLink" border="0" cellpadding="0" cellspacing="0" width="100%" columnClasses="bogus">
 			<h:column id="_msg_subject">
-				<%@include file="dfViewThreadBodyInclude.jsp" %>
+				<%@ include file="dfViewThreadBodyInclude.jsp" %>
 			</h:column>
 		</mf:hierDataTable>
 				
@@ -167,5 +171,8 @@
 	
 	</h:form>
 	<h:outputText value="#{msgs.cdfm_insufficient_privileges_view_topic}" rendered="#{ForumTool.selectedTopic.topic.draft && ForumTool.selectedTopic.topic.createdBy != ForumTool.userId}" />
+	
+				 
+	
 </sakai:view>
 </f:view>

@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -317,8 +317,9 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
           return q.list();
       }
     };
-    
-    return (List)getHibernateTemplate().execute(hcb);
+    List returnList = new ArrayList();
+    returnList.addAll(new HashSet((List)getHibernateTemplate().execute(hcb)));
+    return returnList;
   }
       
   public List getReceivedUuidByContextId(final List siteList) {
@@ -683,17 +684,25 @@ public class MessageForumsForumManagerImpl extends HibernateDaoSupport implement
         };
 
         Topic res = null;
-        List temp = (ArrayList) getHibernateTemplate().execute(hcb);
-        Object [] results = (Object[])temp.get(0);
-        if (results != null) {
-            if (results[0] instanceof Topic) {
-                res = (Topic)results[0];
-                res.setBaseForum((BaseForum)results[1]);
-            } else {
-                res = (Topic)results[1];
-                res.setBaseForum((BaseForum)results[0]);
-            }
-        }
+		try {
+			List temp = (ArrayList) getHibernateTemplate().execute(hcb);
+			if (temp != null && temp.size() > 0) {
+
+				Object[] results = (Object[]) temp.get(0);
+				if (results != null && results.length > 1) {
+					if (results[0] instanceof Topic) {
+						res = (Topic) results[0];
+						res.setBaseForum((BaseForum) results[1]);
+					} else {
+						res = (Topic) results[1];
+						res.setBaseForum((BaseForum) results[0]);
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOG.warn(e);
+		}
+	
         return res;
     }
 

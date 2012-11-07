@@ -32,7 +32,7 @@
   	
 
   		<h:dataTable styleClass="listHier lines nolines" id="members" value="#{mfStatisticsBean.allTopicStatistics}" var="stat" rendered="true"
-   	 		columnClasses="specialLink,specialLink,bogus,bogus,bogus" cellpadding="0" cellspacing="0" summary="#{msgs.statistics_table_topic}">
+   	 		columnClasses="specialLink,specialLink,bogus,bogus,bogus" cellpadding="0" cellspacing="0">
   			<h:column>
   				<f:facet name="header">
   					<h:commandLink action="#{mfStatisticsBean.toggleAllTopicsForumTitleSort}" title="#{msgs.stat_forum_title}">
@@ -70,7 +70,7 @@
 					</h:commandLink>
   				</f:facet>
   				<h:outputText value="#{stat.topicDate}">
-  					<f:convertDateTime pattern="#{msgs.date_format}" timeZone="#{ForumTool.userTimeZone}" />
+  					<f:convertDateTime pattern="#{msgs.date_format}" timeZone="#{ForumTool.userTimeZone}" locale="#{ForumTool.userLocale}"/>
   				</h:outputText>
   			</h:column>
   			<h:column>

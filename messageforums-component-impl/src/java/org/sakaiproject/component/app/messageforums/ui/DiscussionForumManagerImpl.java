@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -424,7 +424,11 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
 	  saveMessage(message, true);
   }
   
-  public void saveMessage(Message message, boolean logEvent)
+  public void saveMessage(Message message, boolean logEvent) {
+      saveMessage(message, logEvent, false);
+  }
+  
+  public void saveMessage(Message message, boolean logEvent, boolean ignoreLockedTopicForum)
   {
     if (LOG.isDebugEnabled())
     {
@@ -443,7 +447,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     	message.setModifiedBy(".anon");
     }
     
-    messageManager.saveMessage(message, logEvent);
+    messageManager.saveMessage(message, logEvent, ignoreLockedTopicForum);
   }
 
   /*
@@ -1811,7 +1815,8 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     	}    	
     }   
 
-    if ((t.getDraft().equals(Boolean.FALSE) && !nonePermission)
+    if ((t.getDraft().equals(Boolean.FALSE) && !nonePermission && 
+            t.getAvailability() != null && t.getAvailability())
     		|| isInstructor()
             || securityService.isSuperUser()
             || isTopicOwner(t))
@@ -2098,7 +2103,7 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
     }
     if (courseMemberMap == null)
     {
-      courseMemberMap = membershipManager.getAllCourseMembers(true, false, true);
+      courseMemberMap = membershipManager.getAllCourseMembers(true, false, true, null);
     }
     return courseMemberMap;
   }
@@ -2272,8 +2277,9 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
         if (levelName != null && levelName.trim().length() > 0)
         {
           level = permissionLevelManager.getPermissionLevelByName(levelName);
-        } 
-        else{
+        } else if (name == null || ".anon".equals(name)) {
+            level = permissionLevelManager.getDefaultNonePermissionLevel();
+        } else{
         	Collection siteIds = new Vector();
         	siteIds.add(contextSiteId);        	
         	

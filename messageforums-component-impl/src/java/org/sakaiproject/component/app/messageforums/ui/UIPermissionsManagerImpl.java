@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -512,7 +512,15 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
   }
   
   public boolean isRead(DiscussionTopic topic, DiscussionForum forum, String userId){
-	  return isRead(topic, forum, userId, getContextId());
+	  String contextId = null;
+	  try{
+		  //context could be null b/c of external queries... first check
+		  //since its faster than a DB lookup
+		  contextId = getContextId();
+	  }catch (Exception e) {
+		  contextId = forumManager.getContextForForumById(forum.getId());
+	}
+	  return isRead(topic, forum, userId, contextId);
   }
   
   public boolean isRead(DiscussionTopic topic, DiscussionForum forum, String userId, String siteId)
@@ -1358,6 +1366,11 @@ public class UIPermissionsManagerImpl implements UIPermissionsManager {
     	userRole = authzGroupService.getUserRole(userId, "/site/" + siteId);
     	roleMap.put(siteId + "-" + userId, userRole);
     	ThreadLocalManager.set("message_center_user_role_map", roleMap);
+    }
+    
+    // if user role is still null at this point, check for .anon
+    if(userRole == null && sessionManager.getCurrentSessionUserId() == null && getAnonRole() == true){
+        return ".anon";
     }
     
     return userRole;

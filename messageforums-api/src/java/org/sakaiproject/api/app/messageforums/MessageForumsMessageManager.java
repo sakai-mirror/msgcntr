@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,6 +40,16 @@ public interface MessageForumsMessageManager {
     public void saveMessage(Message message);
 
     public void saveMessage(Message message, boolean logEvent);
+    
+    /**
+     * 
+     * @param message
+     * @param logEvent
+     * @param ignoreLockedTopicForum set true if you want to allow the message
+     * to be updated even if the topic or forum is locked (ie marking as read or
+     * commenting on a moderated message)
+     */
+    public void saveMessage(Message message, boolean logEvent, boolean ignoreLockedTopicForum);
 
     public void deleteMessage(Message message);
 
@@ -231,8 +241,4 @@ public interface MessageForumsMessageManager {
 	 * @return a list of messages
 	 */
 	public List<Message> getAllMessagesInSite(String siteId);
-
-	public void saveMessageMoveHistory(Long msgid, Long desttopicId,Long sourceTopicId, boolean checkreminder);
-	  
-	public List findMovedMessagesByTopicId(Long id); 
 }

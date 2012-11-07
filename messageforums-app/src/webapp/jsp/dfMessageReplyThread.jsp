@@ -49,7 +49,7 @@
 				<h:outputText value="#{ForumTool.selectedMessage.message.author}" styleClass="textPanelFooter"/>
 				<h:outputText value=" #{msgs.cdfm_openb}" styleClass="textPanelFooter"/>
 				<h:outputText value="#{ForumTool.selectedMessage.message.created}" styleClass="textPanelFooter">
-					<f:convertDateTime pattern="#{msgs.date_format}" timeZone="#{ForumTool.userTimeZone}" />  
+					<f:convertDateTime pattern="#{msgs.date_format}" timeZone="#{ForumTool.userTimeZone}" locale="#{ForumTool.userLocale}"/>  
 				</h:outputText>
 				<h:outputText value=" #{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
 
@@ -117,12 +117,12 @@
 		    <h:inputHidden id="titleHidden" value="#{ForumTool.selectedMessage.message.title}" />
 		<h:outputText value="&nbsp;&nbsp;&nbsp; " escape="false" />
 		<img src="/library/image/silk/paste_plain.png" />
-		<a  href="#"  onclick="InsertHTML('<b><i>Original Message:</i></b><br/><b><i><h:outputText value="#{msgs.cdfm_from}" /></i></b> <i><h:outputText value="#{ForumTool.selectedMessage.message.author}" /><h:outputText value=" #{msgs.cdfm_openb}" /><h:outputText value="#{ForumTool.selectedMessage.message.created}" ><f:convertDateTime pattern="#{msgs.date_format_static}" /></h:outputText><h:outputText value="#{msgs.cdfm_closeb}" /></i><br/><b><i><h:outputText value="#{msgs.cdfm_subject}" /></i></b>');">
+		<a  href="#"  onclick="InsertHTML('<b><i><h:outputText value="#{msgs.cdfm_insert_original_text_comment}"/></i></b><br/><b><i><h:outputText value="#{msgs.cdfm_from}" /></i></b> <i><h:outputText value="#{ForumTool.selectedMessage.message.author}" /><h:outputText value=" #{msgs.cdfm_openb}" /><h:outputText value="#{ForumTool.selectedMessage.message.created}" ><f:convertDateTime pattern="#{msgs.date_format_static}" locale="#{ForumTool.userLocale}" timeZone="#{ForumTool.userTimeZone}"/></h:outputText><h:outputText value="#{msgs.cdfm_closeb}" /></i><br/><b><i><h:outputText value="#{msgs.cdfm_subject}" /></i></b>');">
 		<h:outputText value="#{msgs.cdfm_message_insert}" /></a>
 			<span style="margin-left:3em"><img src="/library/image/silk/table_add.png" />&nbsp;<h:outputText value="#{msgs.cdfm_message_count}" />:&nbsp;<span  id="counttotal"> </span></span>		
 			
 		</div>
-            <sakai:inputRichText textareaOnly="#{PrivateMessagesTool.mobileSession}" value="#{ForumTool.composeBody}" id="df_compose_body" rows="22" cols="120">
+            <sakai:inputRichText textareaOnly="#{PrivateMessagesTool.mobileSession}" value="#{ForumTool.composeBody}" id="df_compose_body" rows="#{ForumTool.editorRows}" cols="120">
 				<f:validateLength maximum="65000"/>
 			</sakai:inputRichText>
 		<script language="javascript" type="text/javascript">
@@ -186,9 +186,9 @@
 			  </h:column>
 			</h:dataTable>   
 		<p style="padding:0" class="act">
-			<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_redirect}" immediate="true"
+			<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_redirect}" 
 				rendered="#{empty ForumTool.attachments}" style="font-size:95%"/>
-			<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_more_redirect}" immediate="true"
+			<sakai:button_bar_item action="#{ForumTool.processAddAttachmentRedirect}" value="#{msgs.cdfm_button_bar_add_attachment_more_redirect}" 
 				rendered="#{!empty ForumTool.attachments}" style="font-size:95%"/>
 		</p>
 		</div>
@@ -223,9 +223,10 @@
             </tr>
             --%>
 
+						<h:outputText value="#{msgs.cdfm_reply_message_note} " styleClass="highlight" rendered="#{ForumTool.selectedTopic.moderated == 'true' }" /><h:outputText value="#{msgs.cdfm_reply_message_mod_inst}" styleClass="instruction" rendered="#{ForumTool.selectedTopic.moderated == 'true' }" />
 	  
 		<p style="padding:0" class="act">
-        <sakai:button_bar_item action="#{ForumTool.processDfReplyMsgPost}" value="#{msgs.cdfm_button_bar_post_message}" accesskey="s" styleClass="active" />
+        <sakai:button_bar_item id="post" action="#{ForumTool.processDfReplyMsgPost}" value="#{msgs.cdfm_button_bar_post_message}" accesskey="s" styleClass="active" onclick="disable()"/>
     <%--    <sakai:button_bar_item action="#{ForumTool.processDfReplyMsgSaveDraft}" value="#{msgs.cdfm_button_bar_save_draft}" /> --%>
         <sakai:button_bar_item action="#{ForumTool.processDfReplyThreadCancel}" value="#{msgs.cdfm_button_bar_cancel}" accesskey="x" />
 		</p>

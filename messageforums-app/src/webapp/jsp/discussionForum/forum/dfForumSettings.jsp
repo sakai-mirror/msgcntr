@@ -47,11 +47,14 @@ if (thisId == null)
         <h:outputText styleClass="messageAlert" value="#{msgs.cdfm_duplicate_forum_confirm}" rendered="#{ForumTool.selectedForum.markForDuplication}" style="display:block" />
 		<table class="forumHeader">
 			  <tr>
-					<td>
+					<td><h:messages styleClass="messageAlert" id="errorMessages" rendered="#{! empty facesContext.maximumSeverity}" />
 				<h:graphicImage url="/images/silk/lock.png" alt="#{msgs.cdfm_forum_locked}" rendered="#{ForumTool.selectedForum.locked=='true'}"  style="margin-right:.3em"/>
 				<h:graphicImage url="/images/silk/lock_open.png" alt="#{msgs.cdfm_forum_locked}" rendered="#{ForumTool.selectedForum.locked=='false'}"  style="margin-right:.3em"/>
 				<span class="title">
-				    <h:outputText id="forum_title"  value="#{ForumTool.selectedForum.forum.title}"/>
+                    <h:outputText value="#{ForumTool.selectedForum.forum.title}" rendered="#{!ForumTool.selectedForum.markForDuplication}"/>
+				    <h:inputText size="50" value="#{ForumTool.selectedForum.forum.title}" id="forum_title" rendered="#{ForumTool.selectedForum.markForDuplication}">
+                        <f:validateLength minimum="1" maximum="255" />
+                    </h:inputText>
 				</span>
 				<h:outputText   value="#{msgs.cdfm_openb}"/>
 					<h:outputText   value="#{msgs.cdfm_moderated}"  rendered="#{ForumTool.selectedForum.moderated=='true'}" />
@@ -203,7 +206,7 @@ if (thisId == null)
 
 		<div id="permissionReadOnlyW">
 		<div id="permissionReadOnly">	
-      <%@include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
+      <%@ include file="/jsp/discussionForum/permissions/permissions_include.jsp"%>
 		</div>	
 		</div>
       --%>      
@@ -215,13 +218,13 @@ if (thisId == null)
           </h:commandButton>
           
           <h:commandButton id="delete_confirm" action="#{ForumTool.processActionDeleteForumConfirm}" 
-                           value="#{msgs.cdfm_button_bar_delete}" rendered="#{!ForumTool.selectedForum.markForDeletion && !ForumTool.selectedForum.markForDuplication}"
+                           value="#{msgs.cdfm_button_bar_delete_forum}" rendered="#{!ForumTool.selectedForum.markForDeletion && !ForumTool.selectedForum.markForDuplication}"
                            accesskey="">
 	        	<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
           </h:commandButton>
           
           <h:commandButton id="delete" action="#{ForumTool.processActionDeleteForum}" 
-                           value="#{msgs.cdfm_button_bar_delete}" rendered="#{ForumTool.selectedForum.markForDeletion}"
+                           value="#{msgs.cdfm_button_bar_delete_forum}" rendered="#{ForumTool.selectedForum.markForDeletion}"
                            accesskey="">
 	        	<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
           </h:commandButton>

@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,6 +49,7 @@ public interface DefaultPermissionsManager
   public static final String MESSAGE_FUNCTION_ALLOW_TO_FIELD_GROUPS = MESSAGE_FUNCTION_PREFIX + MESSAGE_FUNCITON_PREFIX_PERMISSIONS + "allowToField.groups";
   public static final String MESSAGE_FUNCTION_ALLOW_TO_FIELD_ALL_PARTICIPANTS = MESSAGE_FUNCTION_PREFIX + MESSAGE_FUNCITON_PREFIX_PERMISSIONS + "allowToField.allParticipants";
   public static final String MESSAGE_FUNCTION_ALLOW_TO_FIELD_ROLES = MESSAGE_FUNCTION_PREFIX + MESSAGE_FUNCITON_PREFIX_PERMISSIONS + "allowToField.roles";
+  public static final String MESSAGE_FUNCTION_VIEW_HIDDEN_GROUPS = MESSAGE_FUNCTION_PREFIX + MESSAGE_FUNCITON_PREFIX_PERMISSIONS + "viewHidden.groups";
   
   
   // control permissions

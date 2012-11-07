@@ -335,13 +335,26 @@ function setupMessageNav(messageType){
 						// jq1.2 version 
 						//document.location = "#" + $(parentRow).nextAll('.' + messageType + 'Next').eq(0).find('a.messageNewAnchor').attr('name');
 						//jq1.1 version
-						document.location = "#" + $(parentTable).find('tr').slice(thisIndex, totalTableRows).filter('.messageNewNext').eq(0).find('a.messageNewAnchor').attr('name');
+						//document.location = "#" + $(parentTable).find('tr').slice(thisIndex, totalTableRows).filter('.messageNewNext').eq(0).find('a.messageNewAnchor').attr('name');
+                        //new method to avoid FF4 internal linking behaviours MSGCNTR-544
+                        var targetPos = $(parentTable).find('tr').slice(thisIndex, totalTableRows).filter('.messageNewNext').eq(0).position();
+                        window.parent.scrollTo(0, targetPos.top);
+                        
 					}
 					// if "Pending" just link directly to next one
 					else{
-						document.location = "#" + messageType + "newMess" + (intIndex + 1);
+                        //new method to avoid FF4 internal linking behaviours MSGCNTR-544
+                        var targetPos = $('a[name=' +  messageType + "newMess" + (intIndex + 1) + ']').position();
+						window.parent.scrollTo(0, targetPos.top);
 					}
                 });
+                $('#messNavHolder a').click(function(e){
+                    //new method to avoid FF4 internal linking behaviours MSGCNTR-544
+                    e.preventDefault();
+                    var targetPosPrep=$(this).attr('href').replace('#','');
+                    var targetPos = $('a[name=' + targetPosPrep + ']').position();
+                    window.parent.scrollTo(0, targetPos.top);        
+                })
             }
             else {
                 $(this).attr("title", last);
@@ -444,15 +457,41 @@ function printFriendly(url) {
 	if (window.focus) {newwindow.focus()}
 }
 
+var sakaiCKEditorName;
+$(document).ready(function () {
+    if (typeof(CKEDITOR) != 'undefined') {
+        for (instance in CKEDITOR.instances) {
+            // there should only be one ckeditor per page
+            // save the instance name for other functions to use
+            sakaiCKEditorName = instance;
+
+            // bind to the keyup and paste to update the word count
+            CKEDITOR.instances[instance].on("instanceReady", function () {
+                    this.document.on("keyup", ckeditor_word_count);
+                    this.document.on("paste", ckeditor_word_count);
+            });
+        }
+    }
+});
+
 function FCKeditor_OnComplete(editorInstance) {
 	   
     fckeditor_word_count(editorInstance);
     editorInstance.Events.AttachEvent('OnSelectionChange', fckeditor_word_count);
+}
    
+function ckeditor_word_count() {
+     msgcntr_word_count(CKEDITOR.instances[sakaiCKEditorName].getData());
 }
 
 function fckeditor_word_count(editorInstance) {
-     document.getElementById('counttotal').innerHTML = "<span class='highlight'>(" + getWordCount(editorInstance.GetData()) + ")</span>";
+     msgcntr_word_count(editorInstance.GetData());
+}
+
+function msgcntr_word_count(forumHtml) {
+    if (document.getElementById('counttotal')) {
+        document.getElementById('counttotal').innerHTML = "<span class='highlight'>(" + getWordCount(forumHtml) + ")</span>";
+    }
 }
   
  function fckeditor_word_count_fromMessage(msgStr, countSpan){
@@ -461,7 +500,7 @@ function fckeditor_word_count(editorInstance) {
  
  function getWordCount(msgStr) {
  
-     var matches = msgStr.replace(/<[^<|>]+?>|&nbsp;/gi,' ').match(/\b/g);
+     var matches = msgStr.replace(/<[^<|>]+?>|&nbsp;/gi,' ').replace(/[\u0080-\u202e\u2030-\u205f\u2061-\ufefe\uff00-\uffff]/g,'x').match(/\b/g);
     var count = 0;
     if(matches) {
         count = matches.length/2;
@@ -476,30 +515,108 @@ function InsertHTML(header) {
 
 	document.forms['dfCompose'].elements[rteId].value = finalhtml;
 	// Get the editor instance that we want to interact with.
-	var oEditor = FCKeditorAPI.GetInstance(rteId);
-	// Check the active editing mode.
-	if ( oEditor.EditMode == FCK_EDITMODE_WYSIWYG )
+	if (typeof(FCKeditorAPI) != 'undefined')
 	{
-	// Insert the desired HTML.
-		oEditor.InsertHtml( finalhtml );
+		var oEditor = FCKeditorAPI.GetInstance(rteId);
+		// Check the active editing mode.
+		if ( oEditor.EditMode == FCK_EDITMODE_WYSIWYG )
+		{
+			// Insert the desired HTML.
+			oEditor.InsertHtml( finalhtml );
+		}
+		else alert( 'You must be in WYSIWYG mode!' );
 	}
-	else alert( 'You must be in WYSIWYG mode!' );
+	else if (typeof(CKEDITOR) != 'undefined')
+	{
+		var oEditor = CKEDITOR.instances[sakaiCKEditorName];
+		// Check the active editing mode.
+		if ( oEditor.mode == 'wysiwyg' )
+		{
+			// Insert the desired HTML.
+			oEditor.insertHtml( finalhtml );
+		}
+		else alert( 'You must be in WYSIWYG mode!' );
+	}
 }
 
-
-function resizeFrameForDialog()
-        {
-                if (top.location != self.location)       {
-                        var frame = parent.document.getElementById(window.name);
-                }
-                        if( frame )
-                {
-                        var clientH = document.body.clientHeight + 400;
-                        $( frame ).height( clientH );
-                }
-                else
-                {
-                        throw( "resizeFrame did not get the frame (using name=" + window.name + ")" );
-                }
+var setupLongDesc = function(){
+    var showMoreText = $('.showMoreText').text();
+    $('.show').hide();
+    $('.textPanel').each(function(i){
+        if ($(this).text().length > 200) {
+            var trimmed = $(this).text().substring(0, 200) + '... <a class=\"moreDescription\")" href=\"#\">' + showMoreText + '</a>';
         }
+        else{
+            var trimmed = $(this).html();
+        }
+        var insertPoint = $(this).parent('.toggle');
+        $('<p class=\"trimmedPanelTop\">' + trimmed + '</p>').insertBefore(insertPoint);
+    });
+    
+    $('.forumHeader, .topicBloc').each(function(i){
+        var attachList = $(this).find('.attachListTable');
+        var insertPoint='';
+        if ($(this).find('.toggle').length){
+            var insertPoint = $(this).find('.toggle');
+        }
+        else{
+            var insertPoint = $(this).find('.hide');            
+        }
+        $(attachList).insertAfter(insertPoint);
+    });
+     
+    $('.moreDescription').live('click', function(e){
+        e.preventDefault();
+        var trimmedText = $(this).parent();
+        var textPanel = $(this).parent('p').next('div.toggle');
+        $(trimmedText).fadeOut('slow', function(){
+            $(textPanel).fadeIn('slow');
+        });
+        resizeFrame('grow')
+        
+    });
+    
+}
+var setupdfAIncMenus = function(){
+    
+    $('body').click(function(e){
+        if (e.target.className != 'moreMenuLink' && e.target.className != 'moreMenuLinkSpan'){
+            $('.moreMenu').hide();
+        }
+        });
+    $('.moreMenuLink').click(function(e){
+        e.preventDefault();
+        $('.moreMenu').hide();
+        pos =$(this).position()
+        $(this).next('ul').css({
+            'position':'absolute',
+            'top':pos.top + 20,
+            'left':pos.left + 20
+        }).toggle();
+    })
+}
+var clicked = 'false';
+function disable() {
+    if (clicked == 'false') {
+        clicked = 'true'
+    }
+    else {
+        document.forms[0].elements['dfCompose:post'].disabled=true;
+    }
+}
 
+// This is the profile display on user's names.
+$(document).ready(function() {			
+	$('.authorProfile').each(function() {
+		$(this).qtip({ 
+			content: {text: '<h:outputText value="#{msgs.loading_wait}" />',
+				url: $(this).attr('href'), title: {	text: '<h:outputText value="#{msgs.cdfm_profile_information}" />',button: '[ X ]' }
+			},
+			position: {	corner: {target: 'center', tooltip: 'leftMiddle'} },
+			show: { when: 'click', solo: true, effect: {length:0} },
+			hide: { when:'unfocus', fixed:true, delay: 300,  effect: {length:0} },
+			style: { tip: true, border: {color:'#687E9C'}, name: 'light', width: 570 }
+		});
+		$(this).attr('href', 'javascript:;');
+	});
+});	

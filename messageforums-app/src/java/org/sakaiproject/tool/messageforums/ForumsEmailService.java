@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,47 +25,41 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
-
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.api.app.messageforums.Attachment;
 import org.sakaiproject.api.app.messageforums.BaseForum;
+import org.sakaiproject.api.app.messageforums.Message;
 import org.sakaiproject.api.app.messageforums.Topic;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.content.api.ContentResource;
 import org.sakaiproject.content.cover.ContentHostingService;
+import org.sakaiproject.email.api.AddressValidationException;
+import org.sakaiproject.email.api.EmailAddress;
+import org.sakaiproject.email.api.EmailAddress.RecipientType;
+import org.sakaiproject.email.api.EmailMessage;
+import org.sakaiproject.email.api.EmailService;
+import org.sakaiproject.email.api.NoRecipientsException;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.exception.ServerOverloadException;
 import org.sakaiproject.exception.TypeException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.cover.SiteService;
+import org.sakaiproject.time.cover.TimeService;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.tool.messageforums.ui.DiscussionMessageBean;
 import org.sakaiproject.util.FormattedText;
-import org.sakaiproject.api.app.messageforums.Message;
+import org.sakaiproject.util.ResourceLoader;
 
 /**
- * The ItemService calls persistent service locator to reach the manager on the
- * back end.
+ * This sends out emails to a list of users.
+ * Really this should be part of the API, rather than the tool.
  */
 public class ForumsEmailService {
 	private static Log log = LogFactory.getLog(ForumsEmailService.class);
@@ -73,8 +67,6 @@ public class ForumsEmailService {
 	private List<String> toEmailAddress;
 
 	private Message reply;
-
-	private String smtpServer;
 
 	private String prefixedPath;
 
@@ -87,10 +79,8 @@ public class ForumsEmailService {
 			DiscussionMessageBean currthread) {
 		this.toEmailAddress = filterMailAddresses(toEmailAddress);
 		this.reply = reply;
-		this.smtpServer = ServerConfigurationService
-				.getString("smtp@org.sakaiproject.email.api.EmailService");
 		this.prefixedPath = ServerConfigurationService.getString(
-				"forum.email.prefixedPath", "/tmp/");
+				"forum.email.prefixedPath", System.getProperty("java.io.tmpdir"));
 		this.threadhead = currthread;
 
 	}
@@ -99,27 +89,7 @@ public class ForumsEmailService {
 		List<Attachment> attachmentList = null;
 		Attachment a = null;
 		try {
-			Properties props = System.getProperties();
-			// TODO
-
-			// check for testMode@org.sakaiproject.email.api.EmailService
-			// Server
-			if (smtpServer == null || "".equals(smtpServer)) {
-				log
-						.info("smtp@org.sakaiproject.email.api.EmailService is not set");
-				log
-						.error("Please set the value of smtp@org.sakaiproject.email.api.EmailService");
-				return;
-			}
-			props.setProperty("mail.smtp.host", smtpServer);
-				
-			Session session;
-			session = Session.getInstance(props, null);
-			
-			boolean smtpDebug = ServerConfigurationService.getBoolean("smtpDebug@org.sakaiproject.email.api.EmailService", false);
-			session.setDebug(smtpDebug);
-			
-			MimeMessage msg = new MimeMessage(session);
+			EmailMessage msg = new EmailMessage();
 			
 
 			String fromName = ServerConfigurationService.getString("ui.service", "LocalSakaiName");
@@ -131,12 +101,10 @@ public class ForumsEmailService {
 			String subject = DiscussionForumTool.getResourceBundleString("email.subject", 
 					new Object[]{fromName, reply.getAuthor()});
 
-			InternetAddress fromIA = new InternetAddress(fromEmailAddress,
+			EmailAddress fromIA = new EmailAddress(fromEmailAddress,
 					fromName);
 			msg.setFrom(fromIA);
 			log.debug("from: " + fromName + "<" + fromEmailAddress + ">");
-			// form the list of to: addresses from the users users collection
-			InternetAddress[] to = new InternetAddress[toEmailAddress.size()];
 
 			
 			int indx = 0;
@@ -146,13 +114,8 @@ public class ForumsEmailService {
 
 				if ((email != null) && (email.length() > 0) && isValidEmail(email)) {
 					log.debug("adding email <" + email + ">");
-					try {
-						to[indx] = new InternetAddress(email);
-						indx++;
-					} catch (AddressException e) {
-						if (log.isDebugEnabled())
-							log.debug("sendToUsers: " + e);
-					}
+					msg.addRecipient(RecipientType.BCC, email);
+					indx++;
 				}
 			}
 			//if the to list is empty return
@@ -186,6 +149,8 @@ public class ForumsEmailService {
 			Topic topic = reply.getTopic();
 			String topictitle = topic.getTitle();
 			String threadtitle = threadhead.getMessage().getTitle();
+			SimpleDateFormat formatter = new SimpleDateFormat(DiscussionForumTool.getResourceBundleString("date_format"), new ResourceLoader().getLocale());
+			formatter.setTimeZone(TimeService.getLocalTimeZone());
 			content.append(DiscussionForumTool
 					.getResourceBundleString("email.body.location")
 					+ " "
@@ -212,7 +177,7 @@ public class ForumsEmailService {
 			content.append(newline);
 			content.append(DiscussionForumTool
 					.getResourceBundleString("email.body.msgposted")
-					+ " " + reply.getCreated().toString());
+					+ " " + formatter.format(reply.getCreated()));
 			content.append(newline);
 			content.append(newline);
 			content.append(reply.getBody());
@@ -230,64 +195,35 @@ public class ForumsEmailService {
 				}
 				Iterator<Attachment> iter = attachmentList.iterator();
 				while (iter.hasNext()) {
+					try {
 					a = (Attachment) iter.next();
 					log.debug("send(): file");
 					File attachedFile = getAttachedFile(a.getAttachmentId());
 					fileList.add(attachedFile);
 					fileNameList.add(a.getAttachmentName());
+					} catch (Exception e) {
+						log.warn("Failed to load attachment: "+ a.getAttachmentId(), e);
+					}
 				}
 			}
 
-			Multipart multipart = new MimeMultipart();
-			MimeBodyPart messageBodyPart = new MimeBodyPart();
-			messageBodyPart.setContent(FormattedText.escapeHtmlFormattedText(content.toString()), "text/html");			
-			messageBodyPart.addHeader("Content-Transfer-Encoding", "quoted-printable");
-            multipart.addBodyPart(messageBodyPart);
-			msg.setContent(multipart);
-			
+			msg.setBody(FormattedText.escapeHtmlFormattedText(content.toString()));
+			msg.setContentType("text/html");
+			msg.setCharacterSet("utf-8");
+			msg.addHeader("Content-Transfer-Encoding", "quoted-printable");
+			org.sakaiproject.email.api.Attachment attachment;
 			for (int count = 0; count < fileList.size(); count++) {
-				messageBodyPart = new MimeBodyPart();
-				FileDataSource source = new FileDataSource((File) fileList
-						.get(count));
-				messageBodyPart.setDataHandler(new DataHandler(source));
-				messageBodyPart.setFileName((String) fileNameList.get(count));
-				multipart.addBodyPart(messageBodyPart);
+				attachment = new org.sakaiproject.email.api.Attachment(fileList
+						.get(count), fileNameList.get(count));
+				msg.addAttachment(attachment);
 			}
-			msg.setContent(multipart);
-
-			String testmode = ServerConfigurationService
-					.getString("testMode@org.sakaiproject.email.api.EmailService");
-			if ("true".equalsIgnoreCase(testmode)) {
-				log.info("Email testMode = true,  printing out text: ");
-				Enumeration<String> en = msg.getAllHeaderLines();
-				while (en.hasMoreElements()) {
-					log.info(en.nextElement());
-				}
-				log.info(content.toString());
-				return;
-			}
-			Transport.send(msg, to);
-		} catch (UnsupportedEncodingException e) {
-			log.error("Exception throws from send()" + e.getMessage());
-			return;
-		} catch (MessagingException e) {
-			log.error("Exception throws from send()" + e.getMessage());
-			return;
-		} catch (ServerOverloadException e) {
-			log.error("Exception throws from send()" + e.getMessage());
-			return;
-		} catch (PermissionException e) {
-			log.error("Exception throws from send()" + e.getMessage());
-			return;
-		} catch (IdUnusedException e) {
-			log.error("Exception throws from send()" + e.getMessage());
-			return;
-		} catch (TypeException e) {
-			log.error("Exception throws from send()" + e.getMessage());
-			return;
-		} catch (IOException e) {
-			log.error("Exception throws from send()" + e.getMessage());
-			return;
+			
+			EmailService instance = org.sakaiproject.email.cover.EmailService.getInstance();
+			instance.send(msg);
+		} catch (AddressValidationException e) {
+			log.error("Failed to send all emails: "+ e.getMessage());
+		} catch (NoRecipientsException e) {
+			log.warn("No valid recipients found: "+ toEmailAddress.toString());
 		} finally {
 			if (attachmentList != null) {
 				if (prefixedPath != null && !"".equals(prefixedPath)) {

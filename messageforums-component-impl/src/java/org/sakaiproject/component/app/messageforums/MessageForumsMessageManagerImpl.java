@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,7 +44,6 @@ import org.sakaiproject.api.app.messageforums.DiscussionForumService;
 import org.sakaiproject.api.app.messageforums.Message;
 import org.sakaiproject.api.app.messageforums.MessageForumsMessageManager;
 import org.sakaiproject.api.app.messageforums.MessageForumsTypeManager;
-import org.sakaiproject.api.app.messageforums.MessageMoveHistory;
 import org.sakaiproject.api.app.messageforums.PrivateMessage;
 import org.sakaiproject.api.app.messageforums.SynopticMsgcntrManager;
 import org.sakaiproject.api.app.messageforums.Topic;
@@ -52,7 +51,6 @@ import org.sakaiproject.api.app.messageforums.UnreadStatus;
 import org.sakaiproject.api.app.messageforums.cover.SynopticMsgcntrManagerCover;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.AttachmentImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.MessageImpl;
-import org.sakaiproject.component.app.messageforums.dao.hibernate.MessageMoveHistoryImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateMessageImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.UnreadStatusImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.Util;
@@ -91,8 +89,6 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
     private static final String QUERY_FIND_PENDING_MSGS_BY_CONTEXT_AND_USER_AND_PERMISSION_LEVEL_NAME = "findAllPendingMsgsByContextByMembershipByPermissionLevelName";
     private static final String QUERY_FIND_PENDING_MSGS_BY_TOPICID = "findPendingMsgsByTopicId";
     private static final String QUERY_UNDELETED_MSG_BY_TOPIC_ID = "findUndeletedMessagesByTopicId";
-    private static final String QUERY_MOVED_MESSAGES_BY_TOPICID = "findMovedMessagesByTopicId";
-    private static final String QUERY_MOVED_HISTORY_BY_MESSAGEID = "findMovedHistoryByMessageId";
     //private static final String ID = "id";
 
     private static final String MESSAGECENTER_HELPER_TOOL_ID = "sakai.messageforums.helper";
@@ -1172,7 +1168,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         message.setDraft(Boolean.FALSE);
         message.setHasAttachments(Boolean.FALSE);
         
-        LOG.info("message " + message.getUuid() + " created successfully");
+        LOG.debug("message " + message.getUuid() + " created successfully");
         return message;        
     }
 
@@ -1193,7 +1189,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         message.setDraft(Boolean.FALSE);
         message.setHasAttachments(Boolean.FALSE);
 
-        LOG.info("message " + message.getUuid() + " created successfully");
+        LOG.debug("message " + message.getUuid() + " created successfully");
         return message;        
     }
 
@@ -1205,7 +1201,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         attachment.setModified(new Date());
         attachment.setModifiedBy(getCurrentUser());
 
-        LOG.info("attachment " + attachment.getUuid() + " created successfully");
+        LOG.debug("attachment " + attachment.getUuid() + " created successfully");
         return attachment;        
     }
 
@@ -1215,6 +1211,10 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
 
     public void saveMessage(Message message, boolean logEvent) {
     	saveMessage(message, logEvent, ToolManager.getCurrentTool().getId(), getCurrentUser(), getContextId());
+    }
+    
+    public void saveMessage(Message message, boolean logEvent, boolean ignoreLockedTopicForum) {
+        saveMessage(message, logEvent, ToolManager.getCurrentTool().getId(), getCurrentUser(), getContextId(), ignoreLockedTopicForum);
     }
     
     public void saveMessage(Message message, boolean logEvent, String toolId, String userId, String contextId){
@@ -1280,7 +1280,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         	}           
         }
         
-        LOG.info("message " + message.getId() + " saved successfully");
+        LOG.debug("message " + message.getId() + " saved successfully");
         
     }
 
@@ -1319,7 +1319,7 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         } catch (Exception e) {
             e.printStackTrace();
         }
-        LOG.info("message " + id + " deleted successfully");
+        LOG.debug("message " + id + " deleted successfully");
     }
     
     public Message getMessageById(final Long messageId) {        
@@ -1867,88 +1867,4 @@ public class MessageForumsMessageManagerImpl extends HibernateDaoSupport impleme
         LOG.debug("about to return");
         return Util.setToList(resultSet); 
 	}
-	
-
-	public void saveMessageMoveHistory(Long messageId, Long desttopicId, Long sourceTopicId, boolean checkReminder){
-		if (messageId == null || desttopicId == null || sourceTopicId == null) {
-			LOG.error("saveMessageMoveHistory failed with desttopicId: " + desttopicId + ", messageId: " + messageId + ", sourceTopicId: " + sourceTopicId);
-			throw new IllegalArgumentException("Null Argument");
-		}
-
-		LOG.debug("saveMessageMoveHistory executing with desttopicId: " + desttopicId + ", messageId: " + messageId + ", sourceTopicId: " + sourceTopicId);
-
-
-		List moved_history = null;
-
-		moved_history = this.findMovedHistoryByMessageId(messageId);
-
-		// if moving back to the original topic,  set reminder to false, otherwise the original topic will show a Move reminder.
-			LOG.debug("saveMessageMoveHistory (moved_messages size  " + moved_history.size()  );
-			for (Iterator histIter = moved_history.iterator(); histIter.hasNext();) {
-				MessageMoveHistory hist = (MessageMoveHistory) histIter.next();
-				LOG.debug("moved message ids = " +  hist.getId()  + "  from : " + hist.getFromTopicId()  + "   topic : " +  hist.getToTopicId() );
-				if (hist.getFromTopicId().equals(desttopicId)){
-					hist.setReminder(false);
-					hist.setModified(new Date());
-					hist.setModifiedBy(getCurrentUser());
- 					getHibernateTemplate().update(hist);
-				}
-			}
-
-		MessageMoveHistory mhist = new MessageMoveHistoryImpl ();
-
-		mhist.setToTopicId(desttopicId);
-		mhist.setMessageId(messageId);
-		mhist.setFromTopicId(sourceTopicId);
-		mhist.setReminder(checkReminder);
-		mhist.setUuid(getNextUuid());
-		mhist.setCreated(new Date());
-		mhist.setCreatedBy(getCurrentUser());
-		mhist.setModified(new Date());
-		mhist.setModifiedBy(getCurrentUser());
-
-		getHibernateTemplate().saveOrUpdate(mhist);
-
-
-	}
-
-	public List findMovedMessagesByTopicId(final Long topicId) {
-		if (topicId == null) {
-			LOG.error("findMovedMessagesByTopicId failed with topicId: " + topicId);
-			throw new IllegalArgumentException("Null Argument");
-		}
-
-		LOG.debug("findMovedMessagesByTopicId executing with topicId: " + topicId);
-
-		HibernateCallback hcb = new HibernateCallback() {
-			public Object doInHibernate(Session session) throws HibernateException, SQLException {
-				Query q = session.getNamedQuery(QUERY_MOVED_MESSAGES_BY_TOPICID);
-				q.setParameter("topicId", topicId, Hibernate.LONG);
-				return q.list();
-			}
-		};
-
-		return (List) getHibernateTemplate().execute(hcb);        
-	}
-
-	public List findMovedHistoryByMessageId(final Long messageid){
-		if (messageid == null) {
-			LOG.error("findMovedHistoryByMessageId failed with messageid: " + messageid);
-			throw new IllegalArgumentException("Null Argument");
-		}
-
-		LOG.debug("findMovedHistoryByMessageId executing with messageid: " + messageid);
-
-		HibernateCallback hcb = new HibernateCallback() {
-			public Object doInHibernate(Session session) throws HibernateException, SQLException {
-				Query q = session.getNamedQuery(QUERY_MOVED_HISTORY_BY_MESSAGEID);
-				q.setParameter("messageId", messageid, Hibernate.LONG);
-				return q.list();
-			}
-		};
-
-		return (List) getHibernateTemplate().execute(hcb);        
-
-	}
-	   
 }

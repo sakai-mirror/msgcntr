@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -134,7 +134,7 @@ public class MembershipManagerImpl implements MembershipManager{
   /**
    * @see org.sakaiproject.api.app.messageforums.MembershipManager#getFilteredCourseMembers(boolean)
    */
-  public Map getFilteredCourseMembers(boolean filterFerpa){
+  public Map getFilteredCourseMembers(boolean filterFerpa, List<String> hiddenGroups){
 
     List allCourseUsers = getAllCourseUsers();
     
@@ -151,11 +151,15 @@ public class MembershipManagerImpl implements MembershipManager{
     }
     
     /** filter member map */
-    Map memberMap = getAllCourseMembers(filterFerpa, true, true);
+    Map memberMap = getAllCourseMembers(filterFerpa, true, true, hiddenGroups);
     
 //    if (filterFerpa) {
 //    	memberMap = setPrivacyStatus(allCourseUsers, memberMap);
 //    }
+    Set<String> viewableUsersForTA = new HashSet<String>();
+    if (prtMsgManager.isSectionTA()) {
+        viewableUsersForTA = getFellowSectionMembers();
+    }
     
     for (Iterator i = memberMap.entrySet().iterator(); i.hasNext();){
       
@@ -175,17 +179,50 @@ public class MembershipManagerImpl implements MembershipManager{
         }
       }   
       else{
-        ;
+        if (!item.isViewable() && !prtMsgManager.isInstructor()) {
+            if (prtMsgManager.isSectionTA() && viewableUsersForTA.contains(item.getUser().getId())) {
+                // if this user is a member of this TA's section, they
+                // are viewable
+            } else {
+                i.remove();
+            }
+        }
       }
     }
     
     return memberMap;
   }
+  
+  /**
+   * 
+   * @return a non-null set of userIds for all of the members in the current user's section(s). Useful for determining students
+   * who are viewable to a user in a TA role
+   */
+  private Set<String> getFellowSectionMembers() {
+      Set<String> fellowMembers = new HashSet<String>();
+      try {
+          Collection<Group> groups = siteService.getSite(toolManager.getCurrentPlacement().getContext()).getGroupsWithMember(userDirectoryService.getCurrentUser().getId());
+          if (groups != null) {
+              for (Group group : groups) {
+                  Set<Member> groupMembers = group.getMembers();
+                  if (groupMembers != null) {
+                      for (Member groupMember : groupMembers) {
+                          fellowMembers.add(groupMember.getUserId());
+                      }
+                  }
+              }
+          }
+      } catch (IdUnusedException e) {
+          LOG.warn("Unable to retrieve site to determine current user's fellow section members.");
+      }
+      
+      return fellowMembers;
+  }
 
   /**
    * @see org.sakaiproject.api.app.messageforums.MembershipManager#getAllCourseMembers(boolean, boolean, boolean)
    */
-  public Map getAllCourseMembers(boolean filterFerpa, boolean includeRoles, boolean includeAllParticipantsMember)
+  public Map getAllCourseMembers(boolean filterFerpa, boolean includeRoles, boolean includeAllParticipantsMember, List<String> hiddenGroups)
   {   
     Map returnMap = new HashMap();    
     String realmId = getContextSiteId();
@@ -220,18 +257,22 @@ public class MembershipManagerImpl implements MembershipManager{
 	}
         
     if(getPrtMsgManager().isAllowToFieldGroups()){
+    	boolean viewHiddenGroups = getPrtMsgManager().isAllowToViewHiddenGroups();
     	/** handle groups */
     	if (currentSite == null)
     		throw new IllegalStateException("Site currentSite == null!");
     	Collection groups = currentSite.getGroups();    
     	for (Iterator groupIterator = groups.iterator(); groupIterator.hasNext();){
-    		Group currentGroup = (Group) groupIterator.next();      
-    		MembershipItem member = MembershipItem.getInstance();
-    		member.setType(MembershipItem.TYPE_GROUP);
-    		//member.setName(currentGroup.getTitle() + " Group");
-    		member.setName(currentGroup.getTitle() + " " + rl.getFormattedMessage("participants_group_desc",new Object[]{currentGroup.getTitle()}));
-    		member.setGroup(currentGroup);
-    		returnMap.put(member.getId(), member);
+    		Group currentGroup = (Group) groupIterator.next();     
+    		//only show groups the user has access to
+    		if(viewHiddenGroups || !containsId(currentGroup.getTitle(), hiddenGroups)){
+    			MembershipItem member = MembershipItem.getInstance();
+    			member.setType(MembershipItem.TYPE_GROUP);
+    			//member.setName(currentGroup.getTitle() + " Group");
+    			member.setName(rl.getFormattedMessage("participants_group_desc",new Object[]{currentGroup.getTitle()}));
+    			member.setGroup(currentGroup);
+    			returnMap.put(member.getId(), member);
+    		}
     	}
     }
     if(getPrtMsgManager().isAllowToFieldRoles()){
@@ -247,7 +288,7 @@ public class MembershipManagerImpl implements MembershipManager{
     				roleId = roleId.substring(0,1).toUpperCase() + roleId.substring(1); 
     			}
     			//        member.setName(roleId + " Role");
-    			member.setName(roleId + " " + rl.getFormattedMessage("participants_role_desc",new Object[]{roleId}));        
+    			member.setName(rl.getFormattedMessage("participants_role_desc",new Object[]{roleId}));        
     			member.setRole(role);
     			returnMap.put(member.getId(), member);
     		}
@@ -303,6 +344,16 @@ public class MembershipManagerImpl implements MembershipManager{
     // set FERPA status for all items in map - allCourseUsers
     // needed by PrivacyManager to determine status
     return setPrivacyStatus(getAllCourseUsers(), returnMap);
+  }
+  
+  private boolean containsId(String searchId, List<String> ids){
+	  if(ids != null && searchId != null){
+		  for (String id : ids) {
+			  if(id.equals(searchId))
+				  return true;
+		  }
+	  }
+	  return false;
   }
   
     

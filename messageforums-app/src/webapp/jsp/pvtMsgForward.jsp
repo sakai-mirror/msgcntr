@@ -63,7 +63,7 @@
 				  </h:panelGroup>
 	  		      <h:commandLink action="#{PrivateMessagesTool.processActionPrivateMessages}" value="#{msgs.pvt_message_nav}" title=" #{msgs.cdfm_message_forums}"/>
 	              <f:verbatim><h:outputText value=" " /><h:outputText value=" / " /><h:outputText value=" " /></f:verbatim>
-				<h:commandLink action="#{PrivateMessagesTool.processDisplayForum}" value="#{(PrivateMessagesTool.msgNavMode == 'pvt_received' || PrivateMessagesTool.msgNavMode == 'pvt_sent' || PrivateMessagesTool.msgNavMode == 'pvt_deleted' || PrivateMessagesTool.msgNavMode == 'pvt_drafts')? msgs[PrivateMessagesTool.msgNavMode]: PrivateMessagesTool.msgNavMode}" title=" #{#{(PrivateMessagesTool.msgNavMode == 'pvt_received' || PrivateMessagesTool.msgNavMode == 'pvt_sent' || PrivateMessagesTool.msgNavMode == 'pvt_deleted' || PrivateMessagesTool.msgNavMode == 'pvt_drafts')? msgs[PrivateMessagesTool.msgNavMode]: PrivateMessagesTool.msgNavMode}}"/><h:outputText value=" " /><h:outputText value=" / " /><h:outputText value=" " />
+				<h:commandLink action="#{PrivateMessagesTool.processDisplayForum}" value="#{(PrivateMessagesTool.msgNavMode == 'pvt_received' || PrivateMessagesTool.msgNavMode == 'pvt_sent' || PrivateMessagesTool.msgNavMode == 'pvt_deleted' || PrivateMessagesTool.msgNavMode == 'pvt_drafts')? msgs[PrivateMessagesTool.msgNavMode]: PrivateMessagesTool.msgNavMode}" title=" #{(PrivateMessagesTool.msgNavMode == 'pvt_received' || PrivateMessagesTool.msgNavMode == 'pvt_sent' || PrivateMessagesTool.msgNavMode == 'pvt_deleted' || PrivateMessagesTool.msgNavMode == 'pvt_drafts')? msgs[PrivateMessagesTool.msgNavMode]: PrivateMessagesTool.msgNavMode}"/><h:outputText value=" " /><h:outputText value=" / " /><h:outputText value=" " />
 				<h:commandLink action="#{PrivateMessagesTool.processDisplayMessages}" value="#{PrivateMessagesTool.detailMsg.msg.title}" title=" #{PrivateMessagesTool.detailMsg.msg.title}"/><h:outputText value=" " /><h:outputText value=" / " /><h:outputText value=" " />
 				<h:outputText value="#{msgs.pvt_forward}" />
 			<f:verbatim></h3></div></f:verbatim>
@@ -162,16 +162,17 @@
 			</h:panelGroup>	
 				
 				
-		    <h:panelGroup styleClass="shorttext" rendered= "#{PrivateMessagesTool.dispSendEmailOut}">
-					<h:outputLabel><h:outputText value="#{msgs.pvt_send_cc}"/></h:outputLabel>
-			  </h:panelGroup>
-			   
-			  
-			  <h:panelGroup styleClass="checkbox" style="white-space: nowrap;" rendered= "#{PrivateMessagesTool.dispSendEmailOut}">
-			  <h:selectBooleanCheckbox value="#{PrivateMessagesTool.booleanEmailOut}" id="send_email_out" >
-			  </h:selectBooleanCheckbox>
-		   <h:outputLabel for="send_email_out"><h:outputText value="#{msgs.pvt_send_as_email}"/></h:outputLabel>
-			</h:panelGroup>			  
+			<h:panelGroup styleClass="shorttext" rendered= "#{PrivateMessagesTool.emailCopyOptional || PrivateMessagesTool.emailCopyAlways}">
+			  <h:outputLabel><h:outputText value="#{msgs.pvt_send_cc}"/></h:outputLabel>
+			</h:panelGroup>
+
+			<h:panelGroup styleClass="checkbox" style="white-space: nowrap;" rendered= "#{PrivateMessagesTool.emailCopyOptional}">
+			  <h:selectBooleanCheckbox value="#{PrivateMessagesTool.booleanEmailOut}" id="send_email_out"></h:selectBooleanCheckbox>
+			  <h:outputLabel for="send_email_out"><h:outputText value="#{msgs.pvt_send_as_email}"/></h:outputLabel>
+			</h:panelGroup> 
+
+			<h:outputText value="#{msgs.pvt_send_as_email_always}" rendered= "#{PrivateMessagesTool.emailCopyAlways}"></h:outputText>
+
 			
 				
 				<h:panelGroup  styleClass="shorttext">
@@ -203,7 +204,7 @@
 			
 			<h4><h:outputText value="#{msgs.pvt_message}" /></h4>
 					   	
-	     	<sakai:inputRichText textareaOnly="#{PrivateMessagesTool.mobileSession}" rows="22" cols="120" id="df_compose_body" value="#{PrivateMessagesTool.forwardBody}">
+	     	<sakai:inputRichText textareaOnly="#{PrivateMessagesTool.mobileSession}" rows="#{ForumTool.editorRows}" cols="120" id="df_compose_body" value="#{PrivateMessagesTool.forwardBody}">
 				<f:validateLength maximum="65000"/>
 		 	</sakai:inputRichText>
             

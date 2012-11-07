@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,6 +46,7 @@ public interface Message extends MutableEntity {
     public Set getAttachmentsSet();
     public String getAuthor();
     public void setAuthor(String author);
+    public String getAuthorId();
     public String getBody();
     public void setBody(String body);
     public Message getInReplyTo();

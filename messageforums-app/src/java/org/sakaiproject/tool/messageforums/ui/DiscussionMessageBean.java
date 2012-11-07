@@ -9,7 +9,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.osedu.org/licenses/ECL-2.0
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -62,17 +62,10 @@ public class DiscussionMessageBean
   private boolean userCanEmail;
   
 
-  // Move Threads
-  private boolean selected_move;
 
   private MessageForumsMessageManager messageManager;
 
-private boolean moved;
-
-
-
-
-public DiscussionMessageBean(Message msg, MessageForumsMessageManager messageManager)
+  public DiscussionMessageBean(Message msg, MessageForumsMessageManager messageManager)
   {    
     this.message = msg;
     this.messageManager = messageManager; 
@@ -96,24 +89,6 @@ public DiscussionMessageBean(Message msg, MessageForumsMessageManager messageMan
   public void setSelected(boolean selected)
   {
     this.selected = selected;
-  }
-
-  /**
-   * @return Returns the selected threads to move.
-   */
-  public boolean isSelected_move()
-  {
-    return selected_move;
-  }
-
-
-
-  /**
-   * @param selected_move:  The selected threads to set.
-   */
-  public void setSelected_move(boolean selected)
-  {
-    this.selected_move = selected;
   }
 
 
@@ -374,32 +349,22 @@ public DiscussionMessageBean(Message msg, MessageForumsMessageManager messageMan
   
 	public String getAuthorEmail()
 	{
+LOG.debug("... getAuthorEmail(): ");
 		String userEmail = "";
 		try
 		{
 			String currentUserId = this.getMessage().getCreatedBy();
+LOG.debug("... currentUserId : " + currentUserId);
 			
 			userEmail = UserDirectoryService.getUser(currentUserId).getEmail(); 		
+LOG.debug("... getAuthorEmail(): userEmail = " + userEmail);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
+LOG.debug("... before return getAuthorEmail(): userEmail = " + userEmail);
 		
 		return userEmail;
 	}
-	
-	public String getAuthorEid(){
-		String userEid = this.getMessage().getCreatedBy();
- 		return userEid;
-	}
-
-	public void setMoved(boolean b) {
-		moved = b;
-
-	}
-	public boolean isMoved() {
-		return moved;
-	}
-
 }

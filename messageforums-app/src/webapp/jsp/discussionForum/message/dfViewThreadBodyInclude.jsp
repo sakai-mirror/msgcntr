@@ -26,6 +26,14 @@
 
 <h:outputText escape="false" value="<a id=\"#{message.message.id}\" name=\"#{message.message.id}\"></a>" />
 	<f:verbatim><div class="hierItemBlock" ></f:verbatim>
+			<%-- author image --%>
+			<h:panelGroup rendered="#{!message.deleted && ForumTool.showProfileInfo}" styleClass="authorImage">
+				<h:outputLink value="#{ForumTool.serverUrl}/direct/profile/#{message.message.authorId}/formatted" styleClass="authorProfile" rendered="#{ForumTool.showProfileLink}" >
+					<h:graphicImage value="#{ForumTool.serverUrl}/direct/profile/#{message.message.authorId}/image/thumb" alt="#{message.message.author}" />
+				</h:outputLink>
+				<h:graphicImage value="#{ForumTool.serverUrl}/direct/profile/#{message.message.authorId}/image/thumb" alt="#{message.message.author}" rendered="#{!ForumTool.showProfileLink}" />
+			</h:panelGroup>
+			
 			<%-- a deleted message --%>
 			<h:panelGroup styleClass="inactive" rendered="#{message.deleted}" >
 				<f:verbatim><span></f:verbatim>
@@ -49,14 +57,18 @@
 				</h:commandLink>
 				<h:outputText value="<br /><div class=\"messageMetadata\">" escape="false" />
 				<%--author --%>
-				<h:outputText value="  #{message.message.author}" rendered="#{message.read}" styleClass="textPanelFooter md"/>
-				<h:outputText  value="  #{message.message.author}" rendered="#{!message.read }" styleClass="unreadMsg textPanelFooter md"/>
+				<h:outputLink value="#{ForumTool.serverUrl}/direct/profile/#{message.message.authorId}/formatted" styleClass="authorProfile" rendered="#{ForumTool.showProfileLink}">
+					<h:outputText value="  #{message.message.author}" rendered="#{message.read}" styleClass="textPanelFooter md"/>
+					<h:outputText  value="  #{message.message.author}" rendered="#{!message.read }" styleClass="unreadMsg textPanelFooter md"/>
+				</h:outputLink>
+				<h:outputText value="  #{message.message.author}" rendered="#{message.read && !ForumTool.showProfileLink}" styleClass="textPanelFooter md"/>
+				<h:outputText  value="  #{message.message.author}" rendered="#{!message.read && !ForumTool.showProfileLink}" styleClass="unreadMsg textPanelFooter md"/>
 				<%--date --%>
 				<h:outputText value="#{message.message.created}" rendered="#{message.read}" styleClass="textPanelFooter md">
-					<f:convertDateTime pattern="#{msgs.date_format_paren}" timeZone="#{ForumTool.userTimeZone}" />
+					<f:convertDateTime pattern="#{msgs.date_format_paren}" timeZone="#{ForumTool.userTimeZone}" locale="#{ForumTool.userLocale}"/>
 				</h:outputText>
 				<h:outputText  value="#{message.message.created}" rendered="#{!message.read}" styleClass="unreadMsg textPanelFooter md">
-					<f:convertDateTime pattern="#{msgs.date_format_paren}" timeZone="#{ForumTool.userTimeZone}" />
+					<f:convertDateTime pattern="#{msgs.date_format_paren}" timeZone="#{ForumTool.userTimeZone}" locale="#{ForumTool.userLocale}"/>
 				</h:outputText>
 				<h:outputText value="#{msgs.cdfm_readby}" />
 				<h:outputText value="#{message.message.numReaders}" />	
@@ -100,7 +112,8 @@
 				<h:outputText escape="false" value="<div id=\"#{message.message.id}_advanced_box\" class=\"otherActions\" style=\"margin:2px 0;\">" />
 					<%-- Email --%>
                     <h:panelGroup rendered="#{message.userCanEmail}">
-                    	<h:outputLink id="createEmail1" value="mailto:#{message.authorEmail}?subject=Feedback on #{message.message.title}">
+                    	<h:outputLink id="createEmail1" value="mailto:#{message.authorEmail}">
+                        	<f:param value="Feedback on #{message.message.title}" name="subject" />
                         	<h:outputText value="#{msgs.cdfm_button_bar_email}"/>
                         </h:outputLink>
 	                    <h:outputText value=" #{msgs.cdfm_toolbar_separator} " />
@@ -131,7 +144,7 @@
 					</h:panelGroup>
 					<%-- Delete other action --%>
 					<h:panelGroup rendered="#{message.userCanDelete}" >
-						<h:commandLink action="#{ForumTool.processDfMsgDeleteConfirm}" value="#{msgs.cdfm_button_bar_delete}">
+						<h:commandLink action="#{ForumTool.processDfMsgDeleteConfirm}" value="#{msgs.cdfm_button_bar_delete_message}">
 							<f:param value="#{message.message.id}" name="messageId" />
 							<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId" />
 							<f:param value="#{ForumTool.selectedTopic.topic.baseForum.id}" name="forumId" />

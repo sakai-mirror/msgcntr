@@ -107,7 +107,7 @@
 				<h:outputText value="#{ForumTool.selectedMessage.message.author}" />
 				<h:outputText value=" #{msgs.cdfm_openb} " />
 				<h:outputText value="#{ForumTool.selectedMessage.message.created}" >
-					<f:convertDateTime pattern="#{msgs.date_format}" timeZone="#{ForumTool.userTimeZone}" />  
+					<f:convertDateTime pattern="#{msgs.date_format}" timeZone="#{ForumTool.userTimeZone}" locale="#{ForumTool.userLocale}"/>  
 				</h:outputText>
 				<h:outputText value=" #{msgs.cdfm_closeb}" />
 				<%-- Attachments --%>
@@ -128,7 +128,7 @@
 
 			
 			<p class="instruction" style="margin-top:1em">
-  	    <h:outputText value="#{msgs.cdfm_required}"rendered="#{ForumTool.allowedToGradeItem}"/> 
+  	    <h:outputText value="#{msgs.cdfm_required}" rendered="#{ForumTool.allowedToGradeItem}"/> 
   	    <h:outputText value="#{msgs.pvt_star}" styleClass="reqStarInline" rendered="#{ForumTool.allowedToGradeItem}" />
 			</p>
    

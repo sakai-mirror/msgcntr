@@ -5,7 +5,6 @@
 <jsp:useBean id="msgs" class="org.sakaiproject.util.ResourceLoader" scope="session">
    <jsp:setProperty name="msgs" property="baseName" value="org.sakaiproject.api.app.messagecenter.bundle.Messages"/>
 </jsp:useBean>
-<!-- <h4>compose.jsp</h4> -->
 <%
 	String thisId = request.getParameter("panel");
 	if (thisId == null) {
@@ -159,16 +158,16 @@
 			</h:panelGroup>
 		
 	
-			 <h:panelGroup styleClass="shorttext" rendered= "#{PrivateMessagesTool.dispSendEmailOut}">
-					<h:outputLabel><h:outputText value="#{msgs.pvt_send_cc}"/></h:outputLabel>
-			  </h:panelGroup>
-			   
-			  
-			  <h:panelGroup styleClass="checkbox" style="white-space: nowrap;" rendered= "#{PrivateMessagesTool.dispSendEmailOut}">
-			  <h:selectBooleanCheckbox value="#{PrivateMessagesTool.booleanEmailOut}" id="send_email_out" >
-			  </h:selectBooleanCheckbox>
-		   <h:outputLabel for="send_email_out"><h:outputText value="#{msgs.pvt_send_as_email}"/></h:outputLabel>
-			</h:panelGroup>			  
+			 <h:panelGroup styleClass="shorttext" rendered= "#{PrivateMessagesTool.emailCopyOptional || PrivateMessagesTool.emailCopyAlways}">
+			   <h:outputLabel><h:outputText value="#{msgs.pvt_send_cc}"/></h:outputLabel>
+			 </h:panelGroup>
+			     
+			<h:panelGroup styleClass="checkbox" style="white-space: nowrap;" rendered= "#{PrivateMessagesTool.emailCopyOptional}">
+			  <h:selectBooleanCheckbox value="#{PrivateMessagesTool.booleanEmailOut}" id="send_email_out"></h:selectBooleanCheckbox>
+			  <h:outputLabel for="send_email_out"><h:outputText value="#{msgs.pvt_send_as_email}"/></h:outputLabel>
+			</h:panelGroup>	
+			
+			<h:outputText value="#{msgs.pvt_send_as_email_always}" rendered= "#{PrivateMessagesTool.emailCopyAlways}"></h:outputText>
 	
 				<h:outputLabel for="viewlist"><h:outputText value="#{msgs.pvt_label}" /></h:outputLabel>
 				<h:selectOneListbox size="1" id="viewlist" value="#{PrivateMessagesTool.selectedLabel}">
@@ -188,7 +187,7 @@
 			</h:panelGrid>       
 		  
 		  <h4><h:outputText value="#{msgs.pvt_message}" /></h4>
-			<sakai:inputRichText textareaOnly="#{PrivateMessagesTool.mobileSession}" value="#{PrivateMessagesTool.composeBody}" id="pvt_message_body" rows="22" cols="120"> 
+			<sakai:inputRichText textareaOnly="#{PrivateMessagesTool.mobileSession}" value="#{PrivateMessagesTool.composeBody}" id="pvt_message_body" rows="#{ForumTool.editorRows}" cols="120"> 
 				<f:validateLength maximum="65000"/>
 			</sakai:inputRichText>
 	    
