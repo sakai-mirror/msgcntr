@@ -620,3 +620,21 @@ $(document).ready(function() {
 		$(this).attr('href', 'javascript:;');
 	});
 });	
+
+
+function resizeFrameForDialog()
+        {
+                if (top.location != self.location)       {
+                        var frame = parent.document.getElementById(window.name);
+                }
+                        if( frame )
+                {
+                        var clientH = document.body.clientHeight + 400;
+                        $( frame ).height( clientH );
+                }
+                else
+                {
+                        throw( "resizeFrame did not get the frame (using name=" + window.name + ")" );
+                }
+        }
+

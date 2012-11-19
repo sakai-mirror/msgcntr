@@ -62,10 +62,17 @@ public class DiscussionMessageBean
   private boolean userCanEmail;
   
 
+  // Move Threads
+  private boolean selected_move;
 
   private MessageForumsMessageManager messageManager;
 
-  public DiscussionMessageBean(Message msg, MessageForumsMessageManager messageManager)
+private boolean moved;
+
+
+
+
+public DiscussionMessageBean(Message msg, MessageForumsMessageManager messageManager)
   {    
     this.message = msg;
     this.messageManager = messageManager; 
@@ -89,6 +96,24 @@ public class DiscussionMessageBean
   public void setSelected(boolean selected)
   {
     this.selected = selected;
+  }
+
+  /**
+   * @return Returns the selected threads to move.
+   */
+  public boolean isSelected_move()
+  {
+    return selected_move;
+  }
+
+
+
+  /**
+   * @param selected_move:  The selected threads to set.
+   */
+  public void setSelected_move(boolean selected)
+  {
+    this.selected_move = selected;
   }
 
 
@@ -367,4 +392,18 @@ LOG.debug("... before return getAuthorEmail(): userEmail = " + userEmail);
 		
 		return userEmail;
 	}
+	
+	public String getAuthorEid(){
+		String userEid = this.getMessage().getCreatedBy();
+ 		return userEid;
+	}
+
+	public void setMoved(boolean b) {
+		moved = b;
+
+	}
+	public boolean isMoved() {
+		return moved;
+	}
+
 }
