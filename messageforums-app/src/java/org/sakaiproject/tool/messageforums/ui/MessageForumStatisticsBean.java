@@ -728,7 +728,13 @@ public class MessageForumStatisticsBean {
 				sortStatisticsByUser(statistics);
 			}
 			userAuthoredStatisticsCache.put(selectedSiteUserId, statistics);
+		} else {
+		    // sort the statistics
+		    List<DecoratedCompiledUserStatistics> statistics = userAuthoredStatisticsCache.get(selectedSiteUserId);
+		    sortStatisticsByUser(statistics);
+		    userAuthoredStatisticsCache.put(selectedSiteUserId, statistics);
 		}
+		
 		return userAuthoredStatisticsCache.get(selectedSiteUserId);
 	}
 	
@@ -1046,6 +1052,11 @@ public class MessageForumStatisticsBean {
 			}
 
 			userReadStatisticsCache.put(selectedSiteUserId, statistics);
+		} else {
+		    // sort the statistics
+		    List<DecoratedCompiledUserStatistics> statistics = userReadStatisticsCache.get(selectedSiteUserId);
+		    sortStatisticsByUser2(statistics);
+		    userReadStatisticsCache.put(selectedSiteUserId, statistics);
 		}
 		return userReadStatisticsCache.get(selectedSiteUserId);
 	}
