@@ -28,13 +28,13 @@ import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.api.app.messageforums.Attachment;
 import org.sakaiproject.api.app.messageforums.Message;
 import org.sakaiproject.api.app.messageforums.MessageForumsMessageManager;
+import org.sakaiproject.api.app.messageforums.Rank;
+ 
 import org.sakaiproject.tool.cover.SessionManager;
-import org.sakaiproject.tool.messageforums.DiscussionForumTool;
+import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.user.cover.UserDirectoryService;
 
-
-
-/**
+/** 
  * @author <a href="mailto:rshastri@iupui.edu">Rashmi Shastri</a>
  * @author Chen Wen
  *
@@ -42,7 +42,7 @@ import org.sakaiproject.user.cover.UserDirectoryService;
 public class DiscussionMessageBean
 {
 	
-  private static final Log LOG = LogFactory.getLog(DiscussionForumTool.class);
+  private static final Log LOG = LogFactory.getLog(DiscussionMessageBean.class);
 
   private boolean selected;
   private Message message;
@@ -60,19 +60,29 @@ public class DiscussionMessageBean
   private boolean revise;
   private boolean userCanDelete;
   private boolean userCanEmail;
-  
+  private int authorPostCount;
+  private Rank authorRank = null;
 
-  // Move Threads
-  private boolean selected_move;
+  public Rank getAuthorRank() {
+    return authorRank;
+  }
+
+  public void setAuthorRank(Rank aRank) {
+    authorRank = aRank;
+  }
+
+  public void setAuthorPostCount(String userEid) {
+    int authorCount = messageManager.findAuthoredMessageCountForStudent(userEid);
+    authorPostCount = authorCount;
+  }
+
+  public int getAuthorPostCount() {
+    return authorPostCount;
+  }
 
   private MessageForumsMessageManager messageManager;
 
-private boolean moved;
-
-
-
-
-public DiscussionMessageBean(Message msg, MessageForumsMessageManager messageManager)
+  public DiscussionMessageBean(Message msg, MessageForumsMessageManager messageManager)
   {    
     this.message = msg;
     this.messageManager = messageManager; 
@@ -96,24 +106,6 @@ public DiscussionMessageBean(Message msg, MessageForumsMessageManager messageMan
   public void setSelected(boolean selected)
   {
     this.selected = selected;
-  }
-
-  /**
-   * @return Returns the selected threads to move.
-   */
-  public boolean isSelected_move()
-  {
-    return selected_move;
-  }
-
-
-
-  /**
-   * @param selected_move:  The selected threads to set.
-   */
-  public void setSelected_move(boolean selected)
-  {
-    this.selected_move = selected;
   }
 
 
@@ -396,14 +388,5 @@ LOG.debug("... before return getAuthorEmail(): userEmail = " + userEmail);
 	public String getAuthorEid(){
 		String userEid = this.getMessage().getCreatedBy();
  		return userEid;
-	}
-
-	public void setMoved(boolean b) {
-		moved = b;
-
-	}
-	public boolean isMoved() {
-		return moved;
-	}
-
+	}	
 }

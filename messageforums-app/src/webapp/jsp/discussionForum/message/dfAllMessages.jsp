@@ -7,30 +7,13 @@
 </jsp:useBean>
 
 <f:view>
-	<sakai:view title="Forums">
-<link rel="stylesheet" href="/messageforums-tool/css/jquery-ui-1.7.2.custom.css" type="text/css" />
-<link rel="stylesheet" href="/messageforums-tool/css/msgcntr.css" type="text/css" />
-<link rel="stylesheet" href="/messageforums-tool/css/msgcntr_move_thread.css" type="text/css" />
-
-<!-- messageforums-app/src/webapp/jsp/discussionForum/message-->
-
-<script type="text/javascript" src="/library/js/jquery.js"></script>
-<script type="text/javascript" src="/messageforums-tool/js/json2.js"></script>
-<script type="text/javascript" src="/messageforums-tool/js/fluidframework-min.js"></script>
-<script type="text/javascript" src="/messageforums-tool/js/Scroller.js"></script>
-<script type="text/javascript" src="/messageforums-tool/js/jquery.bgiframe.js"></script>
-<script type="text/javascript" src="/messageforums-tool/js/ui.dialog.js"></script>
-<script type="text/javascript" src="/messageforums-tool/js/ui.draggable.js"></script>
-
-<script type="text/javascript" src="/messageforums-tool/js/forum.js"></script>
-<script type="text/javascript" src="/messageforums-tool/js/frameAdjust.js"></script>
-<script type="text/javascript" src="/messageforums-tool/js/forum_movethread.js"></script>
-
-<sakai:script contextBase="/messageforums-tool" path="/js/sak-10625.js"/>
-
+	<sakai:view toolCssHref="/messageforums-tool/css/msgcntr.css">
+	<h:form id="msgForum" rendered="#{!ForumTool.selectedTopic.topic.draft || ForumTool.selectedTopic.topic.createdBy == ForumTool.userId}">
 <!--jsp/discussionForum/message/dfAllMessages.jsp-->
 		<link rel="stylesheet" type="text/css" href="../../css/TableSorter.css" />
   		<script type="text/javascript" src="/library/js/jquery-latest.min.js"></script>
+  		<sakai:script contextBase="/messageforums-tool" path="/js/sak-10625.js"/>
+		<sakai:script contextBase="/messageforums-tool" path="/js/forum.js"/>
  		<sakai:script contextBase="/messageforums-tool" path="/js/jquery.tablesorter.js"/>
  		<sakai:script contextBase="/messageforums-tool" path="/js/forumTopicThreadsSorter.js"/>
  		<script language="JavaScript">
@@ -40,57 +23,6 @@
 			//add handles to list for thread operat
 			instrumentThreads('msgForum\\:messagesInHierDataTable');
  		});
-
-                function disableMoveLink(){
-                        var linkid = "msgForum:df_move_message_commandLink";
-                        var movelink = document.getElementById(linkid);
-                	movelink.style.color="grey";
-                }
-
-                function enableMoveLink(){
-                        var linkid = "msgForum:df_move_message_commandLink";
-                        var movelink = document.getElementById(linkid);
-                	movelink.style.color="";
-                }
- 
-// this is  called from messageforums-app/src/java/org/sakaiproject/tool/messageforums/jsf/HierDataTableRender.java. checkbox is encoded there.  
-
-                function enableDisableMoveThreadLink(){
-                        //function to check total number of CheckBoxes that are checked in a form
-                //initialize total count to zero
-                var totalChecked = 0;
-                                //get total number of CheckBoxes in form
-                        if (typeof document.forms['msgForum'].moveCheckbox.length === 'undefined') {
-                   /*when there is just one checkbox moveCheckbox is not an array,  document.forms['msgForum'].moveCheckbox.length returns undefined */
-                        if (document.forms['msgForum'].moveCheckbox.checked == true )
-                        {
-                                        totalChecked += 1;
-                        }
-                        }
-                        else {
-                // more than one checkbox is checked.
-                var chkBoxCount = document.forms['msgForum'].moveCheckbox.length;
-                //loop through each CheckBox
-                        for (var i = 0; i < chkBoxCount; i++)
-                        {
-                                //check the state of each CheckBox
-                                if (eval("document.forms['msgForum'].moveCheckbox[" + i + "].checked") == true)
-                                {
-                                        //it's checked so increment the counter
-                                        totalChecked += 1;
-                                }
-                        }
-                        }
-                        if (totalChecked >0){
-                                // enable the move link
-                                enableMoveLink();
-                        }
-                        else {
-                                disableMoveLink();
-                        }
-
-                }
-
  		</script>
 		<h:outputText styleClass="showMoreText"  style="display:none" value="#{msgs.cdfm_show_more_full_description}"  />
 
@@ -120,34 +52,24 @@
 				}
 			});
 		});
-
 		</script>	
 		// element into which the value gets insert and retrieved from
 		<span class="highlight"  id="maxthreaddepth" class="skip"><h:outputText value="#{msgs.cdfm_maxthreaddepth}" /></span>
 //--%>
-	<h:form id="msgForum" rendered="#{!ForumTool.selectedTopic.topic.draft || ForumTool.selectedTopic.topic.createdBy == ForumTool.userId}">
-<f:subview id="picker2">
-        <%@ include file="moveThreadPicker.jsp" %>
-</f:subview>
-
 		<sakai:tool_bar separator="#{msgs.cdfm_toolbar_separator}">
 				<%--
 				<sakai:tool_bar_item value="#{msgs.cdfm_container_title_thread}" action="#{ForumTool.processAddMessage}" id="df_compose_message_dfAllMessages"
 		  			rendered="#{ForumTool.selectedTopic.isNewResponse && !ForumTool.selectedTopic.locked}" />
 						--%>
 						
-				<%--
 						  <sakai:tool_bar_item value="#{msgs.cdfm_container_title_thread}" action="#{ForumTool.processAddMessage}" id="df_compose_message_dfAllMessages"
 						  	rendered="#{ForumTool.selectedTopic.isNewResponse && !ForumTool.selectedTopic.locked && !ForumTool.selectedForum.locked == 'true'}" />
-						--%>
 						
       	<sakai:tool_bar_item value="#{msgs.cdfm_flat_view}" action="#{ForumTool.processActionDisplayFlatView}" />
-			<%--	
 				<h:commandLink action="#{ForumTool.processActionTopicSettings}" id="topic_setting" value="#{msgs.cdfm_topic_settings}" 
-				rendered="#{ForumTool.selectedTopic.changeSettings}"> 
+				rendered="#{ForumTool.selectedTopic.changeSettings}">
 					<f:param value="#{ForumTool.selectedTopic.topic.id}" name="topicId"/>
 				</h:commandLink>
-			--%>
 				
 				<h:commandLink action="#{ForumTool.processActionDeleteTopicConfirm}" id="delete_confirm" 
 				value="#{msgs.cdfm_button_bar_delete_topic}" accesskey="d" rendered="#{!ForumTool.selectedTopic.markForDeletion && ForumTool.displayTopicDeleteOption}">
@@ -209,14 +131,8 @@
 					
 					<h:outputText value="#{ForumTool.selectedTopic.topic.title}" styleClass="title"/>
 					
-					<%-- // display singular ('message') if one message --%>
-					<h:outputText styleClass="textPanelFooter" id="topic_msg_count55" value=" #{msgs.cdfm_openb} #{ForumTool.selectedTopic.totalNoMessages} #{msgs.cdfm_lowercase_msg} - #{ForumTool.selectedTopic.unreadNoMessages} #{msgs.cdfm_unread} " 
-								rendered="#{ForumTool.selectedTopic.totalNoMessages == 1}"/>
-						<%-- // display plural ('messages') if 0 or more than 1 messages --%>
-						<h:outputText id="topic_msg_count56" value=" #{msgs.cdfm_openb} #{ForumTool.selectedTopic.totalNoMessages} #{msgs.cdfm_lowercase_msgs} - #{ForumTool.selectedTopic.unreadNoMessages} #{msgs.cdfm_unread} " 
-						  rendered="#{(ForumTool.selectedTopic.totalNoMessages > 1 || ForumTool.selectedTopic.totalNoMessages == 0) }" styleClass="textPanelFooter" />
-						<h:outputText id="topic_moderated" value="#{msgs.cdfm_topic_moderated_flag} " styleClass="textPanelFooter" rendered="#{ForumTool.selectedTopic.moderated == 'true' }" />
-						<h:outputText value="#{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
+                                
+			         <h:outputText id="topic_moderated" value=" #{msgs.cdfm_forum_moderated_flag}" styleClass="childrenNewZero" rendered="#{ForumTool.selectedTopic.moderated == 'true' }" />
 					
 					  <%--//designNote: for paralellism to other views, need to add read/unread count here as well as Moderated attribute--%>  
 					  <%-- 
@@ -226,48 +142,29 @@
 					  <h:outputText value="#{msgs.cdfm_closeb}" styleClass="textPanelFooter"/>
 					  --%>
 					  <h:outputText value=" "  styleClass="actionLinks"/>
-					  <%--//designNote: for paralellism to other views, need to move the "Post new thread" link below, but it is a sakai:toolbar item above...same for Topic Settings --%>
-					<sakai:tool_bar_item action="#{ForumTool.processActionTopicSettings}" id="topic_setting" value="#{msgs.cdfm_topic_settings}" 
-					rendered="#{ForumTool.selectedTopic.changeSettings}" /> 
 					
-					<f:verbatim><br/></f:verbatim>
-					<f:verbatim><div class="post_move_links"></f:verbatim>
-					  <sakai:tool_bar_item value="#{msgs.cdfm_container_title_thread}" action="#{ForumTool.processAddMessage}" id="df_compose_message_dfAllMessages"
-					  	rendered="#{ForumTool.selectedTopic.isNewResponse && !ForumTool.selectedTopic.locked}" />
-					<h:outputText  value=" | " />
-
-
-<%-- hidden link to call ForumTool.processMoveThread  --%>
-<h:commandLink value="" action="#{ForumTool.processMoveThread}" id="hidden_move_message_commandLink" ></h:commandLink>
-
-<%-- link for Move Thread(s)  --%>
-					<f:verbatim>
-<a style="color:grey" class="display-topic-picker" id="msgForum:df_move_message_commandLink" onclick="resizeFrameForDialog();" href="#" >
-				</f:verbatim>
-<h:outputText value="#{msgs.move_thread}" />
-					<f:verbatim></a></f:verbatim>
-					<f:verbatim></div></f:verbatim>
-
+					
+									
 					<h:outputText   value="#{ForumTool.selectedTopic.topic.shortDescription}" rendered="#{ForumTool.selectedTopic.topic.shortDescription} != ''}"  styleClass="shortDescription" />
 					
 					
 					
 						<h:outputLink id="forum_extended_show" value="#" title="#{msgs.cdfm_view}" styleClass="show"
-								rendered="#{!empty ForumTool.selectedTopic.attachList || ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"
+								rendered="#{!empty ForumTool.selectedTopic.attachList || ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && ForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"
 							onclick="resize();$(this).next('.hide').toggle(); $('div.toggle').slideToggle(resize);$(this).toggle();">
 								<h:graphicImage url="/images/collapse.gif"/><h:outputText value="#{msgs.cdfm_view}" />
-								<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
-								<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty ForumTool.selectedTopic.attachList && ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && ForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty ForumTool.selectedTopic.attachList && ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && ForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
 								<h:outputText value=" #{msgs.cdfm_attach}" rendered="#{!empty ForumTool.selectedTopic.attachList}"/>
 					  </h:outputLink>
 				   
 			
 					<h:outputLink id="forum_extended_hide" value="#" title="#{msgs.cdfm_hide}" style="display:none " styleClass="hide" 
-								rendered="#{!empty ForumTool.selectedTopic.attachList || ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"
+								rendered="#{!empty ForumTool.selectedTopic.attachList || ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && ForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"
 							onclick="resize();$(this).prev('.show').toggle(); $('div.toggle').slideToggle(resize);$(this).toggle();">
 								<h:graphicImage url="/images/expand.gif"/><h:outputText value="#{msgs.cdfm_hide}" />
-								<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
-								<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty ForumTool.selectedTopic.attachList && ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && tForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_full_description}" rendered="#{ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && ForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
+								<h:outputText value=" #{msgs.cdfm_and}" rendered="#{!empty ForumTool.selectedTopic.attachList && ForumTool.selectedTopic.topic.extendedDescription != '' && ForumTool.selectedTopic.topic.extendedDescription != null && ForumTool.selectedTopic.topic.extendedDescription != '<br/>'}"/>
 								<h:outputText value=" #{msgs.cdfm_attach}" rendered="#{!empty ForumTool.selectedTopic.attachList}"/>
 					  </h:outputLink>
 					
@@ -292,44 +189,23 @@
 			<%--//designNote: need a rendered attribute here that will toggle the display of the table (if messages) or a textblock (class="instruction") if there are no messages--%>
 			<h:outputText styleClass="messageAlert" value="#{msgs.cdfm_postFirst_warning}" rendered="#{ForumTool.needToPostFirst}"/>				
 			<h:outputText value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.selectedTopic.messages && !ForumTool.needToPostFirst}"  styleClass="instruction" style="display:block"/>
-			<%--//designNote: need a rendered attribute here that will toggle the display of the table (if messages) or a textblock (class="instruction") if there are no messages--%> 				
-			<h:outputText value="#{msgs.cdfm_no_messages}" rendered="#{empty ForumTool.messages}"  styleClass="instruction" style="display:block"/>
 			<%--//gsilver: need a rendered attribute here that will toggle the display of the table (if messages) or a textblock (class="instruction") if there are no messages--%> 						
-<div id="checkbox">
-			<mf:hierDataTable styleClass=" listHier  specialLink allMessages" id="messagesInHierDataTable" rendered="#{!empty ForumTool.messages}"  value="#{ForumTool.messages}" var="message" expanded="#{ForumTool.expanded}"
-					columnClasses="attach, attach,messageTitle,attach,bogus,bogus" cellspacing="0" cellpadding="0" style="border:none">		
-			<h:column id="_checkbox">
-				<f:facet name="header">
-				</f:facet>
-			</h:column>
+			<mf:hierDataTable styleClass=" listHier  specialLink allMessages" id="messagesInHierDataTable" rendered="#{!empty ForumTool.selectedTopic.messages}"  value="#{ForumTool.messages}" var="message" expanded="#{ForumTool.expanded}"
+					columnClasses="attach,messageTitle,attach,bogus,bogus" cellspacing="0" cellpadding="0" style="border:none">
 			<h:column id="_toggle">
-				<f:facet name="header">			
+				<f:facet name="header">
 					<h:commandLink action="#{ForumTool.processActionToggleExpanded}" immediate="true" title="#{msgs.cdfm_collapse_expand_all}">
 							<h:graphicImage value="/images/collapse-expand.gif" style="vertical-align:middle" rendered="#{ForumTool.expanded == 'true'}" />
 							<h:graphicImage value="/images/expand-collapse.gif" style="vertical-align:middle" rendered="#{ForumTool.expanded != 'true'}" />
 					</h:commandLink>
-				</f:facet>				
+				</f:facet>
 			</h:column>
 			<h:column id="_msg_subject">
 				<f:facet name="header">
-					<h:outputText value="#{msgs.cdfm_thread}" />
+				        <h:outputLink value="#" title="#{msgs.sort_thread}">
+				          <h:outputText value="#{msgs.cdfm_thread}" /> 
+					</h:outputLink>
 				</f:facet>
-
-				<%-- moved--%>
-				<h:panelGroup rendered="#{message.moved}">
-					<h:outputText styleClass="textPanelFooter" escape="false" value="| #{message.message.title} - " />
-					<h:commandLink action="#{ForumTool.processActionDisplayTopic}" id="topic_title" styleClass="title">
-						<h:outputText value="#{msgs.moved}" />
-                                                  <f:param value="#{message.message.topic.id}" name="topicId"/>
-                                                  <f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
-                                          </h:commandLink>
-
-					<h:outputText escape="false" styleClass="textPanelFooter"  value=" to #{message.message.topic.title}" />
-				</h:panelGroup>
-				<%-- moved--%>
-
-				<%-- NOT moved--%>
-				<h:panelGroup rendered="#{!message.moved}">
 				<h:outputText escape="false" value="<a id=\"#{message.message.id}\" name=\"#{message.message.id}\"></a>" />
 					<%-- display deleted message linked if any child messages (not deleted)
 						displays the message "this message has been deleted" if the message has been, um deleted, leaves reply children in place --%>
@@ -352,7 +228,7 @@
 						<h:outputText value="#{msgs.cdfm_msg_denied_label}"  styleClass="messageDenied"  rendered="#{message.msgDenied}" />
 					<%-- Rendered to view current thread only --%>
 							<%--//designNote:  not sure what this controls - seems to affect all threads except the deleted, pending and denied--%>
-					<h:commandLink styleClass="messagetitlelink" action="#{ForumTool.processActionDisplayThread}" immediate="true" title="#{message.message.title}"
+					<h:commandLink action="#{ForumTool.processActionDisplayThread}" immediate="true" title="#{message.message.title}"
 						rendered="#{message.depth == 0}">
 				   		<h:outputText value="#{message.message.title}" rendered="#{message.read && message.childUnread == 0 }" />
 							
@@ -373,7 +249,7 @@
 
 					<%-- render the message that has not been deleted, what else? --%>
 				<h:panelGroup rendered="#{!message.deleted}">	          	
-					<h:commandLink styleClass="messagetitlelink" action="#{ForumTool.processActionDisplayMessage}" immediate="true" title=" #{message.message.title}"
+					<h:commandLink action="#{ForumTool.processActionDisplayMessage}" immediate="true" title=" #{message.message.title}"
 						rendered="#{message.depth != 0}" >
 					   	<h:outputText value="#{message.message.title}" rendered="#{message.read}" />
     	    	    	<h:outputText styleClass="unreadMsg" value="#{message.message.title}" rendered="#{!message.read}"/>
@@ -398,13 +274,21 @@
 					<h:outputText value=" cu: #{message.childUnread }" />
 					<h:outputText value= " mr: #{message.read}" />
 					--%>
-					<h:outputText escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount ==0}"  value=" #{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msg} - <em>#{(message.childUnread) + (message.read ? 0 : 1)}</em> #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
-					<h:outputText escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount ==1}"  value=" #{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs} - <em>#{(message.childUnread) + (message.read ? 0 : 1)}</em> #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
-					<h:outputText  escape="false" styleClass="textPanelFooter" rendered="#{message.depth == 0 && message.childCount > 1}" value=" #{msgs.cdfm_openb} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs} - <em>#{(message.childUnread) + (message.read ? 0 : 1)}</em> #{msgs.cdfm_unread} #{msgs.cdfm_closeb}" />
-					<h:outputText  value="#{msgs.cdfm_newflagresponses}" styleClass="childrenNew childrenNewThread" rendered="#{message.depth == 0 && ((message.childUnread) + (message.read ? 0 : 1)) > 0}"/>							
-
-				<%-- NOT moved--%>
-				</h:panelGroup>
+                    <%-- // display  ('unread ') if unread message is>= 1 --%>
+                    <h:outputText styleClass="childrenNew" id="topic_msg_count55" value="  #{(message.childUnread) + (message.read ? 0 : 1)} #{msgs.cdfm_lowercase_unread_msg}" 
+                                  rendered="#{message.depth == 0 && ((message.childUnread) + (message.read ? 0 : 1)) >= 1}"/>     
+   
+                    <%-- // display ('unread ') with different style sheet if unread message is 0 --%>  
+                    <h:outputText styleClass="childrenNewZero" id="topic_msg_count57" value="  #{(message.childUnread) + (message.read ? 0 : 1)} #{msgs.cdfm_lowercase_unread_msg}" 
+                                  rendered="#{message.depth == 0 && ((message.childUnread) + (message.read ? 0 : 1)) == 0}"/> 
+                               
+                     <%-- // display singular ('message') if total message is 1--%>                   
+                     <h:outputText styleClass="textPanelFooter" id="topic_msg_count58" value="#{msgs.cdfm_of} #{message.childCount + 1} #{msgs.cdfm_lowercase_msg}"
+                                   rendered="#{message.depth == 0 && message.childCount ==0}"  />
+                                                                           
+                     <%-- // display singular ('message') if total message is 0 or more than 1--%>                   
+                     <h:outputText styleClass="textPanelFooter" id="topic_msg_count59" value="#{msgs.cdfm_of} #{message.childCount + 1} #{msgs.cdfm_lowercase_msgs}"
+                                   rendered="#{message.depth == 0 && message.childCount >=1}"  />
 			</h:column>
 				<%-- author column --%>
 			<h:column>
@@ -419,17 +303,25 @@
 			</h:column>
 			<h:column>
 				<f:facet name="header">
+				   <h:outputLink value="#" title="#{msgs.sort_author}">
 					<h:outputText value="#{msgs.cdfm_authoredby}" />
+				   </h:outputLink>
 				</f:facet>
 				<h:panelGroup rendered="#{!message.deleted}" >
-						<h:outputText value="#{message.message.author}"/>
-						<%--<h:outputText styleClass="unreadMsg" value="#{message.message.author}" rendered="#{!message.read || message.childUnread > 0}"/>--%>
+                    <h:outputText value="#{message.message.author}" rendered="#{!ForumTool.instructor}"/>
+                    <h:commandLink action="#{mfStatisticsBean.processActionStatisticsUser}" immediate="true" title=" #{message.message.author}" rendered="#{ForumTool.instructor}">
+                        <f:param value="#{message.authorEid}" name="siteUserId"/>
+                        <f:param value="#{message.message.author}" name="siteUser"/>
+                        <h:outputText value="#{message.message.author}" />
+                    </h:commandLink>
 				</h:panelGroup>
 			</h:column>
 				<%-- date column --%>
 			<h:column>
 				<f:facet name="header">
+				    <h:outputLink value="#" title="#{msgs.sort_date}">
 					<h:outputText value="#{msgs.cdfm_date}" />
+				    </h:outputLink>
 				</f:facet>
 				<h:panelGroup rendered="#{!message.deleted}" >
 					<h:outputText value="#{message.message.created}" rendered="#{message.read}">
@@ -441,11 +333,7 @@
 				</h:panelGroup>
 			</h:column> 
 		</mf:hierDataTable>
-</div>
 		
-<input type="hidden" id="selectedTopicid" name="selectedTopicid" class="selectedTopicid" value="0" />
-<input type="hidden" id="moveReminder" name="moveReminder" class="moveReminder" value="false" />
-
 		<h:inputHidden id="mainOrForumOrTopic" value="dfAllMessages" />
 		<%
   String thisId = request.getParameter("panel");
@@ -461,7 +349,6 @@
 			</script> 
 <h:outputText escape="false" value="<script type='text/javascript'>$(document).ready(function() {setupLongDesc()});</script>"  rendered="#{!ForumTool.showShortDescription}"/>
 	</h:form>
-
 	<h:outputText value="#{msgs.cdfm_insufficient_privileges_view_topic}" rendered="#{ForumTool.selectedTopic.topic.draft && ForumTool.selectedTopic.topic.createdBy != ForumTool.userId}" />
 		
 </sakai:view>

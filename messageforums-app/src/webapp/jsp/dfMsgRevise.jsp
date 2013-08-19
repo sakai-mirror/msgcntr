@@ -13,10 +13,10 @@
 			<style type="text/css">
 				@import url("/messageforums-tool/css/msgcntr.css");
 			</style>
-	       		<script type="text/javascript" src="/library/js/jquery.js"></script>
+            <script type="text/javascript" src="/library/js/jquery-ui-latest/js/jquery.min.js"></script>
        		<sakai:script contextBase="/messageforums-tool" path="/js/sak-10625.js"/>
        		<sakai:script contextBase="/messageforums-tool" path="/js/forum.js"/>
-
+			<sakai:script contextBase="/messageforums-tool" path="/js/messages.js"/>
      <h3><h:outputText value="#{msgs.cdfm_revise_forum_msg}" /></h3>
 
 			<table class="topicBloc topicBlocLone">
@@ -140,10 +140,11 @@
         </sakai:panel_titled>
 --%>		        
 			<p style="padding:0" class="act">
-        <sakai:button_bar_item action="#{ForumTool.processDfMsgRevisedPost}" value="#{msgs.cdfm_button_bar_post_revised_msg}" accesskey="s" styleClass="active" />
+        <sakai:button_bar_item action="#{ForumTool.processDfMsgRevisedPost}" value="#{msgs.cdfm_button_bar_post_revised_msg}" accesskey="s" styleClass="active blockMeOnClick" />
        <%-- <sakai:button_bar_item action="#{ForumTool.processDfMsgSaveRevisedDraft}" value="#{msgs.cdfm_button_bar_save_draft}" /> --%>
         <sakai:button_bar_item action="#{ForumTool.processDfMsgRevisedCancel}" value="#{msgs.cdfm_button_bar_cancel}"  accesskey="x" />
-			</p>	
+        <h:outputText styleClass="messageProgress" style="display:none" value="#{msgs.cdfm_processing_submit_message}" />
+        	</p>	
     </h:form>
      
     </sakai:view_content>

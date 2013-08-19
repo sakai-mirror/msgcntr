@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/msgcntr/trunk/messageforums-api/src/java/org/sakaiproject/api/app/messageforums/UnreadStatus.java $
- * $Id: UnreadStatus.java 9227 2006-05-15 15:02:42Z cwen@iupui.edu $
+ * $URL: $
+ * $Id: $
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006, 2008 The Sakai Foundation
@@ -44,26 +44,5 @@ public interface MessageMoveHistory extends MutableEntity{
 
     public Boolean getReminder();
 
-    public void setReminder(Boolean remind);
-     
-
-    /*
-     *
-select * from mfr_message_t  
-where surrogatekey = :topicid 
-union all
-(select * from mfr_message_t, mfr_m
-where id in (select message_id from mfr_move_history_t where from_topic_id = :topicid))
-
-
-
-select msg1.*, 0 as reminder from mfr_message_t msg1
-where msg1.surrogatekey = 9080 
-union all
-(select msg.*, hist.reminder  from mfr_message_t msg, mfr_move_history_t hist
-where msg.id in (select message_id from mfr_move_history_t where from_topic_id = 9080))
-
-
-     */
- 
+    public void setReminder(Boolean remind); 
 }

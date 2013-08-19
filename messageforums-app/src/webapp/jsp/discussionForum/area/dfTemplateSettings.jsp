@@ -17,7 +17,7 @@
        		<sakai:script contextBase="/messageforums-tool" path="/js/sak-10625.js"/>
 		<sakai:script contextBase="/messageforums-tool" path="/js/permissions_header.js"/>
 		<sakai:script contextBase="/messageforums-tool" path="/js/forum.js"/>
-
+		<sakai:script contextBase="/messageforums-tool" path="/js/messages.js"/>
 <%
 	  	String thisId = request.getParameter("panel");
   		if (thisId == null) 
@@ -38,11 +38,11 @@
 	}
 
 	function openDateCal(){
-			NewCal('revise:openDate','MMDDYYYY',true,12);
+			NewCal('revise:openDate','MMDDYYYY',true,12, '<h:outputText value="#{ForumTool.defaultAvailabilityTime}"/>');
 	}
 
 	function closeDateCal(){
-			NewCal('revise:closeDate','MMDDYYYY',true,12);
+			NewCal('revise:closeDate','MMDDYYYY',true,12, '<h:outputText value="#{ForumTool.defaultAvailabilityTime}"/>');
 	}
 </script>
 

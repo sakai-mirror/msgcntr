@@ -41,7 +41,6 @@
 		<dependency>
 		  <groupId>javax.servlet</groupId>
 		  <artifactId>jstl</artifactId>
-		  <!--<version>1.0.2</version>-->
 		  <scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -62,6 +61,10 @@
 			<artifactId>entitybroker-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.sakaiproject.entitybroker</groupId>
+			<artifactId>entitybroker-utils</artifactId>
+		</dependency>
+		<dependency>
             <groupId>org.sakaiproject.edu-services.gradebook</groupId>
             <artifactId>gradebook-service-api</artifactId>
         </dependency>
@@ -75,46 +78,53 @@
 			<artifactId>commons-logging</artifactId>
 		</dependency>
 		<dependency>
-	        <groupId>org.hibernate</groupId>
-       		<artifactId>hibernate</artifactId>
-     	</dependency>
-     	<dependency>
-       		<groupId>org.springframework</groupId>
-       		<artifactId>spring</artifactId>
-     	</dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.sakaiproject.scheduler</groupId>
             <artifactId>scheduler-api</artifactId>
             <version>${sakai.scheduler.version}</version>
             <scope>provided</scope>
         </dependency>
-    <dependency>
-                <groupId>net.sf.json-lib</groupId>
-                <artifactId>json-lib</artifactId>
-                <version>2.2.3</version>
-                <classifier>jdk15</classifier>
-                <type>jar</type>
-        </dependency>
-    <dependency>
-                <groupId>net.sf.json-lib</groupId>
-                <artifactId>json-lib</artifactId>
-                <version>2.2.3</version>
-                <classifier>jdk15-sources</classifier>
-                <type>jar</type>
-        </dependency>
-    <dependency>
-                <groupId>net.sf.json-lib</groupId>
-                <artifactId>json-lib</artifactId>
-                <version>2.2.3</version>
-                <classifier>jdk15-javadoc</classifier>
-                <type>jar</type>
-        </dependency>
-
-
 	<dependency>
 	  <groupId>javax.servlet.jsp</groupId>
 	  <artifactId>jsp-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.2.3</version>
+            <classifier>jdk15</classifier>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.2.3</version>
+            <classifier>jdk15-sources</classifier>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.2.3</version>
+            <classifier>jdk15-javadoc</classifier>
+            <type>jar</type>
+        </dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>0.11.6</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>

@@ -18,6 +18,7 @@
 <h:form id="pvtMsgSettings">
        		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/messageforums-tool" path="/js/sak-10625.js"/>
+       		<sakai:script contextBase="/messageforums-tool" path="/js/messages.js"/>
 			<sakai:tool_bar_message value="#{msgs.pvt_msgs_label} #{msgs.pvt_settings}" />
 			<h:messages styleClass="alertMessage" id="errorMessages" rendered="#{! empty facesContext.maximumSeverity}"/>
 
@@ -36,9 +37,9 @@
 			  </h:panelGrid>
 			  
 			  
-			  <h4><h:outputText value="#{msgs.pvt_personal_settings}" /></h4>
+			  <h4><h:outputText value="#{msgs.pvt_personal_settings}"  rendered="#{!PrivateMessagesTool.emailForwardDisabled}"/></h4>
 
-			  <h:panelGrid styleClass="jsfFormTable" columns="2" >
+			  <h:panelGrid styleClass="jsfFormTable" columns="2" rendered="#{!PrivateMessagesTool.emailForwardDisabled}">
 			    <h:panelGroup styleClass="shorttext">
 			      <h:outputLabel for=""><h:outputText	value="#{msgs.pvt_autofor1}" /></h:outputLabel>
 			    </h:panelGroup>
@@ -68,10 +69,10 @@
 		         
                          <h:panelGrid styleClass="jsfFormTable" columns="2" >			  
 				  
-                         <h:panelGroup styleClass="shorttext">
+                         <h:panelGroup styleClass="shorttext" rendered="#{!PrivateMessagesTool.emailCopyDisabled}">
                            <h:outputLabel for="" ><h:outputText value="#{msgs.pvt_sendemailout}"/></h:outputLabel>
                          </h:panelGroup>
-                         <h:panelGroup>
+                         <h:panelGroup rendered="#{!PrivateMessagesTool.emailCopyDisabled}">
                            <h:selectOneRadio id="email_sendout" value="#{PrivateMessagesTool.sendToEmail}"
                                layout="pageDirection"  styleClass="checkbox inlineForm">
                              <f:selectItem itemValue="0" itemLabel="#{msgs.pvt_sendemail_0}" />

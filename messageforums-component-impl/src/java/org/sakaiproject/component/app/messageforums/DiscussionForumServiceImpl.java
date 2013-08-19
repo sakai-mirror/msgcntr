@@ -71,6 +71,7 @@ import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.cover.SiteService;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.util.Validator;
+import org.sakaiproject.util.cover.LinkMigrationHelper;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1349,17 +1350,8 @@ public class DiscussionForumServiceImpl  implements DiscussionForumService, Enti
 	
 	private String replaceAllRefs(String msgBody, Set<Entry<String, String>> entrySet){
 		if(msgBody != null){
-			boolean updated = false;
-			Iterator<Entry<String, String>> entryItr = entrySet.iterator();
-			while(entryItr.hasNext()) {
-				Entry<String, String> entry = (Entry<String, String>) entryItr.next();
-				String fromContextRef = entry.getKey();
-				if(msgBody.contains(fromContextRef)){									
-					msgBody = msgBody.replace(fromContextRef, entry.getValue());
-					updated = true;
-				}								
-			}
-		}	
+			msgBody = LinkMigrationHelper.migrateAllLinks(entrySet, msgBody);
+			}	
 		return msgBody;		
 	}
 

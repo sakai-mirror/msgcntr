@@ -74,10 +74,18 @@ import org.sakaiproject.component.app.messageforums.MembershipItem;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.HiddenGroupImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateMessageImpl;
 import org.sakaiproject.component.app.messageforums.dao.hibernate.PrivateTopicImpl;
+import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.content.api.FilePickerHelper;
 import org.sakaiproject.entity.api.Reference;
+import org.sakaiproject.event.api.Event;
+import org.sakaiproject.event.api.LearningResourceStoreService;
+import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Actor;
+import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Object;
+import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Statement;
+import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Verb;
+import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Verb.SAKAI_VERB;
 import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Group;
@@ -448,7 +456,12 @@ public class PrivateMessagesTool
           initializePrivateMessageArea();
       }
       
-      return area.getSendToEmail() == Area.EMAIL_COPY_ALWAYS;
+      
+      return !isEmailCopyDisabled() && area.getSendToEmail() == Area.EMAIL_COPY_ALWAYS;
+  }
+  
+  public boolean isEmailCopyDisabled(){
+	  return ServerConfigurationService.getBoolean("mc.messages.ccEmailDisabled", false);
   }
   
   /**
@@ -461,7 +474,29 @@ public class PrivateMessagesTool
           initializePrivateMessageArea();
       }
       
-      return area.getSendToEmail() == Area.EMAIL_COPY_OPTIONAL;
+      return !isEmailCopyDisabled() && area.getSendToEmail() == Area.EMAIL_COPY_OPTIONAL;
+  }
+  
+  
+  public boolean isEmailForwardDisabled(){
+	  return ServerConfigurationService.getBoolean("mc.messages.forwardEmailDisabled", false);
+  }
+  
+  public boolean isShowSettingsLink(){
+	  if(isInstructor()){
+		  //if the site has groups, then show the settings link b/c there
+		  //are settings for groups
+		  if(getCurrentSiteHasGroups()){
+			  return true;
+		  }else{
+			  //if no groups and all email settings are disabled, there's no
+			  //settings to show, so don't show the link
+			  return !isEmailForwardDisabled() || !isEmailCopyDisabled();
+		  }
+	  }else{
+		  //students only see forward options, if it's hidden, don't show this link
+		  return !isEmailForwardDisabled();
+	  }
   }
   
   //Return decorated Forum
@@ -1490,6 +1525,10 @@ public void processChangeSelectView(ValueChangeEvent eve)
     }
     //default setting for moveTo
     moveToTopic=selectedTopicId;
+    LearningResourceStoreService lrss = (LearningResourceStoreService) ComponentManager
+            .get("org.sakaiproject.event.api.LearningResourceStoreService");
+    Event event = EventTrackingService.newEvent("msgcntr", "read private message", true);
+    lrss.registerStatement(getStatementForUserReadPvtMsg(lrss.getEventActor(event), getDetailMsg().getMsg().getTitle()), "msgcntr");
     return SELECTED_MESSAGE_PG;
   }
 
@@ -1976,9 +2015,13 @@ private   int   getNum(char letter,   String   a)
 
     //reset contents
     resetComposeContents();
-
-    EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_ADD, getEventMessage(pMsg), false));
-
+    
+    LearningResourceStoreService lrss = (LearningResourceStoreService) ComponentManager
+            .get("org.sakaiproject.event.api.LearningResourceStoreService");
+    Event event = EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_ADD, getEventMessage(pMsg), false);
+    EventTrackingService.post(event);
+    lrss.registerStatement(getStatementForUserSentPvtMsg(lrss.getEventActor(event), pMsg.getTitle(), SAKAI_VERB.shared), "msgcntr");
+    
     if(fromMainOrHp != null && !"".equals(fromMainOrHp))
     {
     	String tmpBackPage = fromMainOrHp;
@@ -2285,6 +2328,10 @@ private   int   getNum(char letter,   String   a)
       getDetailMsg().setHasPre(thisDmb.getHasPre()) ;
 
     }    
+    LearningResourceStoreService lrss = (LearningResourceStoreService) ComponentManager
+            .get("org.sakaiproject.event.api.LearningResourceStoreService");
+    Event event = EventTrackingService.newEvent("msgcntr", "read private message", true);
+    lrss.registerStatement(getStatementForUserReadPvtMsg(lrss.getEventActor(event), getDetailMsg().getMsg().getTitle()), "msgcntr");
     return null;
   }
 
@@ -2336,7 +2383,10 @@ private   int   getNum(char letter,   String   a)
       getDetailMsg().setHasNext(thisDmb.getHasNext());
       getDetailMsg().setHasPre(thisDmb.getHasPre()) ;
     }
-    
+    LearningResourceStoreService lrss = (LearningResourceStoreService) ComponentManager
+            .get("org.sakaiproject.event.api.LearningResourceStoreService");
+    Event event = EventTrackingService.newEvent("msgcntr", "read private message", true);
+        lrss.registerStatement(getStatementForUserReadPvtMsg(lrss.getEventActor(event), getDetailMsg().getMsg().getTitle()), "msgcntr");
     return null;
   }
   
@@ -2580,7 +2630,11 @@ private   int   getNum(char letter,   String   a)
     	
     	if(!rrepMsg.getDraft()){
     		incrementSynopticToolInfo(recipients.keySet(), false);
-    		EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_RESPONSE, getEventMessage(rrepMsg), false));
+    	    LearningResourceStoreService lrss = (LearningResourceStoreService) ComponentManager
+    	            .get("org.sakaiproject.event.api.LearningResourceStoreService");
+    	    Event event = EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_RESPONSE, getEventMessage(rrepMsg), false);
+    	    EventTrackingService.post(event);
+    	    lrss.registerStatement(getStatementForUserSentPvtMsg(lrss.getEventActor(event), getDetailMsg().getMsg().getTitle(), SAKAI_VERB.responded), "msgcntr");
     	}
     	//reset contents
     	resetComposeContents();
@@ -2927,7 +2981,11 @@ private   int   getNum(char letter,   String   a)
     	if(!rrepMsg.getDraft()){
     		//update Synoptic tool info
     		incrementSynopticToolInfo(recipients.keySet(), false);
-    		EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_FORWARD, getEventMessage(rrepMsg), false));
+            LearningResourceStoreService lrss = (LearningResourceStoreService) ComponentManager
+                    .get("org.sakaiproject.event.api.LearningResourceStoreService");
+            Event event = EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_FORWARD, getEventMessage(rrepMsg), false);
+            EventTrackingService.post(event);
+            lrss.registerStatement(getStatementForUserSentPvtMsg(lrss.getEventActor(event), getDetailMsg().getMsg().getTitle(), SAKAI_VERB.responded), "msgcntr");
     	}
     	//reset contents
     	resetComposeContents();    	    	
@@ -3060,18 +3118,18 @@ private   int   getNum(char letter,   String   a)
 			  replyrecipientaddtmp = UserDirectoryService.getUser(tmpPMR.getUserId());
 		  } catch (UserNotDefinedException e) {
 			  // TODO Auto-generated catch block
-			  e.printStackTrace();
+			  LOG.warn("Unable to find user : " + tmpPMR.getUserId(), e);
 		  }
 
-
-		  if (replyrecipientaddtmp == null)
-			  throw new IllegalStateException(
-					  "User replyrecipientaddtmp == null!");
-		  if(!(replyrecipientaddtmp.getDisplayName()).equals(getUserName()) && !tmpPMR.getBcc())//&&(!(replyrecipientaddtmp.getDisplayName()).equals(msgauther)))
-		  {
-			  returnSet.put(replyrecipientaddtmp, tmpPMR.getBcc());
+		  if (replyrecipientaddtmp == null){
+			  LOG.warn("continuing passed user : "+tmpPMR.getUserId());
+			  //throw new IllegalStateException("User replyrecipientaddtmp == null!");
+		  }else{
+		  	if(!(replyrecipientaddtmp.getDisplayName()).equals(getUserName()) && !tmpPMR.getBcc())//&&(!(replyrecipientaddtmp.getDisplayName()).equals(msgauther)))
+		  	{
+				  returnSet.put(replyrecipientaddtmp, tmpPMR.getBcc());
+		        }
 		  }
-
 	  }
 
 	  if(currentMessage.getRecipientsAsText() != null && !"".equals(currentMessage.getRecipientsAsText())){
@@ -3183,7 +3241,11 @@ private   int   getNum(char letter,   String   a)
 		  if(!rrepMsg.getDraft()){
 			  //update Synoptic tool info
 			  incrementSynopticToolInfo(returnSet.keySet(), false);
-			  EventTrackingService.post(EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_FORWARD, getEventMessage(rrepMsg), false));
+	          LearningResourceStoreService lrss = (LearningResourceStoreService) ComponentManager
+	                    .get("org.sakaiproject.event.api.LearningResourceStoreService");
+	          Event event = EventTrackingService.newEvent(DiscussionForumService.EVENT_MESSAGES_FORWARD, getEventMessage(rrepMsg), false);
+	          EventTrackingService.post(event);
+	          lrss.registerStatement(getStatementForUserSentPvtMsg(lrss.getEventActor(event), getDetailMsg().getMsg().getTitle(), SAKAI_VERB.responded), "msgcntr");
 		  }
 		  //reset contents
 		  resetComposeContents();
@@ -5098,4 +5160,30 @@ private   int   getNum(char letter,   String   a)
 		public Locale getUserLocale(){
 			return new ResourceLoader().getLocale();
 		}
+
+    private LRS_Statement getStatementForUserReadPvtMsg(LRS_Actor student, String subject) {
+        String url = ServerConfigurationService.getPortalUrl();
+        LRS_Verb verb = new LRS_Verb(SAKAI_VERB.interacted);
+        LRS_Object lrsObject = new LRS_Object(url + "/privateMessage", "read-private-message");
+        HashMap<String, String> nameMap = new HashMap<String, String>();
+        nameMap.put("en-US", "User read a private message");
+        lrsObject.setActivityName(nameMap);
+        HashMap<String, String> descMap = new HashMap<String, String>();
+        descMap.put("en-US", "User read a private message with subject: " + subject);
+        lrsObject.setDescription(descMap);
+        return new LRS_Statement(student, verb, lrsObject);
+    }
+
+    private LRS_Statement getStatementForUserSentPvtMsg(LRS_Actor student, String subject, SAKAI_VERB sakaiVerb) {
+        String url = ServerConfigurationService.getPortalUrl();
+        LRS_Verb verb = new LRS_Verb(sakaiVerb);
+        LRS_Object lrsObject = new LRS_Object(url + "/privateMessage", "send-private-message");
+        HashMap<String, String> nameMap = new HashMap<String, String>();
+        nameMap.put("en-US", "User sent a private message");
+        lrsObject.setActivityName(nameMap);
+        HashMap<String, String> descMap = new HashMap<String, String>();
+        descMap.put("en-US", "User sent a private message with subject: " + subject);
+        lrsObject.setDescription(descMap);
+        return new LRS_Statement(student, verb, lrsObject);
+    }
 }

@@ -17,6 +17,7 @@
 	<sakai:view toolCssHref="/messageforums-tool/css/msgcntr.css">
        		<script type="text/javascript" src="/library/js/jquery.js"></script>
        		<sakai:script contextBase="/messageforums-tool" path="/js/sak-10625.js"/>
+       		<sakai:script contextBase="/messageforums-tool" path="/js/messages.js"/>
   <h:form id="msgForum">
 <!--jsp\discussionForum\message\dfMsgGrade.jsp-->
 
@@ -142,7 +143,7 @@
               onchange="document.forms[0].submit();">
            <f:selectItems value="#{ForumTool.assignments}" />
          </h:selectOneMenu>
-         <h:outputFormat value=" #{msgs.cdfm_points_possible}" rendered="#{!ForumTool.selGBItemRestricted && ForumTool.gbItemPointsPossible != null}">
+         <h:outputFormat value=" #{msgs.cdfm_points_possible}" rendered="#{!ForumTool.selGBItemRestricted && ForumTool.gbItemPointsPossible != null && ForumTool.gradeByPoints}">
 						<f:param value="#{ForumTool.gbItemPointsPossible}"/>
 					</h:outputFormat>
       </h:panelGroup>
@@ -152,10 +153,13 @@
 				<h:panelGroup  rendered="#{!ForumTool.selGBItemRestricted}">
 					<h:outputLabel for="dfMsgGradeGradePoint" rendered="#{ForumTool.allowedToGradeItem}"  style="padding-bottom:.3em;display:block;clear:both;float:none;white-space:nowrap">
 						<h:outputText value="#{msgs.cdfm_info_required_sign}" styleClass="reqStarInline"  style="padding-right:3px" />
-						<h:outputText  value="#{msgs.cdfm_grade_points}" />
+						<h:outputText  value="#{msgs.cdfm_grade_points}" rendered="#{ForumTool.gradeByPoints}"/>
+						<h:outputText  value="#{msgs.cdfm_grade_percent}" rendered="#{ForumTool.gradeByPercent}"/>
+						<h:outputText  value="#{msgs.cdfm_grade_letter}" rendered="#{ForumTool.gradeByLetter}"/>
 					</h:outputLabel>	
 					<h:panelGroup >
 	    		<h:inputText value="#{ForumTool.gradePoint}" id="dfMsgGradeGradePoint" size="5" rendered="#{ForumTool.allowedToGradeItem}" />
+	    		<h:outputText value="%" rendered="#{ForumTool.gradeByPercent}" />
 						<h:message for="dfMsgGradeGradePoint" styleClass="alertMessage"  rendered="#{ForumTool.allowedToGradeItem}"/>
 	      </h:panelGroup>
 	      
