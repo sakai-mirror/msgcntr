@@ -1,4 +1,3 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 
 <f:verbatim>
     <h:outputText escape="false" value='<div class="sakai-ppkr" id="sakai-ppkr-messages" title="#{msgs.rank_picker_assign_individuals}">'/>
