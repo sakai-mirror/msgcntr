@@ -9897,9 +9897,5 @@ public class DiscussionForumTool
     public boolean isAlwaysShowFullDesc(){
     	return ServerConfigurationService.getBoolean("mc.alwaysShowFullDesc", false); 
     }
-    
-    public String getCurrentToolId(){
-    	return ToolManager.getCurrentPlacement().getId();
-    }
 }
 
