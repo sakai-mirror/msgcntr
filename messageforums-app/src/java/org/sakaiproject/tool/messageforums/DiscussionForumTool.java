@@ -2386,7 +2386,12 @@ public class DiscussionForumTool
 	  String currentUserId = getUserId();
 	  List<String> currentUser = new ArrayList<String>();
 	  currentUser.add(currentUserId);
+	  if (selectedTopic == null) {
+	      LOG.warn("selectedTopic null in getNeedToPostFirst");
+	      return true;
+	  } else {
 	  return getNeedToPostFirst(currentUser, selectedTopic.getTopic(), selectedTopic.getMessages()).contains(currentUserId);
+  }
   }
 
   /**
