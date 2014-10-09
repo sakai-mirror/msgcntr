@@ -22,6 +22,7 @@ package org.sakaiproject.component.app.messageforums.ui;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1030,7 +1031,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
   
   public void decrementMessagesSynopticToolInfo(String userId, String siteId, int numOfAttempts) {
 		try {
-			SynopticMsgcntrManagerCover.decrementMessagesSynopticToolInfo(userId, siteId);
+			SynopticMsgcntrManagerCover.decrementMessagesSynopticToolInfo(Arrays.asList(userId), siteId);
 		} catch (HibernateOptimisticLockingFailureException holfe) {
 
 			// failed, so wait and try again
@@ -1058,7 +1059,7 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
 
   public void incrementMessagesSynopticToolInfo(String userId, String siteId , int numOfAttempts) {
 		try {
-			SynopticMsgcntrManagerCover.incrementMessagesSynopticToolInfo(userId, siteId);
+			SynopticMsgcntrManagerCover.incrementMessagesSynopticToolInfo(Arrays.asList(userId), siteId);
 		} catch (HibernateOptimisticLockingFailureException holfe) {
 
 			// failed, so wait and try again
