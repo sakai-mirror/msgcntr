@@ -336,7 +336,7 @@
 					<f:param value="#{ForumTool.selectedForum.forum.id}" name="forumId"/>
 				</h:commandLink>
 
-			 </h:panelGroup>
+			 </h:panelGroup>
 		</h:form>
 	</sakai:view>
 </f:view>
