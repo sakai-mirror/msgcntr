@@ -8835,6 +8835,7 @@ public class DiscussionForumTool
             if (currentGroup.getCreateTopicForGroup()==true) {
                 groupSelected = true;
                 selectedTopic = createTopic(topicTempate.getTopic().getBaseForum().getId());
+                selectedTopic.setGradeAssign(topicTempate.getGradeAssign());
                 DiscussionTopic thisTopic = selectedTopic.getTopic();
                 thisTopic.setTitle(topicTempate.getTopic().getTitle() + " - " + currentGroup.getGroup().getTitle());
                 thisTopic.setShortDescription(topicTempate.getTopic().getShortDescription());
@@ -8847,7 +8848,8 @@ public class DiscussionForumTool
                 thisTopic.setCloseDate(topicTempate.getTopic().getCloseDate());
                 thisTopic.setAutoMarkThreadsRead(topicTempate.getTopic().getAutoMarkThreadsRead());
                 thisTopic.setGradebookAssignment(topicTempate.getTopic().getGradebookAssignment());
-                
+
+
                 // Attachments
                 attachments.clear();
                 for (Iterator attachmentIterator = attachmentsTemplate.iterator(); attachmentIterator.hasNext();) {
